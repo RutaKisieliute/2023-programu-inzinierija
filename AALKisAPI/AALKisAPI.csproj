@@ -7,6 +7,7 @@
 		<OutputPath>./build/$(Configuration)</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DefineConstants Condition="'$(Configuration)' == 'Debug'">DEBUG</DefineConstants>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
