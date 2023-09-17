@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AALKisAPI", "AALKisAPI\AALKisAPI.csproj", "{38804E6C-734D-4D24-AF31-3FC33161CF44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AALKisUI", "AALKisUI\AALKisUI.csproj", "{DC8ECC45-0A4B-4EF7-B7E7-EEFEBDEFAED0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{38804E6C-734D-4D24-AF31-3FC33161CF44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38804E6C-734D-4D24-AF31-3FC33161CF44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{38804E6C-734D-4D24-AF31-3FC33161CF44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC8ECC45-0A4B-4EF7-B7E7-EEFEBDEFAED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8ECC45-0A4B-4EF7-B7E7-EEFEBDEFAED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC8ECC45-0A4B-4EF7-B7E7-EEFEBDEFAED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC8ECC45-0A4B-4EF7-B7E7-EEFEBDEFAED0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
