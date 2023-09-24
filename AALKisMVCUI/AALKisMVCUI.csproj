@@ -8,6 +8,11 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DefineConstants Condition="'$(Configuration)' == 'Debug'">DEBUG</DefineConstants>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+		<UseAppHost>false</UseAppHost>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="../AALKisShared/**/*.*" Link="AALKisShared/%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
 
 </Project>
