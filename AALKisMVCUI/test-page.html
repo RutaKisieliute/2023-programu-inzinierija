@@ -1,98 +1,13 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <style>
-* {
-    box-sizing: border-box;
-    top: 0px;
-    bottom: 0px;
-    left: 0px;
-    right: 0px;
-    padding: 0px;
-    margin: 0px;
-}
-
-div.note-container {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-}
-
-div.note-container > * {
-    margin: 10px 20px;
-}
-
-div.note-container button.reset-storage {
-    height: 50px;
-    width: 150px;
-}
-
-div.note-container textarea.note-area {
-    height: 100%;
-    resize: none;
-}
-        </style>
+        <link rel="stylesheet" href="test-style.css"></link>
     </head>
     <body>
         <div class="note-container">
-            <button class="reset-storage">Reset Storage</button>
+            <button class="reset-storage">Reset Saved Data</button>
             <textarea class="note-area"></textarea>
         </div>
+        <script src="test-script.js"></script>
     </body>
-    <script>
-
-function startup()
-{
-    // note-area textarea
-    {
-        let noteAreas = document.body.getElementsByClassName("note-area");
-        for(let i = 0; i < noteAreas.length; ++i)
-        {
-            let noteArea = noteAreas[i];
-            noteArea.value = localStorage.getItem(noteAreaIdentifier(noteArea));
-            noteAreaUpdateHTML(noteArea);
-            noteArea.setAttribute("oninput", "noteAreaUpdateHTML(this);");
-            noteArea.setAttribute("onchange", "noteAreaSave(this);");
-            //console.log(noteArea);
-        }
-    }
-
-    // reset-storage button
-    {
-        let buttons = document.body.getElementsByClassName("reset-storage");
-        for(let i = 0; i < buttons.length; ++i)
-        {
-            let button = buttons[i];
-            button.setAttribute("onclick", "localStorage.clear();")
-        }
-    }
-
-}
-
-const noteAreaIdentifier = (noteArea) => noteArea.className + "/" + noteArea.id;
-
-function noteAreaUpdateHTML(noteArea)
-{
-    noteArea.setHTML(noteArea.value);
-}
-
-function noteAreaSave(noteArea)
-{
-    localStorage.setItem(noteAreaIdentifier(noteArea), noteArea.value);
-    let postBody = {
-        "identifier": noteAreaIdentifier(noteArea),
-        "value": noteArea.value
-    };
-    fetch("http://localhost:5001", postBody)
-        .then((response) => {
-            if(!response.ok)
-                return;
-            console.warn(response);
-        });
-}
-
-startup();
-    </script>
 </html>
