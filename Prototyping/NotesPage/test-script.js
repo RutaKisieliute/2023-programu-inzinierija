@@ -1,3 +1,5 @@
+const DEBUG = true;
+
 function startup()
 {
     // note-area textarea
@@ -25,43 +27,31 @@ function startup()
     }
 }
 
-function escapeHTML(str)
-{
-    return str
-        .replace(/[&<>\"\']/g, (ch) => {
-            switch(ch)
-            {
-                case('&'):
-                    return "&amp;";
-                case('<'):
-                    return "&lt;";
-                case('>'):
-                    return "&gt;";
-                case('"'):
-                    return "&quot;";
-                case("'"):
-                    return "&#039;";
-            }
-        });
-}
-
 const noteAreaIdentifier = (noteArea) => noteArea.className + "/" + noteArea.id;
+
+// https://stackoverflow.com/questions/494143
+function createElementFromHTML(htmlString) {
+    let div = document.createElement('div');
+    div.innerHTML = htmlString.trim();
+    return div.childNodes;
+}
 
 function noteAreaUpdateHTML(noteArea)
 {
-    let noteText = escapeHTML(noteArea.value);
+    let noteText = noteArea.value;
     noteArea.setHTML(noteText);
+    //noteArea.replaceChildren(...createElementFromHTML(noteText));
     console.log(noteText);
 }
 
 function noteAreaSave(noteArea)
 {
-    let noteText = escapeHTML(noteArea.value);
+    let noteText = noteArea.value;
     localStorage.setItem(noteAreaIdentifier(noteArea), noteText);
-    let postBody = {
-        "identifier": noteAreaIdentifier(noteArea),
-        "value": noteText
-    };
+    //let postBody = {
+    //    "identifier": noteAreaIdentifier(noteArea),
+    //    "value": noteText
+    //};
     //fetch("http://localhost:5001", postBody)
     //    .then((response) => {
     //        if(!response.ok)
