@@ -12,7 +12,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="../AALKisShared/**/*.*" Link="AALKisShared/%(RecursiveDir)%(Filename)%(Extension)" />
+		<ProjectReference Include="../AALKisShared/AALKisShared.csproj" />
+		<!--<Reference Include="AALKisShared">
+			<HintPath>../AALKisShared/build/AALKisShared.dll</HintPath>
+			<Private>False</Private>
+		</Reference>-->
 	</ItemGroup>
 
 </Project>
