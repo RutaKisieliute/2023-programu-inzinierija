@@ -1,16 +1,9 @@
 #!/bin/bash -x
-cd $(dirname $0)
+export ASPNETCORE_ENVIRONMENT='Development'
 
-dotnet dev-certs https
-sudo -E dotnet dev-certs https -ep /usr/local/share/ca-certificates/aspnet/https.crt --format PEM
-sudo update-ca-certificates
-mkdir -p $HOME/.pki/nssdb
-sudo certutil -d sql:$HOME/.pki/nssdb -A -t "P,," -n localhost -i /usr/local/share/ca-certificates/aspnet/https.crt
-sudo certutil -d sql:$HOME/.pki/nssdb -A -t "C,," -n localhost -i /usr/local/share/ca-certificates/aspnet/https.crt
+EXEC_DIR=$(dirname $(realpath $0))
+cd $EXEC_DIR
 
-dotnet run --project ./AALKisMVCUI/AALKisMVCUI.csproj --configuration Debug
+dotnet run --project ./AALKisMVCUI/AALKisMVCUI.csproj --configuration Debug --launch-profile 'https'
 
-dotnet dev-certs https --clean
-sudo rm -r /usr/local/share/ca-certificates/aspnet
-sudo update-ca-certificates
-sudo certutil -d sql:$HOME/.pki/nssdb -D -n localhost
+dotnet clean ./AALKisMVCUI/AALKisMVCUI.csproj
