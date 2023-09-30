@@ -1,0 +1,10 @@
+@model AALKisMVCUI.Models.CategoryModel
+
+<h1>@Model.Name</h1>
+<h2>Published notes for @Model.Name go here.</h2>
+<h3><ul>
+    @foreach(string x in Model.Notes){
+        string link = "aaa";
+        <ul><a href=@link>@x</a></ul>
+    }
+</ul></h3>
