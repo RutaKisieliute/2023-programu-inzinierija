@@ -39,27 +39,35 @@ public class CategoriesController : Controller
 
     public IActionResult C(string id)
     {
-        List<string> cats = new List<string>(0);
+        List<string>? cats = new List<string>(0);
+        List<string>? NoteList;
+        string [] PostSplit;
+        List<(string, string)> NoteList2 = new List<(string, string)>(0);
         HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "CategoryList").Result;
         if(response.IsSuccessStatusCode)
         {
             string data = response.Content.ReadAsStringAsync().Result;
             cats = JsonSerializer.Deserialize<List<string>>(data);
         }
-        if(cats.Contains(id))
+        if(cats != null && cats.Contains(id))
         {
-            var NoteList = new List<string>(0);
-            NoteList.Add("note1");
-            NoteList.Add("note2");
-            NoteList.Add("note3");
-            NoteList.Add("note4");
-            NoteList.Add("another note");
-
-            var notes = new CategoryModel{
-                Notes = NoteList,
-                Name = id
-            };
-            return View(notes);
+            response = _client.GetAsync(_client.BaseAddress + "NoteList?category=" + id).Result;
+            if(response.IsSuccessStatusCode)
+            {
+                string data = response.Content.ReadAsStringAsync().Result;
+                NoteList = JsonSerializer.Deserialize<List<string>>(data);
+                foreach(string str in NoteList)
+                {
+                    PostSplit = str.Split(';');
+                    NoteList2.Add((PostSplit[0], PostSplit[1]));
+                }
+                var notes = new CategoryModel
+                {
+                    Notes = NoteList2,
+                    Name = id
+                };
+                return View(notes);
+            }
         }
         return Error();
     }
