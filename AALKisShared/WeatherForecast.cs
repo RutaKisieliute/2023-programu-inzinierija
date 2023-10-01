@@ -1,4 +1,4 @@
-namespace AALKisAPI;
+namespace AALKisShared;
 
 public class WeatherForecast
 {
