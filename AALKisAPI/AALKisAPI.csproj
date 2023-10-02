@@ -14,4 +14,12 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<ProjectReference Include="../AALKisShared/AALKisShared.csproj" />
+		<!--<Reference Include="AALKisShared">
+			<HintPath>../AALKisShared/build/AALKisShared.dll</HintPath>
+			<Private>False</Private>
+		</Reference>-->
+	</ItemGroup>
+
 </Project>
