@@ -34,7 +34,12 @@ namespace AALKisMVCUI.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsStringAsync();
-                entries = JsonSerializer.Deserialize<List<DictionaryModel>>(data);
+                _logger.Log(LogLevel.Error, $"{data}");
+                var strEntries = JsonSerializer.Deserialize<List<string>>(data);
+                entries.AddRange(from str in strEntries
+                        select new DictionaryModel(0,
+                            str.Split(';')[0],
+                            str.Split(';')[1]));
             }
 
             return View(entries);
