@@ -1,0 +1,9 @@
+@model AALKisMVCUI.Models.CategoryModel
+
+<h1>@Model.Name</h1>
+<h2>Published notes for @Model.Name go here.</h2>
+<h3><ul>
+    @foreach((string st1, string st2) in Model.Notes){
+        <ul>@Html.ActionLink(st1, "N", "Note", new {id=st2})</ul>
+    }
+</ul></h3>
