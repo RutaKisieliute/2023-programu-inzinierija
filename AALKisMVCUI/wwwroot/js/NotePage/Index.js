@@ -1,3 +1,5 @@
+var pageHost;
+var pagePath;
 var mainNoteContainerDiv;
 var mainClearNoteDataButton;
 var mainNoteAreaTextarea;
@@ -9,6 +11,9 @@ var mainNoteAreaTextarea;
  */
 function startup()
 {
+    pageHost = window.location.protocol + "//" + window.location.host;
+    pagePath = window.location.pathname;
+
     mainNoteContainerDiv = document.getElementById("main-note-container");
 
     mainClearNoteDataButton = document.getElementById("main-clear-note-data");
@@ -44,16 +49,16 @@ function saveNoteArea(noteArea)
 {
     let noteText = noteArea.value;
     localStorage.setItem(noteArea.id, noteText);
-    //let postBody = {
-    //    "identifier": noteAreaIdentifier(noteArea),
-    //    "value": noteText
-    //};
-    //fetch("http://localhost:5001", postBody)
-    //    .then((response) => {
-    //        if(!response.ok)
-    //            return;
-    //        console.warn(response);
-    //    });
+    let postBody = {
+        Id: noteArea.id,
+        Contents: noteText
+    };
+    fetch(pageHost + pagePath + "/NotePost", {
+        method: "POST",
+        body: JSON.stringify(postBody)
+    })
+        .then((response) => console.log(response),
+            (response) => console.warn(response));
 }
 
 /**

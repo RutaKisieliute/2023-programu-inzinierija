@@ -8,12 +8,13 @@ public static class FileStreamExtensions
     {
         byte[] contents = new byte[(int)file.Length];
         file.Read(contents, 0, (int)file.Length);
-        return Encoding.ASCII.GetString(contents);
+        return Encoding.UTF8.GetString(contents);
     }
 
     public static void WriteString(this FileStream file, string str)
     {
-        byte[] contents = Encoding.ASCII.GetBytes(str);
+        byte[] contents = Encoding.UTF8.GetBytes(str);
         file.Write(contents, 0, contents.Length);
+        file.Flush();
     }
 }
