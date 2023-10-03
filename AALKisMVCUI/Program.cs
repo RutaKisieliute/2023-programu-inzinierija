@@ -1,6 +1,8 @@
+using AALKisMVCUI.Utility;
+
 namespace AALKisMVCUI;
 
-public class Program
+public static class Program
 {
     public static void Main(string[] args)
     {
@@ -8,7 +10,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
-        builder.Services.AddHttpClient();
+        builder.Services.AddHttpClient<APIClient>();
 
         var app = builder.Build();
 
