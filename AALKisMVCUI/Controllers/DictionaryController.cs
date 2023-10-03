@@ -13,7 +13,7 @@ namespace AALKisMVCUI.Controllers
 {
     public class DictionaryController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<DictionaryController> _logger;
 
         private readonly Uri baseAddress = new Uri("https://localhost:7014");
         private readonly HttpClient _client;
@@ -27,14 +27,14 @@ namespace AALKisMVCUI.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<DictionaryEntry> entries = new List<DictionaryEntry>();
+            List<DictionaryModel> entries = new List<DictionaryModel>();
 
             HttpResponseMessage response = await _client.GetAsync("api/DictionaryEntries");
 
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsStringAsync();
-                entries = JsonSerializer.Deserialize<List<DictionaryEntry>>(data);
+                entries = JsonSerializer.Deserialize<List<DictionaryModel>>(data);
             }
 
             return View(entries);
@@ -47,13 +47,13 @@ namespace AALKisMVCUI.Controllers
                 return NotFound();
             }
 
-            DictionaryEntry dictionaryEntry = null;
+            DictionaryModel dictionaryEntry = null;
             HttpResponseMessage response = await _client.GetAsync($"api/DictionaryEntries/{id}");
 
             if (response.IsSuccessStatusCode)
             {
                 var data = await response.Content.ReadAsStringAsync();
-                dictionaryEntry = JsonSerializer.Deserialize<DictionaryEntry>(data);
+                dictionaryEntry = JsonSerializer.Deserialize<DictionaryModel>(data);
             }
 
             if (dictionaryEntry == null)
@@ -71,7 +71,7 @@ namespace AALKisMVCUI.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(DictionaryEntry dictionaryEntry)
+        public async Task<IActionResult> Create(DictionaryModel dictionaryEntry)
         {
             if (ModelState.IsValid)
             {
