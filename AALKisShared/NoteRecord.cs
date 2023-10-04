@@ -1,20 +1,14 @@
+using AALKisShared.Utility;
+
 namespace AALKisShared;
 
 public record struct NoteRecord
 {
-    public string Id { get; set; } = "";
+    public string Name { get; set; }
 
-    public string Contents { get; set; } = "";
-
-    public DateTime Date { get; set; } = DateTime.MinValue;
-
-    public NoteRecord() {
-        Date = DateTime.Now;
-    }
-
-    public NoteRecord(string id, string contents) : this()
+    public static NoteRecord FromFile(string path)
     {
-        Id = id;
-        Contents = contents;
+        return JsonFileReader<NoteRecord>.JsonFileToType(path);
     }
 }
+

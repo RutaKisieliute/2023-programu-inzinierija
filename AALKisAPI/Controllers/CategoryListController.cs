@@ -19,7 +19,7 @@ public class CategoryListController : ControllerBase
         //right now it reads from a .txt file but eventually it should read from a database
         string input;
         List<string> list = new List<string>();
-        StreamReader reader = new StreamReader("../DataBase/Categories.txt");
+        StreamReader reader = new StreamReader("DataBase/Categories.txt");
         try
         {
             do
