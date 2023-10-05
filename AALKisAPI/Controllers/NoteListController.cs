@@ -16,7 +16,7 @@ public class NoteListController : ControllerBase
     [HttpGet]
     public IEnumerable<string> Get(string category)
     {
-        string adress = "../DataBase/";
+        string adress = "DataBase/";
         string input;
         List<string> list = new List<string>();
         StreamReader reader = new StreamReader(adress + category + ".txt");
