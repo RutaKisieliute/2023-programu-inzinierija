@@ -18,7 +18,7 @@ public class NotesViewController : Controller
 
     public async Task<IActionResult> Index()
     {
-        string targetUri = "/NoteCategories";
+        string targetUri = "/NoteCatalog/Get";
 
         string contents = await _client.GetContents(targetUri);
 
