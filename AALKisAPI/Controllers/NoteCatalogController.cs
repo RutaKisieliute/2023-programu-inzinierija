@@ -115,7 +115,7 @@ public class NoteCatalogController : ControllerBase
             return;
         }
 
-        (new NoteRecord {Name = note, Text = ""}).SaveToJson($"{baseDirectory}/{category}");
+        (new NoteRecord {Name = note, Text = ""}).SaveToJsonFile($"{baseDirectory}/{category}");
         return;
     }
 
@@ -157,10 +157,27 @@ public class NoteCatalogController : ControllerBase
     }
 
     [HttpPut("[action]/{category}/{note}")]
-    public void Put(string category, string note)
+    public async void Put(string category, string note)
     {
-        _logger.LogWarning("Put is not yet implemented");
-        Response.StatusCode = StatusCodes.Status400BadRequest;
+        if(!Exists(category))
+        {
+            _logger.LogWarning($"Attempted to put to missing category {category}");
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+
+        if(!Exists(category, note))
+        {
+            _logger.LogWarning($"Attempted to put to missing note {note} from category {category}");
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+            return;
+        }
+
+        string body = await new StreamReader(Request.Body).ReadToEndAsync();
+
+        NoteRecord record = NoteRecord.FromJsonString(body, note);
+        record.SaveToJsonFile($"{baseDirectory}/{category}");
+
         return;
     }
 }

@@ -5,6 +5,7 @@ namespace AALKisShared;
 
 public record struct NoteRecord
 {
+    [JsonIgnore]
     public string Name { get; set; }
 
     public string Text { get; set; }
@@ -17,16 +18,23 @@ public record struct NoteRecord
         }
 
         NoteRecord record = readContents
-                ? JsonFileReaderWriter<NoteRecord>.JsonFileToType(path)
+                ? JsonFileReaderWriter.JsonFileToType<NoteRecord>(path)
                 : new NoteRecord();
 
         record.Name = Path.GetFileNameWithoutExtension(path);
         return record;
     }
 
-    public void SaveToJson(string directory)
+    public static NoteRecord FromJsonString(string json, string name)
     {
-        JsonFileReaderWriter<NoteRecord>.TypeToJsonFile(this, $"{directory}/{this.Name}.json");
+        NoteRecord result = JsonConvert.DeserializeObject<NoteRecord>(json);
+        result.Name = name;
+        return result;
+    }
+
+    public void SaveToJsonFile(string directory)
+    {
+        JsonFileReaderWriter.TypeToJsonFile<NoteRecord>(this, $"{directory}/{this.Name}.json");
     }
 }
 

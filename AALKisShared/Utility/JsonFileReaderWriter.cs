@@ -2,9 +2,9 @@ using Newtonsoft.Json;
 
 namespace AALKisShared.Utility;
 
-public class JsonFileReaderWriter<T>
+public static class JsonFileReaderWriter
 {
-    public static T? JsonFileToType(string path)
+    public static T? JsonFileToType<T>(string path)
     {
         using(FileStream file = new FileStream(path, FileMode.Open, FileAccess.Read))
         {
@@ -13,7 +13,7 @@ public class JsonFileReaderWriter<T>
         }
     }
 
-    public static void TypeToJsonFile(T obj, string path)
+    public static void TypeToJsonFile<T>(T obj, string path)
     {
         string json = JsonConvert.SerializeObject(obj);
         using(FileStream file = new FileStream(path, FileMode.Create, FileAccess.Write))
