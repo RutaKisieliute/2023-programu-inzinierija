@@ -1,15 +1,45 @@
-.media-scroller {
-    background: #fff;
-    display: grid;
-    gap: 2rem;
-    grid-auto-flow: column;
-    grid-auto-columns: 19.5rem;
-    padding: 0 1rem 1rem;
-    overflow-x: auto;
-    overscroll-behavior-inline: contain;
+.container {
+    max-width: 100% !important; /*Remove boostrap container's default "margins" from the sides*/
 }
 
+.catalog {
+    margin: 0 0 1rem 0;
+}
 
+.catalog-name {
+    padding: 0 0 0 1rem;
+    
+    font-size: 1.5rem;
+}
+
+.catalog-name:before {
+    content: url(../../svg/drag_icon.svg);
+    display: block;
+    height: 1.5rem;
+    width: 1.5rem;
+    float: left;
+    margin: 4px 6px 0 0;
+    cursor: grab;
+}
+
+.fader {
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 90%);
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    top: 70%;
+    border-radius: 0 0 10px 10px;
+}
+
+.media-scroller {
+    display: grid;
+    gap: 1.5rem;
+    grid-auto-flow: column;
+    grid-auto-columns: 15rem;
+    padding: 0.5rem 1rem 1rem 1rem;
+    overflow-x: scroll;
+    overscroll-behavior-inline: contain;
+}
 
 .media-element {
     position: relative;
@@ -17,23 +47,22 @@
     grid-template-rows: min-content;
     gap: 1rem;
     padding: 1rem;
-    background: #green;
+    background: #fff;
     border-radius: 10px;
-    box-shadow: 0 0 10px #aaa;
+    border: 1px solid #aaa;
 }
 
-    .media-element:hover {
-        .bar
-
-{
-    background: #ffa530;
+.media-element:hover {
+    .bar {background: #ffa530;}
+    border: 1px solid #ffa530;
+    cursor: pointer;
 }
 
-}
+
 
 .media-element > .paragraph {
     inline-size: 100%;
-    height: 18.5rem;
+    height: 15rem;
     overflow: hidden;
 }
 
@@ -44,7 +73,7 @@
 
 .snaps-inline > * {
     scroll-snap-align: start;
-}
+} 
 
 .snaps-inline > *:last-child {
     scroll-snap-align: end;
@@ -52,14 +81,13 @@
 
 .title {
     margin: 0px;
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.1rem;
     color: #3D3D3D;
 }
 
 .paragraph {
     margin: 0px;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     color: #727272;
 }
 
@@ -72,10 +100,16 @@
 
 .bar {
     background: #aaa;
-    width: 120px;
-    height: 17px;
+    width: 80px;
+    height: 12px;
     border-radius: 5px;
     position: absolute;
     top: 55%;
-    left: 31%;
+    left: 34%;
+}
+
+.prevent-select {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
