@@ -14,33 +14,24 @@ public class APIClient
         return;
     }
 
-    public async Task<string> GetContents(string requestUri)
+    public async Task<string?> Fetch(string uri, HttpMethod method, string? content = null)
     {
-        HttpResponseMessage response = await Client.GetAsync(requestUri);
-
+        HttpRequestMessage request = new HttpRequestMessage(method, uri);
+        if(content != null)
+        {
+            request.Content = new StringContent(content);
+        }
+        HttpResponseMessage response = Client.Send(request);
         if(!response.IsSuccessStatusCode)
         {
-            throw new BadHttpRequestException($"API server is running,"
-                    + " but failed to get {requestUri}",
+            throw new BadHttpRequestException($"Failed to execute fetch"
+                    + $" to {uri} with {method} {content}",
                     (int)response.StatusCode);
         }
-
-        string contents = await response.Content.ReadAsStringAsync();
-
-        return contents;
-    }
-
-    public async void PostContents(string requestUri, HttpContent content)
-    {
-        HttpResponseMessage response = await Client.PostAsync(requestUri, content);
-
-        if(!response.IsSuccessStatusCode)
+        if(response == null || response.Content.Headers.ContentLength == 0)
         {
-            throw new BadHttpRequestException($"API server is running,"
-                    + " but failed to post {requestUri}",
-                    (int)response.StatusCode);
+            return null;
         }
-
-        return;
+        return await response.Content.ReadAsStringAsync();
     }
 }

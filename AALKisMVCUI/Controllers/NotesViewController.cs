@@ -20,10 +20,10 @@ public class NotesViewController : Controller
     {
         string targetUri = "/NoteCatalog/Get";
 
-        string contents = await _client.GetContents(targetUri);
-
-        var categories = JsonConvert.DeserializeObject<List<NoteCategoryRecord>>(contents)
+        string contents = await _client.Fetch(targetUri, HttpMethod.Get)
             ?? throw new JsonException($"Got empty response from {targetUri}");
+
+        var categories = JsonConvert.DeserializeObject<List<NoteCategoryRecord>>(contents);
 
         return View(categories);
     }
