@@ -5,7 +5,6 @@ namespace AALKisShared;
 
 public record struct NoteRecord
 {
-    [JsonIgnore]
     public string Name { get; set; }
 
     public string Text { get; set; }
@@ -25,16 +24,24 @@ public record struct NoteRecord
         return record;
     }
 
-    public static NoteRecord FromJsonString(string json, string name)
+    public static NoteRecord FromJsonString(string json, string? name = null)
     {
         NoteRecord result = JsonConvert.DeserializeObject<NoteRecord>(json);
-        result.Name = name;
+        if(name != null)
+        {
+            result.Name = name;
+        }
         return result;
     }
 
     public void SaveToJsonFile(string directory)
     {
         JsonFileReaderWriter.TypeToJsonFile<NoteRecord>(this, $"{directory}/{this.Name}.json");
+    }
+
+    public string ToJsonString()
+    {
+        return JsonConvert.SerializeObject(this);
     }
 }
 
