@@ -2,8 +2,19 @@
 
 <h1>@Model.Name</h1>
 <h2>Published notes for @Model.Name go here.</h2>
-<h3><ul>
-    @foreach((string st1, string st2) in Model.Notes){
+@{
+if(Model.Notes == null || Model.Notes.Count == 0)
+{
+    <h1>No notes exist in this category.</h1>
+}
+else
+{
+    Console.WriteLine(Model.Notes.Count);
+    <h3><ul>
+    @foreach((string st1, string st2) in Model.Notes)
+    {
         <ul>@Html.ActionLink(st1, "N", "Note", new {id=st2})</ul>
     }
-</ul></h3>
+    </ul></h3>
+}
+}

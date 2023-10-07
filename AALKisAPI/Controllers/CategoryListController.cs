@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Controllers;
 
@@ -16,21 +17,26 @@ public class CategoryListController : ControllerBase
     [HttpGet]
     public IEnumerable<string> Get()
     {
-        //right now it reads from a .txt file but eventually it should read from a database
-        string input;
         List<string> list = new List<string>();
-        StreamReader reader = new StreamReader("DataBase/Categories.txt");
-        try
+        using (MySqlConnection con = new MySqlConnection("server=sql11.freesqldatabase.com;user=sql11651620;database=sql11651620;port=3306;password=HmgC9rDhfQ"))
         {
-            do
+            con.Open();
+            MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT tag FROM tags", con);
+            MySqlDataReader reader;
+            try
             {
-                input = reader.ReadLine();
-                list.Add(input);
-            }while(input != null);
-        }
-        catch(Exception e)
-        {
-            return null;
+                reader = cmd.ExecuteReader();
+            }
+            catch(Exception e)
+            {
+                _logger.LogError(e.ToString());
+                return list;
+            }
+            while(reader.Read())
+            {
+                list.Add(reader["tag"].ToString());
+            }
+            reader.Close();
         }
         return list;
     }

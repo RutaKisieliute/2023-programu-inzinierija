@@ -39,7 +39,7 @@ public class CategoriesController : Controller
 
     public IActionResult C(string id)
     {
-        List<string>? cats = new List<string>(0);
+        List<string>? categs = new List<string>(0);
         List<string>? NoteList;
         string [] PostSplit;
         List<(string, string)> NoteList2 = new List<(string, string)>(0);
@@ -47,9 +47,9 @@ public class CategoriesController : Controller
         if(response.IsSuccessStatusCode)
         {
             string data = response.Content.ReadAsStringAsync().Result;
-            cats = JsonSerializer.Deserialize<List<string>>(data);
+            categs = JsonSerializer.Deserialize<List<string>>(data);
         }
-        if(cats != null && cats.Contains(id))
+        if(categs != null && categs.Contains(id))
         {
             response = _client.GetAsync(_client.BaseAddress + "NoteList?category=" + id).Result;
             if(response.IsSuccessStatusCode)
