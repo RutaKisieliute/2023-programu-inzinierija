@@ -10,10 +10,10 @@
 
 <div class="container editor-container">
     <h1>Currently editing "@(Model.Name)"</h1>
-    <span class="textarea" role="textbox" contenteditable>@Html.Raw(Model.Text)</span>
+    <span id="editor-textarea" role="textbox" contenteditable>@Html.Raw(Model.Text)</span>
 </div>
 <footer>
-        <div class="editor-status">Foo!</div>
+        <div id="editor-status"></div>
 </footer>
 
 @section Scripts {

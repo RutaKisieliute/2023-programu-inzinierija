@@ -10,7 +10,7 @@ public class NoteCatalogController : ControllerBase
 {
     private readonly ILogger<NoteCatalogController> _logger;
 
-    private readonly string baseDirectory = "./DataBase/Categories";
+    private readonly string baseDirectory = "./DataBase/Catalog";
 
     public NoteCatalogController(ILogger<NoteCatalogController> logger)
     {

@@ -6,7 +6,7 @@
     flex-flow: column;
 }
 
-.textarea {
+#editor-textarea {
     display: block;
 
     width: 100%;
@@ -25,7 +25,7 @@
     flex: 1 1 auto;
 }
 
-.editor-status {
+#editor-status {
     min-height: 1em;
     line-height: 1em;
     margin: 0.5em;

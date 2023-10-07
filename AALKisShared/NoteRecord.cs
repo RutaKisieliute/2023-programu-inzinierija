@@ -21,6 +21,7 @@ public record struct NoteRecord
                 : new NoteRecord();
 
         record.Name = Path.GetFileNameWithoutExtension(path);
+
         return record;
     }
 
