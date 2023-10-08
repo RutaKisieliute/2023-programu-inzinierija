@@ -4,6 +4,7 @@ using AALKisMVCUI.Models;
 using System.Text.Json.Serialization;
 using Microsoft.JSInterop.Implementation;
 using System.Text.Json;
+using AALKisMVCUI.Utility;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -12,24 +13,39 @@ public class NoteController : Controller
     private readonly ILogger<HomeController> _logger;
 
     readonly Uri baseAddress = new Uri("https://localhost:7014");
-    private readonly HttpClient _client;
+    //private readonly HttpClient _client;
+    private readonly APIClient _client;
 
-    public NoteController(ILogger<HomeController> logger)
+    public NoteController(ILogger<HomeController> logger, APIClient client)
     {
         _logger = logger;
-        _client = new HttpClient();
-        _client.BaseAddress = baseAddress;
+        _client = client;
     }
 
     public IActionResult Index()
     {
-        return Error();
+        return Redirect("/Note/Error");
     }
 
-    public IActionResult N(string code)
+    public async Task<IActionResult> N(string id)
     {
-        //API call goes here
-        return View(new NoteModel{text = "Notes are not implemented yet."});
+        string? data = null;
+        try
+        {
+            data = await _client.Fetch($"/NoteFetch?id={id}", HttpMethod.Get);
+        }
+        catch(Exception e)
+        {
+            _logger.LogError(e.Message);
+            return View("error");
+        }
+        List<string> NoteData = JsonSerializer.Deserialize<List<string>>(data) ?? new List<string>{"", "", ""};
+        NoteModel note = new NoteModel{
+            Name = NoteData[0],
+            Author = NoteData[1],
+            Content = NoteData[2]
+        };
+        return View(note);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

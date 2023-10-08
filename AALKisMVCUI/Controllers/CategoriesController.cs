@@ -51,7 +51,7 @@ public class CategoriesController : Controller
         }
         if(categs != null && categs.Contains(id))
         {
-            response = _client.GetAsync(_client.BaseAddress + "NoteList?category=" + id).Result;
+            response = _client.GetAsync(_client.BaseAddress + "NoteList?tag=" + id).Result;
             if(response.IsSuccessStatusCode)
             {
                 string data = response.Content.ReadAsStringAsync().Result;
