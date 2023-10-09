@@ -29,11 +29,10 @@ public class NoteEditorController : Controller
     {
         try
         {
-            string content = await _client.Fetch($"NoteCatalog/Exists/{category}/{note}",
-                    HttpMethod.Get)
-                ?? throw new Exception($"Failed to check if {note} in {category} exists");
+            bool exists = await _client.Fetch<bool>($"NoteCatalog/Exists/{category}/{note}",
+                    HttpMethod.Get);
 
-            if(!JsonConvert.DeserializeObject<bool>(content))
+            if(!exists)
             {
                 throw new Exception($"{note} in {category} does not exist, yet attempted to open it");
             }
@@ -57,11 +56,10 @@ public class NoteEditorController : Controller
     {
         try
         {
-            string content = await _client.Fetch($"NoteCatalog/Get/{category}/{note}",
-                    HttpMethod.Get)
-                ?? throw new Exception($"Could not get note {note} in {category} that exists");
-
-            var record = NoteRecord.FromJsonString(content);
+            var record = await _client.Fetch<NoteRecord>($"NoteCatalog/Get/{category}/{note}",
+                    HttpMethod.Get);
+            record.Name = note;
+            record.Text = record.Text.Replace("\n", "<br>");
 
             return record;
         }
@@ -80,7 +78,10 @@ public class NoteEditorController : Controller
     {
         try
         {
-            NoteRecord record = NoteRecord.FromJsonString(body.GetRawText(), note);
+            var record = new NoteRecord();
+            record.Text = body.GetProperty("text").GetString()
+                ?? throw new BadHttpRequestException("Got an empty text property");
+            record.Name = note;
 
             record.Text = record.Text.Replace("<br>", "\n");
             record.Text = System.Web.HttpUtility.HtmlEncode(record.Text)

@@ -3,46 +3,65 @@ using Newtonsoft.Json;
 
 namespace AALKisShared;
 
-public record struct NoteRecord
+public record struct NoteRecord : IJsonSerializable
 {
     public string Name { get; set; }
 
     public string Text { get; set; }
 
-    public static NoteRecord FromJsonFile(string path, bool readContents = true)
+    [Flags]
+    public enum NoteFlags
     {
-        if(!File.Exists(path))
-        {
-            throw new FileNotFoundException("NoteRecord not found", path);
-        }
-
-        NoteRecord record = readContents
-                ? JsonFileReaderWriter.JsonFileToType<NoteRecord>(path)
-                : new NoteRecord();
-
-        record.Name = Path.GetFileNameWithoutExtension(path);
-
-        return record;
+        None = 0b0,
+        MarkedForDeletion = 0b1,
+        InheritKeywords = 0b10,
+        ShareKeywords = 0b100
     }
 
-    public static NoteRecord FromJsonString(string json, string? name = null)
-    {
-        NoteRecord result = JsonConvert.DeserializeObject<NoteRecord>(json);
-        if(name != null)
-        {
-            result.Name = name;
-        }
-        return result;
-    }
+    public NoteFlags Flags { get; set; }
 
-    public void SaveToJsonFile(string directory)
+    public NoteRecord()
     {
-        JsonFileReaderWriter.TypeToJsonFile<NoteRecord>(this, $"{directory}/{this.Name}.json");
+        Name = "";
+        Text = "";
+        Flags = NoteFlags.None;
     }
 
     public string ToJsonString()
     {
         return JsonConvert.SerializeObject(this);
+    }
+
+    public void SetFromJsonString(string json)
+    {
+        this = JsonConvert.DeserializeObject<NoteRecord>(json);
+    }
+
+    public void ToJsonFile(string directoryPath)
+    {
+        using(var stream = new FileStream($"{directoryPath}/{Name}.json",
+                    FileMode.Create, FileAccess.Write))
+        {
+            stream.WriteJson(this);
+        }
+    }
+
+    public void SetFromJsonFile(string filePath, bool previewOnly = false)
+    {
+        if(!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("Failed to set NoteRecord from file", filePath);
+        }
+
+        if(!previewOnly)
+        {
+            using(var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                this = stream.ReadJson<NoteRecord>();
+            }
+        }
+
+        Name = Path.GetFileNameWithoutExtension(filePath);
     }
 }
 
