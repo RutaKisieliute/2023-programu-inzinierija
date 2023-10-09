@@ -34,5 +34,14 @@ public record struct KeywordRecord
         return JsonConvert.SerializeObject(this);
     }
 
+    public static KeywordRecord FromJsonString(string json, string? name = null)
+    {
+        KeywordRecord result = JsonConvert.DeserializeObject<KeywordRecord>(json);
+        if(name != null)
+        {
+            result.Name = name;
+        }
+        return result;
+    }
 
 }

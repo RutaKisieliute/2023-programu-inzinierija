@@ -14,14 +14,10 @@ public class APIClient
         return;
     }
 
-    public async Task<string?> Fetch(string uri, HttpMethod method, string? content = null)
+    public async Task<string?> Fetch(string uri, HttpMethod method, HttpContent? content = null)
     {
-        HttpRequestMessage request = new HttpRequestMessage(method, uri);
-        if(content != null)
-        {
-            request.Content = new StringContent(content);
-        }
-        HttpResponseMessage response = Client.Send(request);
+        HttpRequestMessage request = new HttpRequestMessage(method, uri) { Content = content };
+        HttpResponseMessage response = await Client.SendAsync(request);
         if(!response.IsSuccessStatusCode)
         {
             throw new BadHttpRequestException($"Failed to execute fetch"
