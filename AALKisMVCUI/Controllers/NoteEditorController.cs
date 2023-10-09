@@ -59,7 +59,6 @@ public class NoteEditorController : Controller
             var record = await _client.Fetch<NoteRecord>($"NoteCatalog/Get/{category}/{note}",
                     HttpMethod.Get);
             record.Name = note;
-            record.Text = record.Text.Replace("\n", "<br>");
 
             return record;
         }
@@ -78,14 +77,15 @@ public class NoteEditorController : Controller
     {
         try
         {
-            var record = new NoteRecord();
+            var record = await GetNoteRecord(category, note)
+                ?? throw new HttpRequestException("Failed to get the note record.");
             record.Text = body.GetProperty("text").GetString()
                 ?? throw new BadHttpRequestException("Got an empty text property");
-            record.Name = note;
 
             record.Text = record.Text.Replace("<br>", "\n");
             record.Text = System.Web.HttpUtility.HtmlEncode(record.Text)
-                .Replace("&amp;", "&");
+                .Replace("&amp;", "&")
+                .Replace("\n", "<br>");
 
             await _client.Fetch($"NoteCatalog/Put/{category}/{note}",
                     HttpMethod.Put,
