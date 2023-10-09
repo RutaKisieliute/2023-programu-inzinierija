@@ -27,7 +27,8 @@ public class NoteEditorController : Controller
     [HttpGet("{category}/{note}")]
     public async Task<IActionResult> Index(string category, string note)
     {
-        string content = await _client.Fetch($"NoteCatalog/Exists/{category}/{note}", HttpMethod.Get)
+        string content = await _client.Fetch($"NoteCatalog/Exists/{category}/{note}",
+                HttpMethod.Get)
             ?? throw new Exception($"Failed to check if {note} in {category} exists");
 
         if(!JsonConvert.DeserializeObject<bool>(content))
@@ -41,7 +42,8 @@ public class NoteEditorController : Controller
     [HttpGet("[action]/{category}/{note}")]
     public async Task<NoteRecord> GetNoteRecord(string category, string note)
     {
-        string content = await _client.Fetch($"NoteCatalog/Get/{category}/{note}", HttpMethod.Get)
+        string content = await _client.Fetch($"NoteCatalog/Get/{category}/{note}",
+                HttpMethod.Get)
             ?? throw new Exception($"Could not get note {note} in {category} that exists");
 
         var record = NoteRecord.FromJsonString(content);
@@ -58,9 +60,11 @@ public class NoteEditorController : Controller
 
         record.Text = record.Text.Replace("<br>", "\n");
         record.Text = System.Web.HttpUtility.HtmlEncode(record.Text)
-            .Replace("&amp;", "&").Replace("\n", "<br>");
+            .Replace("&amp;", "&");
 
-        await _client.Fetch($"NoteCatalog/Put/{category}/{note}", HttpMethod.Put, record.ToJsonString());
+        await _client.Fetch($"NoteCatalog/Put/{category}/{note}",
+                HttpMethod.Put,
+                new StringContent(record.ToJsonString()));
         return;
     }
 }

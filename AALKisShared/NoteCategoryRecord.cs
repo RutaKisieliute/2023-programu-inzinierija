@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AALKisShared;
 
-public record class NoteCategoryRecord : IEnumerable<NoteRecord>
+public record class NoteCategoryRecord
 {
     public string Name { get; set; }
 
@@ -19,16 +19,6 @@ public record class NoteCategoryRecord : IEnumerable<NoteRecord>
             Notes = (from filePath in Directory.GetFiles(path)
                  select NoteRecord.FromJsonFile(filePath, readNoteContents))
                 .ToList()};
-    }
-
-    public IEnumerator<NoteRecord> GetEnumerator()
-    {
-        return Notes.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-       return GetEnumerator();
     }
 }
 
