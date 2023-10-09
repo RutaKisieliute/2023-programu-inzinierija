@@ -10,6 +10,11 @@
     outline: 0px solid transparent;
 }
 
+b {
+    font-weight: normal;
+    text-shadow: -1px -1px 0 #000f;
+}
+
 #editor-textarea {
     display: block;
 

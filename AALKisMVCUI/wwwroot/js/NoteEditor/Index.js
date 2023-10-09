@@ -1,5 +1,5 @@
 const miliBeforeSave = 1000;
-const miliBeforeStatusClear = 2000;
+const miliBeforeStatusClear = 4000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
@@ -44,14 +44,20 @@ const getKeywordId = (keyword) => { return "keyword-" + keyword; };
 function scrollToHref(anchorTag)
 {
     let targetQuery = (anchorTag ? anchorTag.href : window.location.href).match(/#[A-z-_]+/);
-    if(targetQuery)
+    if(!targetQuery)
     {
-        document.querySelector(targetQuery).scrollIntoView({ "behavior": "smooth" });
+        return false;
     }
+
+    let target = document.querySelector(targetQuery)
+    if(!target)
+    {
+        return false;
+    }
+    target.scrollIntoView({ "behavior": "smooth" });
 
     return false;
 }
-
 
 function saveTextArea()
 {
@@ -68,7 +74,7 @@ function saveTextArea()
     function failure()
     {
         clearTimeout(statusClearTimeoutId);
-        statusDiv.innerHTML = "!!FAILED TO SAVE!!"
+        statusDiv.innerHTML = "<b>!!FAILED TO SAVE!!</b>"
         statusClearTimeoutId = setTimeout(() => { statusDiv.innerHTML = "" }, miliBeforeStatusClear);
     }
 
@@ -78,7 +84,8 @@ function saveTextArea()
             "method": "POST",
             "body": JSON.stringify({ "text": spanEditHTML }),
             "headers": {"content-type": "application/json"}
-        }).then((success), (failure));
+        }).then((response) => { if(!response.ok) failure(); else success(); },
+            (failure));
 }
 
 //async function fetchTextArea(spanTextArea)
