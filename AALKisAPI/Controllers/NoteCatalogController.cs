@@ -29,7 +29,7 @@ public class NoteCatalogController : ControllerBase
         }
         catch(Exception e)
         {
-            _logger.LogWarning(e.ToString());
+            _logger.LogError(e.ToString());
             Response.StatusCode = StatusCodes.Status400BadRequest;
         }
         return null;
@@ -46,7 +46,7 @@ public class NoteCatalogController : ControllerBase
         }
         catch(Exception e)
         {
-            _logger.LogWarning(e.ToString());
+            _logger.LogError(e.ToString());
             Response.StatusCode = StatusCodes.Status400BadRequest;
         }
         return null;
@@ -61,7 +61,7 @@ public class NoteCatalogController : ControllerBase
         }
         catch(Exception e)
         {
-            _logger.LogWarning(e.ToString());
+            _logger.LogError(e.ToString());
             Response.StatusCode = StatusCodes.Status400BadRequest;
         }
         return null;
@@ -86,7 +86,7 @@ public class NoteCatalogController : ControllerBase
 
         if(Exists(category))
         {
-            _logger.LogWarning($"Attempted to create an existing category {category}");
+            _logger.LogError($"Attempted to create an existing category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
@@ -103,14 +103,14 @@ public class NoteCatalogController : ControllerBase
 
         if(!Exists(category))
         {
-            _logger.LogWarning($"Attempted to create a note {note} for missing category {category}");
+            _logger.LogError($"Attempted to create a note {note} for missing category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
 
         if(Exists(category, note))
         {
-            _logger.LogWarning($"Attempted to create an existing note {note} for category {category}");
+            _logger.LogError($"Attempted to create an existing note {note} for category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
@@ -124,7 +124,7 @@ public class NoteCatalogController : ControllerBase
     {
         if(!Exists(category))
         {
-            _logger.LogWarning($"Attempted to delete missing category {category}");
+            _logger.LogError($"Attempted to delete missing category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
@@ -139,14 +139,14 @@ public class NoteCatalogController : ControllerBase
     {
         if(!Exists(category))
         {
-            _logger.LogWarning($"Attempted to delete note {note} for missing category {category}");
+            _logger.LogError($"Attempted to delete note {note} for missing category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
 
         if(!Exists(category, note))
         {
-            _logger.LogWarning($"Attempted to delete missing note {note} for category {category}");
+            _logger.LogError($"Attempted to delete missing note {note} for category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
@@ -161,14 +161,14 @@ public class NoteCatalogController : ControllerBase
     {
         if(!Exists(category))
         {
-            _logger.LogWarning($"Attempted to put to missing category {category}");
+            _logger.LogError($"Attempted to put to missing category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
 
         if(!Exists(category, note))
         {
-            _logger.LogWarning($"Attempted to put to missing note {note} from category {category}");
+            _logger.LogError($"Attempted to put to missing note {note} from category {category}");
             Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }

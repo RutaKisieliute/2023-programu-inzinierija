@@ -6,6 +6,15 @@
     flex-flow: column;
 }
 
+[contenteditable] {
+    outline: 0px solid transparent;
+}
+
+b {
+    font-weight: normal;
+    text-shadow: -1px -1px 0 #000f;
+}
+
 #editor-textarea {
     display: block;
 
@@ -17,22 +26,43 @@
 
     min-height: 1em;
 
-    border: 1px solid #ccc;
     font-family: inherit;
     font-size: inherit;
-    padding: 0.2em;
+
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    padding: 4px;
 
     flex: 1 1 auto;
+}
+
+#editor-textarea:empty::before {
+    content: "Double click me to begin writing!";
+    color: #aaa;
+}
+
+#editor-textarea:hover {
+    border-color: #888;
+    border-width: 1px;
+    outline: 1px solid #888;
+    padding: 4px;
+}
+
+#editor-textarea[contenteditable="true"] {
+    outline: 1px solid #000;
+    border: 2px solid #000;
+    padding: 3px;
+}
+
+#editor-textarea[contenteditable="true"]:empty::before
+{
+    content: "You can write in here!";
+    color: #666;
 }
 
 #editor-status {
     min-height: 1em;
     line-height: 1em;
     margin: 0.5em;
-}
-
-.textarea[contenteditable]:empty::before {
-  content: "You can write in here!";
-  color: gray;
 }
 
