@@ -11,9 +11,6 @@ namespace AALKisMVCUI.Controllers;
 public class NoteController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-
-    readonly Uri baseAddress = new Uri("https://localhost:7014");
-    //private readonly HttpClient _client;
     private readonly APIClient _client;
 
     public NoteController(ILogger<HomeController> logger, APIClient client)

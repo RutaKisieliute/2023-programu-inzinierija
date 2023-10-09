@@ -1,3 +1,5 @@
+using AALKisShared.Utility;
+
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 
@@ -5,7 +7,7 @@ namespace AALKisAPI.Utility;
 
 public class DatabaseService
 {
-    private static readonly string DBConnection = "server=sql11.freesqldatabase.com;user=sql11651620;database=sql11651620;port=3306;password=HmgC9rDhfQ";
+    private readonly string DBConnection;
 
     public enum COLUMN
     {
@@ -18,6 +20,7 @@ public class DatabaseService
     
     public DatabaseService()
     {
+        DBConnection = File.ReadAllText("databaselogin.txt");
         Con = new MySqlConnection(DBConnection);
     }
 
