@@ -18,37 +18,52 @@ public class NoteCatalogController : ControllerBase
     }
 
     [HttpGet("[action]")]
-    public IEnumerable<NoteCategoryRecord>? Get([FromQuery] bool getNoteContents = true)
+    public IEnumerable<CategoryRecord<NoteRecord>>? Get([FromQuery] bool getContents = true)
     {
         try
         {
-            return from dirPath in Directory.GetDirectories(baseDirectory)
-                    select NoteCategoryRecord.FromDirectory(
-                            readNoteContents: getNoteContents,
-                            path: dirPath);
+            //return Directory.GetDirectories(baseDirectory)
+            //    .Select(dirPath => CategoryRecord<NoteRecord>.FromDirectory(
+            //                readNoteContents: getNoteContents,
+            //                path: dirPath));
+            return Directory.GetDirectories(baseDirectory)
+                .Select(directoryPath => {
+                            var records = new CategoryRecord<NoteRecord>();
+                            records.SetFromDirectory(
+                                    previewOnly: !getContents,
+                                    path: directoryPath);
+                            return records;
+                        });
         }
         catch(Exception e)
         {
             _logger.LogError(e.ToString());
-            Response.StatusCode = StatusCodes.Status400BadRequest;
         }
+
+        Response.StatusCode = StatusCodes.Status400BadRequest;
         return null;
     }
 
     [HttpGet("[action]/{category}")]
-    public NoteCategoryRecord? Get(string category, [FromQuery] bool getNoteContents = true)
+    public CategoryRecord<NoteRecord>? Get(string category, [FromQuery] bool getContents = true)
     {
         try
         {
-            return NoteCategoryRecord.FromDirectory(
-                    readNoteContents: getNoteContents,
+            var records = new CategoryRecord<NoteRecord>();
+            records.SetFromDirectory(
+                    previewOnly: !getContents,
                     path: $"{baseDirectory}/{category}");
+            return records;
+            //return NoteCategoryRecord.FromDirectory(
+            //        readNoteContents: getNoteContents,
+            //        path: $"{baseDirectory}/{category}");
         }
         catch(Exception e)
         {
             _logger.LogError(e.ToString());
-            Response.StatusCode = StatusCodes.Status400BadRequest;
         }
+
+        Response.StatusCode = StatusCodes.Status400BadRequest;
         return null;
     }
 
@@ -57,13 +72,16 @@ public class NoteCatalogController : ControllerBase
     {
         try
         {
-            return NoteRecord.FromJsonFile($"{baseDirectory}/{category}/{note}.json");
+            var record = new NoteRecord();
+            record.SetFromJsonFile($"{baseDirectory}/{category}/{note}.json");
+            return record;
         }
         catch(Exception e)
         {
             _logger.LogError(e.ToString());
-            Response.StatusCode = StatusCodes.Status400BadRequest;
         }
+
+        Response.StatusCode = StatusCodes.Status400BadRequest;
         return null;
     }
 
@@ -115,7 +133,7 @@ public class NoteCatalogController : ControllerBase
             return;
         }
 
-        (new NoteRecord {Name = note, Text = ""}).SaveToJsonFile($"{baseDirectory}/{category}");
+        new NoteRecord().ToJsonFile($"{baseDirectory}/{category}");
         return;
     }
 
@@ -175,8 +193,12 @@ public class NoteCatalogController : ControllerBase
 
         string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-        NoteRecord record = NoteRecord.FromJsonString(body, note);
-        record.SaveToJsonFile($"{baseDirectory}/{category}");
+        var record = new NoteRecord();
+
+        record.SetFromJsonString(body);
+        record.Name = note;
+
+        record.ToJsonFile($"{baseDirectory}/{category}");
 
         return;
     }

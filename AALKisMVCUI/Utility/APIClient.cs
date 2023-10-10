@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace AALKisMVCUI.Utility;
 
 public class APIClient
@@ -29,5 +31,12 @@ public class APIClient
             return null;
         }
         return await response.Content.ReadAsStringAsync();
+    }
+
+    public async Task<T?> Fetch<T>(string uri, HttpMethod method, HttpContent? content = null)
+    {
+        string? json = await Fetch(uri, method, content);
+        return JsonConvert.DeserializeObject<T>(json
+                ?? throw new JsonException("Attempted to deserialize a null string"));
     }
 }

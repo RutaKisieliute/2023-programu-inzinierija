@@ -17,7 +17,7 @@ var statusClearTimeoutId;
 
 function startup()
 {
-    spanEditHTML = spanTextArea.innerHTML.replaceAll("\n", "<br>");
+    spanEditHTML = spanTextArea.innerHTML;
 
     shouldUpdateSpanViewHTML = true;
 
