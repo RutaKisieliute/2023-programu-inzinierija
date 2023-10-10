@@ -1,4 +1,7 @@
+using AALKisAPI.Utility;
+
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Controllers;
 
@@ -16,22 +19,8 @@ public class CategoryListController : ControllerBase
     [HttpGet]
     public IEnumerable<string> Get()
     {
-        //right now it reads from a .txt file but eventually it should read from a database
-        string input;
-        List<string> list = new List<string>();
-        StreamReader reader = new StreamReader("DataBase/Categories.txt");
-        try
-        {
-            do
-            {
-                input = reader.ReadLine();
-                list.Add(input);
-            }while(input != null);
-        }
-        catch(Exception e)
-        {
-            return null;
-        }
-        return list;
+        DatabaseService database = new DatabaseService();
+        List<string> tags = database.GetTags().Where(str => str != null).ToList<string>();
+        return tags;
     }
 }

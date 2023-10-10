@@ -1,4 +1,7 @@
+using AALKisAPI.Utility;
+
 using Microsoft.AspNetCore.Mvc;
+using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Controllers;
 
@@ -14,25 +17,15 @@ public class NoteListController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<string> Get(string category)
+    public IEnumerable<string> Get(string tag)
     {
-        string adress = "DataBase/";
-        string input;
-        List<string> list = new List<string>();
-        StreamReader reader = new StreamReader(adress + category + ".txt");
-        try
+        DatabaseService database = new DatabaseService();
+        List<List<string?>> notes = database.GetNotesByTag(tag);
+        List<string> converted = new List<string>();
+        foreach(List<string?> list in notes)
         {
-            input = reader.ReadLine();
-            while(input != null)
-            {
-                list.Add(input);
-                input = reader.ReadLine();
-            }
+            converted.Add(list[0] + ";" + list[1]);
         }
-        catch(Exception e)
-        {
-            return null;
-        }
-        return list;
+        return converted;
     }
 }

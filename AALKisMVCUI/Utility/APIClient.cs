@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace AALKisMVCUI.Utility;
 
 public class APIClient
@@ -14,33 +16,27 @@ public class APIClient
         return;
     }
 
-    public async Task<string> GetContents(string requestUri)
+    public async Task<string?> Fetch(string uri, HttpMethod method, HttpContent? content = null)
     {
-        HttpResponseMessage response = await Client.GetAsync(requestUri);
-
+        HttpRequestMessage request = new HttpRequestMessage(method, uri) { Content = content };
+        HttpResponseMessage response = await Client.SendAsync(request);
         if(!response.IsSuccessStatusCode)
         {
-            throw new BadHttpRequestException($"API server is running,"
-                    + " but failed to get {requestUri}",
+            throw new BadHttpRequestException($"Failed to execute fetch"
+                    + $" to {uri} with {method} {content}",
                     (int)response.StatusCode);
         }
-
-        string contents = await response.Content.ReadAsStringAsync();
-
-        return contents;
+        if(response == null || response.Content.Headers.ContentLength == 0)
+        {
+            return null;
+        }
+        return await response.Content.ReadAsStringAsync();
     }
 
-    public async void PostContents(string requestUri, HttpContent content)
+    public async Task<T?> Fetch<T>(string uri, HttpMethod method, HttpContent? content = null)
     {
-        HttpResponseMessage response = await Client.PostAsync(requestUri, content);
-
-        if(!response.IsSuccessStatusCode)
-        {
-            throw new BadHttpRequestException($"API server is running,"
-                    + " but failed to post {requestUri}",
-                    (int)response.StatusCode);
-        }
-
-        return;
+        string? json = await Fetch(uri, method, content);
+        return JsonConvert.DeserializeObject<T>(json
+                ?? throw new JsonException("Attempted to deserialize a null string"));
     }
 }

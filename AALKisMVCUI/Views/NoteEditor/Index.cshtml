@@ -1,0 +1,21 @@
+@model NoteRecord
+
+@{
+    ViewData["Title"] = "Note Editor";
+}
+
+@section ExtraHead {
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/NoteEditor/Index.css">
+}
+
+<div class="container editor-container">
+    <h1>Currently editing "@(Model.Name)"</h1>
+    <span id="editor-textarea" role="textbox" contenteditable>@Html.Raw(Model.Text)</span>
+</div>
+<footer>
+        <div id="editor-status"></div>
+</footer>
+
+@section Scripts {
+    <script src="~/js/NoteEditor/Index.js"></script>
+}

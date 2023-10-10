@@ -18,11 +18,10 @@ public class NotesViewController : Controller
 
     public async Task<IActionResult> Index()
     {
-        string targetUri = "/NoteCategories";
+        string targetUri = "/NoteCatalog/Get";
 
-        string contents = await _client.GetContents(targetUri);
-
-        var categories = JsonConvert.DeserializeObject<List<NoteCategoryRecord>>(contents)
+        var categories = await _client
+            .Fetch<List<CategoryRecord<NoteRecord>>>(targetUri, HttpMethod.Get)
             ?? throw new JsonException($"Got empty response from {targetUri}");
 
         return View(categories);

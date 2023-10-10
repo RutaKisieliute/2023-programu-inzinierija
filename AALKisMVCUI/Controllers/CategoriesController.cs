@@ -4,57 +4,62 @@ using AALKisMVCUI.Models;
 using System.Text.Json.Serialization;
 using Microsoft.JSInterop.Implementation;
 using System.Text.Json;
+using AALKisMVCUI.Utility;
 
 namespace AALKisMVCUI.Controllers;
 
 public class CategoriesController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly APIClient _client;
 
-    readonly Uri baseAddress = new Uri("https://localhost:7014");
-    private readonly HttpClient _client;
-
-    public CategoriesController(ILogger<HomeController> logger)
+    public CategoriesController(ILogger<HomeController> logger, APIClient client)
     {
         _logger = logger;
-        _client = new HttpClient();
-        _client.BaseAddress = baseAddress;
+        _client = client;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        List<string> cats = new List<string>(0);
-        HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "CategoryList").Result;
-        if(response.IsSuccessStatusCode)
+        List<string> categs = new List<string>(0);
+        string? data = await _client.Fetch("/CategoryList", HttpMethod.Get);
+        try
         {
-            string data = response.Content.ReadAsStringAsync().Result;
-            cats = JsonSerializer.Deserialize<List<string>>(data);
+            categs = JsonSerializer.Deserialize<List<string>>(data);
+        }
+        catch(Exception e)
+        {
+            _logger.LogError(e.Message);
+            categs = new List<string> {"Error"};
         }
         var categories = new CategoriesModel
         {
-            Categs = cats,
+            Categs = categs,
         };
         return View(categories);
     }
 
-    public IActionResult C(string id)
+    public async Task<IActionResult> C(string id)
     {
-        List<string>? cats = new List<string>(0);
+        List<string>? categs = new List<string>(0);
         List<string>? NoteList;
         string [] PostSplit;
         List<(string, string)> NoteList2 = new List<(string, string)>(0);
-        HttpResponseMessage response = _client.GetAsync(_client.BaseAddress + "CategoryList").Result;
-        if(response.IsSuccessStatusCode)
+        string? data = await _client.Fetch("/CategoryList", HttpMethod.Get);
+        try
         {
-            string data = response.Content.ReadAsStringAsync().Result;
-            cats = JsonSerializer.Deserialize<List<string>>(data);
+            categs = JsonSerializer.Deserialize<List<string>>(data);
         }
-        if(cats != null && cats.Contains(id))
+        catch(Exception e)
         {
-            response = _client.GetAsync(_client.BaseAddress + "NoteList?category=" + id).Result;
-            if(response.IsSuccessStatusCode)
+            _logger.LogError(e.Message);
+            categs = null;
+        }
+        if(categs != null && categs.Contains(id))
+        {
+            data = await _client.Fetch($"/NoteList?tag={id}", HttpMethod.Get);
+            try
             {
-                string data = response.Content.ReadAsStringAsync().Result;
                 NoteList = JsonSerializer.Deserialize<List<string>>(data);
                 foreach(string str in NoteList)
                 {
@@ -68,8 +73,13 @@ public class CategoriesController : Controller
                 };
                 return View(notes);
             }
+            catch(Exception e)
+            {
+                _logger.LogError(e.Message);
+                return Redirect("Categories/Error");
+            }
         }
-        return Error();
+        return Redirect("Categories/Error");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
