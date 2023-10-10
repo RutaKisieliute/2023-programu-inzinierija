@@ -20,7 +20,7 @@ public class DatabaseService
     
     public DatabaseService()
     {
-        DBConnection = File.ReadAllText("databaselogin.txt");
+        DBConnection = File.ReadAllText("./Utility/databaselogin.txt");
         Con = new MySqlConnection(DBConnection);
     }
 
@@ -73,7 +73,7 @@ public class DatabaseService
     public List<string?> GetNote(string id)
     {
         List<string?> list = new List<string?>();
-        string query = "SELECT name, author_username, note FROM notes WHERE id = " + id;
+        string query = "SELECT name, author_id, note FROM notes WHERE id = " + id;
         Con.Open();
         MySqlCommand cmd = new MySqlCommand(query, Con);
         MySqlDataReader reader;
@@ -87,7 +87,7 @@ public class DatabaseService
         }
         reader.Read();
         list.Add(reader["name"].ToString());
-        list.Add(reader["author_username"].ToString());
+        list.Add(reader["author_id"].ToString());
         list.Add(reader["note"].ToString());
         reader.Close();
         return list;
