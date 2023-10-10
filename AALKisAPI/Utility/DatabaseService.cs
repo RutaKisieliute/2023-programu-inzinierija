@@ -67,6 +67,7 @@ public class DatabaseService
             list.Add(new List<string?>{reader["name"].ToString(), reader["note_id"].ToString()});
         }
         reader.Close();
+        Con.Close();
         return list;
     }
 
@@ -90,6 +91,7 @@ public class DatabaseService
         list.Add(reader["author_id"].ToString());
         list.Add(reader["note"].ToString());
         reader.Close();
+        Con.Close();
         return list;
     }
 }
