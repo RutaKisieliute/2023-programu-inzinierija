@@ -82,7 +82,7 @@ function saveTextArea()
         + category + "/" + note,
         {
             "method": "POST",
-            "body": JSON.stringify({ "text": spanEditHTML }),
+            "body": spanEditHTML,
             "headers": {"content-type": "application/json"}
         }).then((response) => { if(!response.ok) failure(); else success(); },
             (failure));

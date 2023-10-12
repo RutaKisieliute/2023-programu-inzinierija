@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Utility;
-using AALKisMVCUI.Models;
 using AALKisShared;
-using Newtonsoft.Json;
 using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -24,20 +23,20 @@ public class EditorController : Controller
         return Redirect("Home/Error");
     }
 
-    [HttpGet("{category}/{note}")]
-    public async Task<IActionResult> Index(string category, string note)
+    [HttpGet("{folderName}/{noteName}")]
+    public async Task<IActionResult> Index(string folderName, string noteName)
     {
         try
         {
-            bool exists = await _client.Fetch<bool>($"NoteCatalog/Exists/{category}/{note}",
-                    HttpMethod.Get);
+            var response = await _client.Fetch($"Note/{folderName}/{noteName}",
+                    HttpMethod.Head);
 
-            if(!exists)
+            if(!response.IsSuccessStatusCode)
             {
-                throw new Exception($"{note} in {category} does not exist, yet attempted to open it");
+                throw new Exception($"{noteName} in {folderName} does not exist, yet attempted to open it");
             }
 
-            return View(await GetNoteRecord(category, note));
+            return View(await GetNoteRecord(folderName, noteName));
         }
         catch(HttpRequestException e)
         {
@@ -51,14 +50,14 @@ public class EditorController : Controller
         return BadRequest();
     }
 
-    [HttpGet("[action]/{category}/{note}")]
-    public async Task<NoteRecord?> GetNoteRecord(string category, string note)
+    [HttpGet("[action]/{folderName}/{noteName}")]
+    public async Task<NoteRecord?> GetNoteRecord(string folderName, string noteName)
     {
         try
         {
-            var record = await _client.Fetch<NoteRecord>($"NoteCatalog/Get/{category}/{note}",
+            var record = await _client.Fetch<NoteRecord>($"Note/{folderName}/{noteName}",
                     HttpMethod.Get);
-            record.Title = note;
+            record.Title = noteName;
 
             return record;
         }
@@ -66,40 +65,37 @@ public class EditorController : Controller
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            _logger.LogError($"Failed to get {category}/{note} NoteRecord;\n"
+            _logger.LogError($"Failed to get {folderName}/{noteName} NoteRecord;\n"
                     + e.ToString());
         }
         return null;
     }
 
-    [HttpPost("[action]/{category}/{note}")]
-    public async Task<IActionResult> PostNoteRecord(string category, string note, [FromBody] JsonElement body)
+    [HttpPost("[action]/{folderName}/{noteName}")]
+    public async Task<IActionResult> PostNoteRecord(string folderName, string noteName)
     {
         try
         {
-            var record = await GetNoteRecord(category, note)
-                ?? throw new HttpRequestException("Failed to get the note record.");
-            record.Content = body.GetProperty("text").GetString()
-                ?? throw new BadHttpRequestException("Got an empty text property");
+            string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            record.Content = record.Content.Replace("<br>", "\n");
-            record.Content = System.Web.HttpUtility.HtmlEncode(record.Content)
+            body = body.Replace("<br>", "\n");
+            body = System.Web.HttpUtility.HtmlEncode(body)
                 .Replace("&amp;", "&")
                 .Replace("\n", "<br>");
 
-            await _client.Fetch($"NoteCatalog/Put/{category}/{note}",
+            await _client.Fetch($"Note/{folderName}/{noteName}",
                     HttpMethod.Put,
-                    new StringContent(record.ToJsonString()));
+                    new StringContent(body));
         }
-        catch(HttpRequestException e)
+        catch(HttpRequestException exception)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(exception.ToString());
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
-        catch(Exception e)
+        catch(Exception exception)
         {
-            _logger.LogError($"Failed to post {category}/{note} NoteRecord;\n"
-                    + e.ToString());
+            _logger.LogError($"Failed to post {folderName}/{noteName} NoteRecord;\n"
+                    + exception.ToString());
 
             return BadRequest();
         }

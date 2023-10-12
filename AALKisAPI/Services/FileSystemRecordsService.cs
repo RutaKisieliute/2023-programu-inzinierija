@@ -68,7 +68,7 @@ public class FileSystemRecordsService : IRecordsService
             throw new IOException($"Note {noteTitle} in folder {folderName}"
                     + "already exists.");
         }
-        new NoteRecord().ToJsonFile($"{baseDirectory}/{folderName}");
+        (new NoteRecord {Title = noteTitle, Content = ""}).ToJsonFile($"{baseDirectory}/{folderName}");
         return;
     }
 

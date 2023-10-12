@@ -18,7 +18,7 @@ public class MyNotesController : Controller
 
     public async Task<IActionResult> Index()
     {
-        string targetUri = "/NoteCatalog/Get";
+        string targetUri = "/Folder";
 
         var categories = await _client
             .Fetch<List<FolderRecord<NoteRecord>>>(targetUri, HttpMethod.Get)

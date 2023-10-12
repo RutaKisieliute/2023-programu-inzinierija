@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
+using System.Text.Json;
 
 namespace AALKisAPI.Controllers;
 
@@ -39,7 +40,7 @@ public class NoteController : ControllerBase
     {
         if(!_recordsService.CheckIfNoteExists(folderName, noteTitle))
         {
-            return new StatusCodeResult(StatusCodes.Status410Gone);
+            return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
 }
@@ -55,7 +56,7 @@ public class NoteController : ControllerBase
         {
             _logger.LogError($"Failed to create note {noteTitle} in folder {folderName}: "
                     + exception.ToString());
-            return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status201Created);
     }
@@ -71,7 +72,7 @@ public class NoteController : ControllerBase
         {
             _logger.LogError($"Failed to delete note {noteTitle} in {folderName}: "
                     + exception.ToString());
-            return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
@@ -84,6 +85,7 @@ public class NoteController : ControllerBase
             var record = _recordsService.GetNote(folderName, noteTitle, false);
 
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
+
             record.Content = body;
 
             _recordsService.UpdateNote(folderName, record);
@@ -92,7 +94,7 @@ public class NoteController : ControllerBase
         {
             _logger.LogError($"Could not update note {noteTitle} in {folderName}: "
                     + exception.ToString());
-            return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
