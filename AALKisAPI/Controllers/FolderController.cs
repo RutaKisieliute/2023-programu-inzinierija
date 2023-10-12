@@ -10,10 +10,10 @@ public class FolderController : ControllerBase
 {
     private readonly ILogger<FolderController> _logger;
 
-    private readonly FileSystemRecordsService _recordsService;
+    private readonly IRecordsService _recordsService;
 
     public FolderController(ILogger<FolderController> logger,
-            FileSystemRecordsService recordsService)
+            IRecordsService recordsService)
     {
         _logger = logger;
         _recordsService = recordsService;

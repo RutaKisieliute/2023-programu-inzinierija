@@ -2,7 +2,7 @@ using AALKisShared;
 
 namespace AALKisAPI.Services;
 
-public class FileSystemRecordsService
+public class FileSystemRecordsService : IRecordsService
 {
     private static readonly string baseDirectory = "./DataBase/Folders";
 
