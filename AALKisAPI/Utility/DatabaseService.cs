@@ -12,7 +12,7 @@ public class DatabaseService
     public enum COLUMN
     {
         Name = 0,
-        Author,
+        User,
         Content
     }
 

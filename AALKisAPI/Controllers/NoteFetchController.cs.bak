@@ -24,7 +24,7 @@ public class NoteFetchController : ControllerBase
         if(note.Count < 3) note = new List<string?>{null, null, null};
         if(note[1] == "1") note[1] = "Admin";
         note[(int) DatabaseService.COLUMN.Name] ??= "Error - note not found";
-        note[(int) DatabaseService.COLUMN.Author] ??= "";
+        note[(int) DatabaseService.COLUMN.User] ??= "";
         note[(int) DatabaseService.COLUMN.Content] ??= "The note you're trying to reach has not been found";
         return note;
     }

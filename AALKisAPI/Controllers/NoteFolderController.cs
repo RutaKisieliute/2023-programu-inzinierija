@@ -6,29 +6,29 @@ namespace AALKisAPI.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class NoteCatalogController : ControllerBase
+public class NoteFolderController : ControllerBase
 {
-    private readonly ILogger<NoteCatalogController> _logger;
+    private readonly ILogger<NoteFolderController> _logger;
 
     private readonly string baseDirectory = "./DataBase/Catalog";
 
-    public NoteCatalogController(ILogger<NoteCatalogController> logger)
+    public NoteFolderController(ILogger<NoteFolderController> logger)
     {
         _logger = logger;
     }
 
     [HttpGet("[action]")]
-    public IEnumerable<CategoryRecord<NoteRecord>>? Get([FromQuery] bool getContents = true)
+    public IEnumerable<FolderRecord<NoteRecord>>? Get([FromQuery] bool getContents = true)
     {
         try
         {
             //return Directory.GetDirectories(baseDirectory)
-            //    .Select(dirPath => CategoryRecord<NoteRecord>.FromDirectory(
+            //    .Select(dirPath => FolderRecord<NoteRecord>.FromDirectory(
             //                readNoteContents: getNoteContents,
             //                path: dirPath));
             return Directory.GetDirectories(baseDirectory)
                 .Select(directoryPath => {
-                            var records = new CategoryRecord<NoteRecord>();
+                            var records = new FolderRecord<NoteRecord>();
                             records.SetFromDirectory(
                                     previewOnly: !getContents,
                                     path: directoryPath);
@@ -45,11 +45,11 @@ public class NoteCatalogController : ControllerBase
     }
 
     [HttpGet("[action]/{category}")]
-    public CategoryRecord<NoteRecord>? Get(string category, [FromQuery] bool getContents = true)
+    public FolderRecord<NoteRecord>? Get(string category, [FromQuery] bool getContents = true)
     {
         try
         {
-            var records = new CategoryRecord<NoteRecord>();
+            var records = new FolderRecord<NoteRecord>();
             records.SetFromDirectory(
                     previewOnly: !getContents,
                     path: $"{baseDirectory}/{category}");
@@ -196,7 +196,7 @@ public class NoteCatalogController : ControllerBase
         var record = new NoteRecord();
 
         record.SetFromJsonString(body);
-        record.Name = note;
+        record.Title = note;
 
         record.ToJsonFile($"{baseDirectory}/{category}");
 

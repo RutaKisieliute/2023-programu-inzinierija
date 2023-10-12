@@ -5,12 +5,12 @@ using AALKisShared;
 
 namespace AALKisMVCUI.Controllers;
 
-public class NotesViewController : Controller
+public class MyNotesController : Controller
 {
-    private readonly ILogger<NotesViewController> _logger;
+    private readonly ILogger<MyNotesController> _logger;
     private readonly APIClient _client;
 
-    public NotesViewController(ILogger<NotesViewController> logger, APIClient client)
+    public MyNotesController(ILogger<MyNotesController> logger, APIClient client)
     {
         _logger = logger;
         _client = client;
@@ -21,7 +21,7 @@ public class NotesViewController : Controller
         string targetUri = "/NoteCatalog/Get";
 
         var categories = await _client
-            .Fetch<List<CategoryRecord<NoteRecord>>>(targetUri, HttpMethod.Get)
+            .Fetch<List<FolderRecord<NoteRecord>>>(targetUri, HttpMethod.Get)
             ?? throw new JsonException($"Got empty response from {targetUri}");
 
         return View(categories);

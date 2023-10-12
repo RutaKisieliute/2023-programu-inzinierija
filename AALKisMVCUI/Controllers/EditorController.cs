@@ -8,12 +8,12 @@ using System.Text.Json;
 namespace AALKisMVCUI.Controllers;
 
 [Route("[controller]")]
-public class NoteEditorController : Controller
+public class EditorController : Controller
 {
-    private readonly ILogger<NoteEditorController> _logger;
+    private readonly ILogger<EditorController> _logger;
     private readonly APIClient _client;
 
-    public NoteEditorController(ILogger<NoteEditorController> logger, APIClient client)
+    public EditorController(ILogger<EditorController> logger, APIClient client)
     {
         _logger = logger;
         _client = client;
@@ -58,7 +58,7 @@ public class NoteEditorController : Controller
         {
             var record = await _client.Fetch<NoteRecord>($"NoteCatalog/Get/{category}/{note}",
                     HttpMethod.Get);
-            record.Name = note;
+            record.Title = note;
 
             return record;
         }
@@ -79,11 +79,11 @@ public class NoteEditorController : Controller
         {
             var record = await GetNoteRecord(category, note)
                 ?? throw new HttpRequestException("Failed to get the note record.");
-            record.Text = body.GetProperty("text").GetString()
+            record.Content = body.GetProperty("text").GetString()
                 ?? throw new BadHttpRequestException("Got an empty text property");
 
-            record.Text = record.Text.Replace("<br>", "\n");
-            record.Text = System.Web.HttpUtility.HtmlEncode(record.Text)
+            record.Content = record.Content.Replace("<br>", "\n");
+            record.Content = System.Web.HttpUtility.HtmlEncode(record.Content)
                 .Replace("&amp;", "&")
                 .Replace("\n", "<br>");
 
