@@ -2,17 +2,13 @@ namespace AALKisShared;
 
 public record class FolderRecord<T> where T : IJsonSerializable, new()
 {
-    public int Id { get; set; }
+    public int Id { get; set; } = -1;
 
-    public string Name { get; set; }
+    public string Name { get; set; } = "";
 
-    public List<T> Records { get; set; }
+    public List<T> Records { get; set; } = new List<T>();
 
-    public FolderRecord()
-    {
-        Name = "";
-        Records = new List<T>();
-    }
+    public FolderRecord() { }
 
     public void SetFromDirectory(string path, bool previewOnly = false)
     {

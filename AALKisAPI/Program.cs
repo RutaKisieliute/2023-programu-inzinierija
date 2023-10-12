@@ -1,3 +1,5 @@
+using AALKisAPI.Services;
+
 namespace AALKisAPI;
 
 public static class Program
@@ -12,6 +14,7 @@ public static class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddScoped<FileSystemRecordsService>();
 
         var app = builder.Build();
 

@@ -5,11 +5,11 @@ namespace AALKisShared;
 
 public record struct NoteRecord : IJsonSerializable
 {
-    public long Id { get; set; }
+    public long Id { get; set; } = -1;
 
-    public string Title { get; set; }
+    public string Title { get; set; } = "";
 
-    public string Content { get; set; }
+    public string? Content { get; set; } = null;
 
     [Flags]
     public enum NoteFlags : int
@@ -21,15 +21,9 @@ public record struct NoteRecord : IJsonSerializable
         Public = 0b1000
     }
 
-    public NoteFlags Flags { get; set; }
+    public NoteFlags Flags { get; set; } = NoteFlags.None;
 
-    public NoteRecord()
-    {
-        Id = -1;
-        Title = "";
-        Content = "";
-        Flags = NoteFlags.None;
-    }
+    public NoteRecord() { }
 
     public string ToJsonString()
     {
@@ -52,17 +46,14 @@ public record struct NoteRecord : IJsonSerializable
 
     public void SetFromJsonFile(string filePath, bool previewOnly = false)
     {
-        if(!File.Exists(filePath))
+        using(var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            throw new FileNotFoundException("Failed to set NoteRecord from file", filePath);
+            this = stream.ReadJson<NoteRecord>();
         }
 
-        if(!previewOnly)
+        if(previewOnly)
         {
-            using(var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-            {
-                this = stream.ReadJson<NoteRecord>();
-            }
+            this.Content = null;
         }
 
         Title = Path.GetFileNameWithoutExtension(filePath);
