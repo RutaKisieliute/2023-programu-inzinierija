@@ -1,12 +1,14 @@
 namespace AALKisShared;
 
-public record class CategoryRecord<T> where T : IJsonSerializable, new()
+public record class FolderRecord<T> where T : IJsonSerializable, new()
 {
+    public int Id { get; set; }
+
     public string Name { get; set; }
 
     public List<T> Records { get; set; }
 
-    public CategoryRecord()
+    public FolderRecord()
     {
         Name = "";
         Records = new List<T>();
@@ -14,7 +16,7 @@ public record class CategoryRecord<T> where T : IJsonSerializable, new()
 
     public void SetFromDirectory(string path, bool previewOnly = false)
     {
-        string GetLowestDirectoryName(string path)
+        static string GetLowestDirectoryName(string path)
         {
             return path.Split(new char[] {'\\', '/'})
                     .Last(str => str.Length > 0);

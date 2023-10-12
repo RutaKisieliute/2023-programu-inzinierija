@@ -5,25 +5,29 @@ namespace AALKisShared;
 
 public record struct NoteRecord : IJsonSerializable
 {
-    public string Name { get; set; }
+    public long Id { get; set; }
 
-    public string Text { get; set; }
+    public string Title { get; set; }
+
+    public string Content { get; set; }
 
     [Flags]
-    public enum NoteFlags
+    public enum NoteFlags : int
     {
         None = 0b0,
         MarkedForDeletion = 0b1,
         InheritKeywords = 0b10,
-        ShareKeywords = 0b100
+        ShareKeywords = 0b100,
+        Public = 0b1000
     }
 
     public NoteFlags Flags { get; set; }
 
     public NoteRecord()
     {
-        Name = "";
-        Text = "";
+        Id = -1;
+        Title = "";
+        Content = "";
         Flags = NoteFlags.None;
     }
 
@@ -39,7 +43,7 @@ public record struct NoteRecord : IJsonSerializable
 
     public void ToJsonFile(string directoryPath)
     {
-        using(var stream = new FileStream($"{directoryPath}/{Name}.json",
+        using(var stream = new FileStream($"{directoryPath}/{Title}.json",
                     FileMode.Create, FileAccess.Write))
         {
             stream.WriteJson(this);
@@ -61,7 +65,7 @@ public record struct NoteRecord : IJsonSerializable
             }
         }
 
-        Name = Path.GetFileNameWithoutExtension(filePath);
+        Title = Path.GetFileNameWithoutExtension(filePath);
     }
 }
 

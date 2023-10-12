@@ -9,8 +9,8 @@
 }
 
 <div class="container editor-container">
-    <h1>Currently editing "@(Model.Name)"</h1>
-    <span id="editor-textarea" role="textbox" contenteditable>@Html.Raw(Model.Text)</span>
+    <h1>Currently editing "@(Model.Title)"</h1>
+    <span id="editor-textarea" role="textbox" contenteditable>@Html.Raw(Model.Content)</span>
 </div>
 <footer>
         <div id="editor-status"></div>
