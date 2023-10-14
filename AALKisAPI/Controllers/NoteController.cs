@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
-using System.Text.Json;
 
 namespace AALKisAPI.Controllers;
 

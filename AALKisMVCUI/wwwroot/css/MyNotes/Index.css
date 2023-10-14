@@ -1,3 +1,7 @@
+#create-folder-btn {
+    margin: 0rem 1rem 1rem 1rem;
+}
+
 .container {
     max-width: 100% !important; /*Remove boostrap container's default "margins" from the sides*/
 }
@@ -41,6 +45,7 @@
 }
 
 .scroller-element {
+    height: 19rem;
     position: relative;
     display: grid;
     grid-template-rows: min-content;

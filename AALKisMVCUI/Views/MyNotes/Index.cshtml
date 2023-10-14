@@ -4,6 +4,17 @@
     <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
 }
 
+<button id="create-folder-btn" class="btn btn-secondary">Create New Folder</button>
+
+<dialog id="create-folder-dialog">
+    <h6 for="exampleInputEmail1">Folder name</h6>
+    
+    <input maxlength="20" id="exampleInputEmail1" type="text" class="form-control" placeholder="Enter folder name">
+    <br />
+    <button type="submit" class="btn btn-secondary">Create</button>
+   
+</dialog>
+
 @foreach(FolderRecord<NoteRecord> folder in Model)
 {
 

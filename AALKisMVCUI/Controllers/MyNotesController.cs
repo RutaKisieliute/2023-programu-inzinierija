@@ -72,8 +72,34 @@ public class MyNotesController : Controller
         catch (Exception ex) {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
             _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
-            return Json(new { redirectToUrl = "www.google.com" });
+            return BadRequest();
         }
 
     }
+
+    [HttpPost("[action]/{folderName}")]
+    public async Task<IActionResult> CreateEmptyFolder(string folderName)
+    {
+        try
+        {
+            string targetUri = "/Folder/" + folderName;
+
+            // Create Folder
+            var response = await _client
+                    .Fetch(targetUri, HttpMethod.Post)
+                    ?? throw new JsonException($"Got empty response from {targetUri}");
+
+            return Ok();
+
+
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            return BadRequest();
+        }
+
+    }
+
 }
