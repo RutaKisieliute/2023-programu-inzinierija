@@ -40,10 +40,10 @@ public class NoteController : ControllerBase
     {
         if(!_recordsService.CheckIfNoteExists(folderName, noteTitle))
         {
-            return BadRequest();
+            return new StatusCodeResult(StatusCodes.Status410Gone);
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
-}
+    }
 
     [HttpPost("{folderName}/{noteTitle}")]
     public IActionResult Create(string folderName, string noteTitle)

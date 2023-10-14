@@ -2,16 +2,16 @@
     max-width: 100% !important; /*Remove boostrap container's default "margins" from the sides*/
 }
 
-.catalog {
+.folder {
     margin: 0 0 1rem 0;
 }
 
-.catalog-name {
+.folder-name {
     padding: 0 0 0 1rem;
     font-size: 1.5rem;
 }
 
-.catalog-name:before {
+.folder-name:before {
     content: url(../../svg/drag_icon.svg);
     display: block;
     height: 1.5rem;
@@ -30,7 +30,7 @@
     border-radius: 0 0 10px 10px;
 }
 
-.media-scroller {
+.scroller {
     display: grid;
     gap: 1.5rem;
     grid-auto-flow: column;
@@ -40,7 +40,7 @@
     overscroll-behavior-inline: contain;
 }
 
-.media-element {
+.scroller-element {
     position: relative;
     display: grid;
     grid-template-rows: min-content;
@@ -51,7 +51,7 @@
     border: 1px solid #aaa;
 }
 
-.media-element:hover {
+.scroller-element:hover {
     .bar {background: #ffa530;}
     border: 1px solid #ffa530;
     cursor: pointer;
@@ -59,7 +59,7 @@
 
 
 
-.media-element > .paragraph {
+.scroller-element > .paragraph {
     inline-size: 100%;
     height: 15rem;
     overflow: hidden;
@@ -111,4 +111,8 @@
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
+}
+
+a:hover, a:visited, a:link, a:active {
+    text-decoration: none;
 }

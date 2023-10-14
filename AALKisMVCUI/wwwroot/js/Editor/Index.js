@@ -1,9 +1,9 @@
-const miliBeforeSave = 1000;
+const miliBeforeSave = 500; 
 const miliBeforeStatusClear = 4000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
-const category = window.location.pathname.split('/')[2];
+const folder = window.location.pathname.split('/')[2];
 const note = window.location.pathname.split('/')[3];
 
 const spanTextArea = document.getElementById("editor-textarea");
@@ -79,7 +79,7 @@ function saveTextArea()
     }
 
     fetch(webOrigin + "/" + controller + "/PostNoteRecord/"
-        + category + "/" + note,
+        + folder + "/" + note,
         {
             "method": "POST",
             "body": spanEditHTML,
@@ -91,7 +91,7 @@ function saveTextArea()
 //async function fetchTextArea(spanTextArea)
 //{
 //    let result = await fetch(webOrigin + "/" + controller + "/GetNoteRecord/"
-//        + category + "/" + note);
+//        + folder + "/" + note);
 //}
 
 
