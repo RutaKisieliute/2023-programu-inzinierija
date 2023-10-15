@@ -86,6 +86,7 @@ public class NoteController : ControllerBase
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
             record.Content = body;
+            record.EditDate = DateTime.Now;
 
             _recordsService.UpdateNote(folderName, record);
         }

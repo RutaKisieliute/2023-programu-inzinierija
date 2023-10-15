@@ -11,6 +11,8 @@ public record struct NoteRecord : IJsonSerializable
 
     public string? Content { get; set; } = null;
 
+    public DateTime EditDate { get; set; } = DateTime.Now;
+
     [Flags]
     public enum NoteFlags : int
     {
