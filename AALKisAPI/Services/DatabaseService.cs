@@ -135,22 +135,19 @@ public class DatabaseService : IRecordsService
         string query2 = $"SELECT notes.* FROM folders, notes WHERE folders.title = '{folderName}' AND notes.folder_id = folders.id";
         NoteRecord note;
         FolderRecord<NoteRecord> folder = new FolderRecord<NoteRecord>(){Name = folderName};
-        MySqlDataReader reader;
         try
         {
-            using (MySqlConnection connection1 = new MySqlConnection(DBConnection))
-            using (MySqlCommand cmd1 = new MySqlCommand(query1, connection1))
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            connection.Open();
+            using(MySqlCommand cmd1 = new MySqlCommand(query1, connection))
+            using(MySqlDataReader reader = cmd1.ExecuteReader())
             {
-                connection1.Open();
-                reader = cmd1.ExecuteReader();
                 reader.Read();
                 folder.Id = Convert.ToInt32(reader["id"]);
             }
-            using (MySqlConnection connection2 = new MySqlConnection(DBConnection))
-            using (MySqlCommand cmd2 = new MySqlCommand(query2, connection2))
+            using (MySqlCommand cmd2 = new MySqlCommand(query2, connection))
+            using(MySqlDataReader reader = cmd2.ExecuteReader())
             {
-                connection2.Open();
-                reader = cmd2.ExecuteReader();
                 while(reader.Read())
                 {
                     note = new NoteRecord();
@@ -163,9 +160,10 @@ public class DatabaseService : IRecordsService
             }
             return folder;
         }
-        catch(Exception)
+        catch(Exception e)
         {
             //backup?
+            Console.WriteLine("This fucked up in GetFolder -->" + e.Message + "!!!");
             return folder;
         }
     }
@@ -234,13 +232,138 @@ public class DatabaseService : IRecordsService
 
     }
 
-    public void CreateFolder(string folderName){}
+    public void CreateFolder(string folderName)
+    {
+        string query1 = "SELECT MAX(id) FROM folders";
+        string query2;
+        int id;
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using(MySqlCommand cmd = new MySqlCommand(query1, connection))
+            {
+                MySqlDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+                id = Convert.ToInt32(reader["id"]) + 1;
+            }
+            query2 = $"INSERT INTO folders (id, title, user_id) VALUES ({id.ToString()}, '{folderName}', 1)";
+            using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 
-    public void CreateNote(string folderName, string noteTitle){}
+    public void CreateNote(string folderName, string noteTitle)
+    {
+        if(!CheckIfFolderExists(folderName)) return;
+        string query1 = "SELECT MAX(id) FROM notes";
+        string query2 = $"SELECT id FROM folders WHERE title = '{folderName}'";
+        string query3;
+        MySqlDataReader reader;
+        int id, FolderId;
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using(MySqlCommand cmd = new MySqlCommand(query1, connection))
+            {
+                reader = cmd.ExecuteReader();
+                reader.Read();
+                id = Convert.ToInt32(reader["id"]) + 1;
+            }
+            using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            {
+                reader = cmd.ExecuteReader();
+                reader.Read();
+                FolderId = Convert.ToInt32(reader["id"]);
+            }
+            query3 = $"INSERT INTO notes (id, title, public, content, folder_id) VALUES ({id}, {noteTitle}, true, '', {FolderId})";
+            using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 
-    public void DeleteFolder(string folderName, bool recursive){}
+    public void DeleteFolder(string folderName, bool recursive)
+    {
+        if(!CheckIfFolderExists(folderName)) return;
+        string query1 = $"SELECT id FROM folders WHERE title = '{folderName}'";
+        string query2, query3;
+        MySqlDataReader reader;
+        int id;
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using(MySqlCommand cmd = new MySqlCommand(query1, connection))
+            {
+                reader = cmd.ExecuteReader();
+                reader.Read();
+                id = Convert.ToInt32(reader["id"]);
+            }
+            query2 = $"DELETE FROM folders WHERE id = {id}";
+            using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            if(recursive)
+            {
+                query3 = $"DELETE FROM notes WHERE folder_id = {id}";
+                using(MySqlCommand cmd = new MySqlCommand(query3, connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 
-    public void DeleteNote(string folderName, string noteTitle){}
+    public void DeleteNote(string folderName, string noteTitle)
+    {
+        try
+        {
+            NoteRecord note = GetNote(folderName, noteTitle, false);
+            string query = $"DELETE FROM notes WHERE id = {note.Id}";
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using MySqlCommand cmd = new MySqlCommand(query, connection);
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 
-    public void UpdateNote(string folderName, NoteRecord record){}
+    public void UpdateNote(string folderName, NoteRecord record)
+    {
+        if(!CheckIfNoteExists(folderName, record.Title)) return;
+        bool IsPublic = ((record.Flags & NoteRecord.NoteFlags.Public) == NoteRecord.NoteFlags.Public);
+        try
+        {
+            FolderRecord<NoteRecord> folder = GetFolder(folderName, false);
+            string query = $"UPDATE notes SET content = '{record.Content}', title = '{record.Title}', public = {IsPublic}, folder_id = {folder.Id} WHERE id = {record.Id}";
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using MySqlCommand cmd = new MySqlCommand(query, connection);
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 }
