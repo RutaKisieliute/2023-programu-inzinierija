@@ -23,11 +23,15 @@ public class MyNotesController : Controller
     {
         string targetUri = "/Folder";
 
-        var categories = await _client
+        var folders = await _client
             .Fetch<List<FolderRecord<NoteRecord>>>(targetUri, HttpMethod.Get)
             ?? throw new JsonException($"Got empty response from {targetUri}");
-
-        return View(categories);
+        // Order by access date descending.
+        foreach (var folder in folders)
+        {
+            folder.Records = folder.Records.OrderByDescending(record => record.EditDate).ToList();
+        }
+        return View(folders);
     }
 
     [HttpPost("[action]/{folderName}")]
@@ -72,8 +76,34 @@ public class MyNotesController : Controller
         catch (Exception ex) {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
             _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
-            return Json(new { redirectToUrl = "www.google.com" });
+            return BadRequest();
         }
 
     }
+
+    [HttpPost("[action]/{folderName}")]
+    public async Task<IActionResult> CreateEmptyFolder(string folderName)
+    {
+        try
+        {
+            string targetUri = "/Folder/" + folderName;
+
+            // Create Folder
+            var response = await _client
+                    .Fetch(targetUri, HttpMethod.Post)
+                    ?? throw new JsonException($"Got empty response from {targetUri}");
+
+            return Ok();
+
+
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            return BadRequest();
+        }
+
+    }
+
 }

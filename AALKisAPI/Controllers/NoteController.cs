@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
-using System.Text.Json;
 
 namespace AALKisAPI.Controllers;
 
@@ -87,6 +86,7 @@ public class NoteController : ControllerBase
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
             record.Content = body;
+            record.EditDate = DateTime.Now;
 
             _recordsService.UpdateNote(folderName, record);
         }
