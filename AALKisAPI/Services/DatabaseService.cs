@@ -234,22 +234,25 @@ public class DatabaseService : IRecordsService
 
     public void CreateFolder(string folderName)
     {
-        string query1 = "SELECT MAX(id) FROM folders";
+        string query1 = "SELECT MAX(id) AS max FROM folders";
         string query2;
         int id;
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
+            connection.Open();
             using(MySqlCommand cmd = new MySqlCommand(query1, connection))
+            using(MySqlDataReader reader = cmd.ExecuteReader())
             {
-                MySqlDataReader reader = cmd.ExecuteReader();
+                
                 reader.Read();
-                id = Convert.ToInt32(reader["id"]) + 1;
+                id = Convert.ToInt32(reader["max"]) + 1;
             }
-            query2 = $"INSERT INTO folders (id, title, user_id) VALUES ({id.ToString()}, '{folderName}', 1)";
+            query2 = $"INSERT INTO folders (id, title, user_id) VALUES ({id}, '{folderName}', 1)";
             using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            using(MySqlDataReader reader = cmd.ExecuteReader())
             {
-                cmd.ExecuteNonQuery();
+                if(cmd.ExecuteNonQuery() < 1) Console.WriteLine("nothing changed||||||||");
             }
         }
         catch(Exception e)
@@ -261,35 +264,38 @@ public class DatabaseService : IRecordsService
     public void CreateNote(string folderName, string noteTitle)
     {
         if(!CheckIfFolderExists(folderName)) return;
-        string query1 = "SELECT MAX(id) FROM notes";
+        string query1 = "SELECT MAX(id) AS max FROM notes";
         string query2 = $"SELECT id FROM folders WHERE title = '{folderName}'";
         string query3;
-        MySqlDataReader reader;
         int id, FolderId;
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
+            connection.Open();
             using(MySqlCommand cmd = new MySqlCommand(query1, connection))
+            using(MySqlDataReader reader = cmd.ExecuteReader())
             {
-                reader = cmd.ExecuteReader();
                 reader.Read();
-                id = Convert.ToInt32(reader["id"]) + 1;
+                id = Convert.ToInt32(reader["max"]) + 1;
             }
             using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            using(MySqlDataReader reader = cmd.ExecuteReader())
             {
-                reader = cmd.ExecuteReader();
                 reader.Read();
                 FolderId = Convert.ToInt32(reader["id"]);
             }
-            query3 = $"INSERT INTO notes (id, title, public, content, folder_id) VALUES ({id}, {noteTitle}, true, '', {FolderId})";
-            using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            query3 = $"INSERT INTO notes (id, title, public, content, folder_id) VALUES ({id}, '{noteTitle}', true, '', {FolderId})";
+            using(MySqlCommand cmd = new MySqlCommand(query3, connection))
             {
                 cmd.ExecuteNonQuery();
             }
+            Console.WriteLine("should be good!!!!!!!!!!!!!!?????????????!!!!!!!!");
+            return;
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("fucked in create ---->" + e.ToString() + "!!!!!!!!!!!!");
+            return;
         }
     }
 
@@ -303,6 +309,7 @@ public class DatabaseService : IRecordsService
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
+            connection.Open();
             using(MySqlCommand cmd = new MySqlCommand(query1, connection))
             {
                 reader = cmd.ExecuteReader();
@@ -336,6 +343,7 @@ public class DatabaseService : IRecordsService
             NoteRecord note = GetNote(folderName, noteTitle, false);
             string query = $"DELETE FROM notes WHERE id = {note.Id}";
             using MySqlConnection connection = new MySqlConnection(DBConnection);
+            connection.Open();
             using MySqlCommand cmd = new MySqlCommand(query, connection);
             {
                 cmd.ExecuteNonQuery();
@@ -355,9 +363,10 @@ public class DatabaseService : IRecordsService
         {
             FolderRecord<NoteRecord> folder = GetFolder(folderName, false);
             string query = $"UPDATE notes SET content = '{record.Content}', title = '{record.Title}', public = {IsPublic}, folder_id = {folder.Id} WHERE id = {record.Id}";
-            using MySqlConnection connection = new MySqlConnection(DBConnection);
-            using MySqlCommand cmd = new MySqlCommand(query, connection);
+            using (MySqlConnection connection = new MySqlConnection(DBConnection))
+            using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {
+                connection.Open();
                 cmd.ExecuteNonQuery();
             }
         }
