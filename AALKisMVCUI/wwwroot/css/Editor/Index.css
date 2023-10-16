@@ -29,6 +29,8 @@ b {
     font-family: inherit;
     font-size: inherit;
 
+    white-space: pre;
+
     border: 1px solid #ccc;
     border-radius: 2px;
     padding: 4px;
@@ -65,4 +67,3 @@ b {
     line-height: 1em;
     margin: 0.5em;
 }
-

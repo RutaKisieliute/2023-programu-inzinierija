@@ -78,10 +78,8 @@ public class EditorController : Controller
         {
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            body = body.Replace("<br>", "\n");
             body = System.Web.HttpUtility.HtmlEncode(body)
-                .Replace("&amp;", "&")
-                .Replace("\n", "<br>");
+                .Replace("&amp;", "&");
 
             await _client.Fetch($"Note/{folderName}/{noteName}",
                     HttpMethod.Put,
