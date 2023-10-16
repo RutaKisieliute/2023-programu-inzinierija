@@ -26,10 +26,11 @@ public class MyNotesController : Controller
         var folders = await _client
             .Fetch<List<FolderRecord<NoteRecord>>>(targetUri, HttpMethod.Get)
             ?? throw new JsonException($"Got empty response from {targetUri}");
+        folders.Sort();
         // Order by access date descending.
         foreach (var folder in folders)
         {
-            folder.Records = folder.Records.OrderByDescending(record => record.EditDate).ToList();
+            folder.Records.Sort(); // = folder.Records.OrderByDescending(record => record.EditDate).ToList();
         }
         return View(folders);
     }

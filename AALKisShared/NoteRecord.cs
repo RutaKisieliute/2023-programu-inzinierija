@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AALKisShared;
 
-public record struct NoteRecord : IJsonSerializable
+public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
 {
     public long Id { get; set; } = -1;
 
@@ -59,6 +59,22 @@ public record struct NoteRecord : IJsonSerializable
         }
 
         Title = Path.GetFileNameWithoutExtension(filePath);
+    }
+
+    public int CompareTo(NoteRecord other)
+    {
+        // If the MarkedForDeletion flags differ,
+        if(((this.Flags ^ other.Flags) & NoteFlags.MarkedForDeletion) == NoteFlags.MarkedForDeletion)
+        {
+            // If this is marked for deletion,
+            if((this.Flags & NoteFlags.MarkedForDeletion) == NoteFlags.MarkedForDeletion)
+                // Then this should go after
+                return 1;
+            // Otherwise this should go before
+            return -1;
+        }
+        // Otherwise, fall back to title string comparison
+        return this.Title.CompareTo(other.Title);
     }
 }
 
