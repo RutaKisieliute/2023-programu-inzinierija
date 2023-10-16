@@ -8,6 +8,7 @@ const note = window.location.pathname.split('/')[3];
 
 const spanTextArea = document.getElementById("editor-textarea");
 var spanEditHTML;
+var caretPositionSpanEditHTML = 0;
 var shouldUpdateSpanViewHTML;
 var spanViewHTML;
 
@@ -26,7 +27,9 @@ function startup()
     //setInterval((fetchTextArea), miliBetweenFetches, spanTextArea)
 
     spanTextArea.addEventListener("input", (onInput));
+    spanTextArea.addEventListener("paste", (onPaste));
     spanTextArea.addEventListener("focus", (onFocus));
+    spanTextArea.addEventListener("click", (onClick));
     spanTextArea.addEventListener("dblclick", (onDoubleClick));
     spanTextArea.addEventListener("focusout", (onFocusOut));
 
@@ -94,9 +97,9 @@ function saveTextArea()
 //        + folder + "/" + note);
 //}
 
-
 function onInput(event)
 {
+    console.log("Hello from onInput!");
     // Clear the timer to save
     clearTimeout(saveTimeoutId);
 
@@ -114,20 +117,80 @@ function onInput(event)
     saveTimeoutId = setTimeout((saveTextArea), miliBeforeSave);
 }
 
-function onFocus()
+function onPaste(event)
 {
-    spanTextArea.innerHTML = spanEditHTML;
+    // https://stackoverflow.com/a/34876744
+    event.preventDefault();
+
+    var text = '';
+
+    console.log(spanTextArea.selectionStart);
+
+    if (event.clipboardData || event.originalEvent.clipboardData)
+    {
+        text = (event.originalEvent || event).clipboardData.getData('text/plain');
+    }
+    else if (window.clipboardData)
+    {
+        text = window.clipboardData.getData('Text');
+    }
+
+    // `execCommand` is obsolete/deprecated,
+    // but there are no alternatives as I've read,
+    // so it `execCommand` stays.
+    if (document.queryCommandSupported('insertText'))
+    {
+        document.execCommand('insertText', false, text);
+    }
+    else
+    {
+        document.execCommand('paste', false, text);
+    }
 }
 
-function onDoubleClick()
+function onFocus(event)
+{
+    // Show editing HTML
+    spanTextArea.innerHTML = spanEditHTML;
+
+    // Set the caret position
+    // https://stackoverflow.com/a/6249440
+    var range = document.createRange();
+    var selection = window.getSelection();
+
+    // `setStart` works by offset if node.nodeType == 3 (Text),
+    // so `spanTextArea` can't be passed directly,
+    // but the first child node of it is a Text node.
+    range.setStart(spanTextArea.childNodes[0], caretPositionSpanEditHTML);
+    range.setEnd(spanTextArea.childNodes[0], caretPositionSpanEditHTML);
+    range.collapse(true);
+
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
+function onClick(event)
+{
+    // Save the caret position
+    try
+    {
+        var selection = window.getSelection().getRangeAt(0);
+        caretPositionSpanEditHTML = selection.startOffset;
+    }
+    catch (error)
+    {
+        console.warn(error);
+    }
+}
+
+function onDoubleClick(event)
 {
     // Allow editing on double click
     spanTextArea.setAttribute("contentEditable", "true");
-
     spanTextArea.focus({ "focusVisible": "true" });
 }
 
-function onFocusOut()
+function onFocusOut(event)
 {
     // Disable editing after losing focus
     // Can't click hyperlinks when content is editable

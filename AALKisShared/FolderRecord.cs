@@ -1,6 +1,6 @@
 namespace AALKisShared;
 
-public record class FolderRecord<T> where T : IJsonSerializable, new()
+public record class FolderRecord<T> : IComparable<FolderRecord<T>> where T : IJsonSerializable, new()
 {
     public int Id { get; set; } = -1;
 
@@ -10,24 +10,11 @@ public record class FolderRecord<T> where T : IJsonSerializable, new()
 
     public FolderRecord() { }
 
-    public void SetFromDirectory(string path, bool previewOnly = false)
+    public int CompareTo(FolderRecord<T>? other)
     {
-        static string GetLowestDirectoryName(string path)
-        {
-            return path.Split(new char[] {'\\', '/'})
-                    .Last(str => str.Length > 0);
-        }
-
-        Name = GetLowestDirectoryName(path);
-
-        Records = Directory.GetFiles(path)
-            .Select<string, T>(filePath => {
-                    T t = new T();
-                    t.SetFromJsonFile(filePath, previewOnly);
-                    return t; })
-            .ToList();
-
-        return;
+        if(other == null)
+            return -1;
+        return this.Name.CompareTo(other.Name);
     }
 }
 
