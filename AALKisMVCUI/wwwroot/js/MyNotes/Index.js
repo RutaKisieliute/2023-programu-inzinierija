@@ -2,6 +2,8 @@ const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
 // Dictionary list [{folderName: x, htmlElementCreate: y}, ]
 var htmlCreateElements = [];
+// Dictionary list [{folderName: x, noteName: y, overflowButton: z}, ]
+var overflowButtonElements = [];
 const folderCreationDialog = document.getElementById("create-folder-dialog");
 const createFolderButton = document.getElementById("create-folder-btn");
 
@@ -9,31 +11,86 @@ const createFolderButton = document.getElementById("create-folder-btn");
 function startup() {
     // Refresh page, if navigated with back button, to reflect edited note changes.
     var perfEntries = performance.getEntriesByType("navigation");
-
     if (perfEntries[0].type === "back_forward") {
         location.reload();
     }
+
+    // Enable popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl, {
+            trigger: 'focus',
+            content:
+            `<div class="popover-container">
+                <div class="popover-option popover-option-top">
+                    Change Folder
+                </div>
+                <div class="popover-option popover-option-bottom">
+                    Archive Note
+                </div>
+            </div>`
+            ,
+            html: true
+        })
+    })
+
     // Get html create elements with folder names.
     var folders = document.getElementsByClassName("folder");
     for (let folder of folders) {
         const folderName = folder.getElementsByClassName("folder-name")[0].innerHTML;
         const createElement = folder.getElementsByClassName("scroller")[0].getElementsByClassName("create-element")[0];
         htmlCreateElements.push({ "folderName": folderName, htmlElementCreate: createElement });
+
+        var scrollerElements = folder.getElementsByClassName("scroller")[0].getElementsByClassName("scroller-element");
+        var scrollerElements = Array.from(scrollerElements);
+        scrollerElements.shift(); // remove first - create-element
+        for (let scrollerElement of scrollerElements) {
+            const noteName = scrollerElement.getElementsByClassName("title")[0].innerHTML;
+            const overflowButton = scrollerElement.getElementsByClassName("overflow-btn")[0];
+            overflowButtonElements.push({ "folderName": folderName, "noteName": noteName, "overflowButton": overflowButton });
+        }
     }
 
     // Set on click listeners
     for (let dict of htmlCreateElements) {
         dict.htmlElementCreate.addEventListener("click", function () { onNoteClick(dict.folderName); })
     }
+    for (let dict of overflowButtonElements) {
+        dict.overflowButton.addEventListener("click", function (event) { onOverflowClick(event, dict.folderName, dict.noteName); })
+        dict.overflowButton.addEventListener('shown.bs.popover', function () {
+            //dict.overflowButton.getElementsByClassName("popover-option")[0].addEventListener("click", function () { onChangeFolderClick(folderName, noteName); });
+            //dict.overflowButton.getElementsByClassName("popover-option")[1].addEventListener("click", function () { onArchiveNoteClick(folderName, noteName); });
+            $(".popover-option-top").off("click");
+            $(".popover-option-bottom").off("click");
+            $(".popover-option-top").on("click", function () {
+                onChangeFolderClick(dict.folderName, dict.noteName);
+            })
+            $(".popover-option-bottom").on("click", function () {
+                onArchiveNoteClick(dict.folderName, dict.noteName);
+            })
+        });
+    }
     createFolderButton.addEventListener("click", (onCreateFolderClick));
     folderCreationDialog.addEventListener("click", (onDialogClick));
     folderCreationDialog.getElementsByTagName("button")[0]
-        .addEventListener("click", function () { onDialogButtonClick(folderCreationDialog.getElementsByTagName("input")[0].value) });
+        .addEventListener("click", function () { onDialogButtonClick(folderCreationDialog.getElementsByTagName("input")[0].value); });
         
 }
 
 function onNoteClick(folderName) {
     createEmptyNote(folderName);
+}
+
+function onOverflowClick(event, folderName, noteName) {
+    event.stopPropagation();
+    console.log("Overflow: " + folderName + " " + noteName);    
+}
+function onChangeFolderClick(folderName, noteName) {
+    console.log("Change Folder: " + folderName + " " + noteName);
+}
+
+function onArchiveNoteClick(folderName, noteName) {
+    console.log("Archive Note: " + folderName + " " + noteName);
 }
 
 function onCreateFolderClick() {

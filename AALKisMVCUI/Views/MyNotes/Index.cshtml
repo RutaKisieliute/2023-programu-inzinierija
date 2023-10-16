@@ -6,7 +6,7 @@
 
 <button id="create-folder-btn" class="btn btn-secondary">Create New Folder</button>
 
-<dialog id="create-folder-dialog">
+<dialog id="create-folder-dialog" class="dialog">
     <h6 for="exampleInputEmail1">Folder name</h6>
     
     <input maxlength="20" id="exampleInputEmail1" type="text" class="form-control" placeholder="Enter folder name">
@@ -30,13 +30,23 @@
 
             @foreach(NoteRecord note in folder.Records)
             {
-                <a href="/Editor/@folder.Name/@note.Title">
+                
                 <div class="scroller-element">
-                    <p class="title prevent-select">@note.Title</p>
-                    <p class="paragraph prevent-select">@note.Content</p>
-                    <div class="fader"></div>
+                    <svg tabIndex="0" data-bs-toggle="popover" class="overflow-btn" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             viewBox="0 0 110 137.5" style="enable-background:new 0 0 110 137.5;" xml:space="preserve" fill="#ffff00">
+                            <circle cx="55" cy="34" r="12" />
+                            <circle cx="55" cy="67" r="12" />
+                            <circle cx="55" cy="100" r="12" />
+                    </svg>
+                    
+                    <a href="/Editor/@folder.Name/@note.Title">
+                        <p class="title prevent-select">@note.Title</p>
+                        <p class="paragraph prevent-select">@note.Content</p>
+                        <div class="fader"></div>
+                    </a>
+                    
                 </div>
-                </a>
+                
 
             }
 
