@@ -412,4 +412,22 @@ public class DatabaseService : IRecordsService
             return list;
         }
     }
+
+    public void RenameFolder(string OldFolderName, string NewFolderName)
+    {
+        try
+        {
+            string query = $"UPDATE folders SET title = '{NewFolderName}' WHERE title = '{OldFolderName}'";
+            using (MySqlConnection connection = new MySqlConnection(DBConnection))
+            using (MySqlCommand cmd = new MySqlCommand(query, connection))
+            {
+                connection.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
 }

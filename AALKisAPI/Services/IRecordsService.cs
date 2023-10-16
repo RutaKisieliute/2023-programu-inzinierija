@@ -25,4 +25,6 @@ public interface IRecordsService
     public void UpdateNote(string folderName, NoteRecord record);
 
     public List<NoteRecord> SearchByTitle(string searchQuery);
+
+    public void RenameFolder(string OldFolderName, string NewFolderName);
 }

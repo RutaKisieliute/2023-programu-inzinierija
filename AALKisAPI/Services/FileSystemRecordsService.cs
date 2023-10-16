@@ -119,4 +119,6 @@ public class FileSystemRecordsService : IRecordsService
         //but we'll probably use DatabaseService instead anyway
         return new List<NoteRecord>();
     }
+
+    public void RenameFolder(string OldFolderName, string NewFolderName){}
 }
