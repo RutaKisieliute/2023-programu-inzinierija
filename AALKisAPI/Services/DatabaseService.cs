@@ -20,63 +20,58 @@ public class DatabaseService : IRecordsService
         User,
         Content
     }
-
-    //public MySqlConnection Con { get; }
     
     public DatabaseService()
     {
         DBConnection = File.ReadAllText("./Services/databaselogin.txt");
-        //Con = new MySqlConnection(DBConnection);
     }
 
     /*public List<string?> GetTags()
     {
         List<string?> list = new List<string?>();
-        Con.Open();
-        MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT tag FROM tags", Con);
-        MySqlDataReader reader;
         try
         {
-            reader = cmd.ExecuteReader();
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT tag FROM tags", connection);
+            using MySqlDataReader reader = cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                list.Add(reader["tag"].ToString());
+            }
+            return list;
         }
         catch(Exception)
         {
             return list;
         }
-        while(reader.Read())
-        {
-            list.Add(reader["tag"].ToString());
-        }
-        reader.Close();
-        Con.Close();
-        return list;
     }
 
-    public List<List<string?>> GetNotesByTag(string tag)
+    public List<NoteRecord> GetNotesByTag(string tag)
     {
-        List<List<string?>> list = new List<List<string?>>();
-        string query = "SELECT name, note_id FROM tags JOIN notes ON note_id = id WHERE public = true AND tag = '" + tag + "'";
-        Con.Open();
-        MySqlCommand cmd = new MySqlCommand(query, Con);
-        MySqlDataReader reader;
+        List<NoteRecord> list = new List<NoteRecord>();
+        NoteRecord note = new NoteRecord();
+        string query = $"SELECT title, note_id FROM tags JOIN notes ON note_id = id WHERE public = true AND tag = '{tag}'";
         try
         {
-            reader = cmd.ExecuteReader();
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using MySqlCommand cmd = new MySqlCommand(query, connection);
+            using MySqlDataReader reader = cmd.ExecuteReader();
+            while(reader.Read())
+            {
+                note.Id = Convert.ToInt64(reader["id"]);
+                note.Title = reader["title"].ToString() ?? "";
+                note.Content = reader["content"].ToString();
+                if(Convert.ToBoolean(reader["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+            }
         }
         catch(Exception)
         {
             return list;
         }
-        while(reader.Read())
-        {
-            list.Add(new List<string?>{reader["name"].ToString(), reader["note_id"].ToString()});
-        }
-        reader.Close();
-        Con.Close();
         return list;
     }
 
-    public List<string?> GetNote(string id)
+    /*public List<string?> GetNote(string id)
     {
         List<string?> list = new List<string?>();
         string query = "SELECT name, author_id, note FROM notes WHERE id = " + id;
@@ -130,32 +125,45 @@ public class DatabaseService : IRecordsService
 
     public FolderRecord<NoteRecord> GetFolder(string folderName, bool previewOnly)
     {
-        if(!CheckIfFolderExists(folderName)) throw new Exception("The folder doesn't exist");
-        string query1 = $"SELECT id FROM folders WHERE title = '{folderName}'";
-        string query2 = $"SELECT notes.* FROM folders, notes WHERE folders.title = '{folderName}' AND notes.folder_id = folders.id";
+        //if(!CheckIfFolderExists(folderName)) throw new Exception("The folder doesn't exist");
+        string query2 = $"SELECT id FROM folders WHERE title = '{folderName}'";
+        string query1 = $"SELECT notes.* FROM folders, notes WHERE folders.title = '{folderName}' AND notes.folder_id = folders.id";
         NoteRecord note;
         FolderRecord<NoteRecord> folder = new FolderRecord<NoteRecord>(){Name = folderName};
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
             connection.Open();
-            using(MySqlCommand cmd1 = new MySqlCommand(query1, connection))
-            using(MySqlDataReader reader = cmd1.ExecuteReader())
+            using (MySqlCommand cmd1 = new MySqlCommand(query1, connection))
+            using(MySqlDataReader reader1 = cmd1.ExecuteReader())
             {
-                reader.Read();
-                folder.Id = Convert.ToInt32(reader["id"]);
-            }
-            using (MySqlCommand cmd2 = new MySqlCommand(query2, connection))
-            using(MySqlDataReader reader = cmd2.ExecuteReader())
-            {
-                while(reader.Read())
+                if(reader1.Read())
                 {
+                    folder.Id = Convert.ToInt32(reader1["folder_id"]);
                     note = new NoteRecord();
-                    note.Id = Convert.ToInt64(reader["id"]);
-                    note.Title = reader["title"].ToString() ?? "";
-                    note.Content = reader["content"].ToString();
-                    if(Convert.ToBoolean(reader["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+                    note.Id = Convert.ToInt64(reader1["id"]);
+                    note.Title = reader1["title"].ToString() ?? "";
+                    note.Content = reader1["content"].ToString();
+                    if(Convert.ToBoolean(reader1["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
                     folder.Records.Add(note);
+                    while(reader1.Read())
+                    {
+                        note = new NoteRecord();
+                        note.Id = Convert.ToInt64(reader1["id"]);
+                        note.Title = reader1["title"].ToString() ?? "";
+                        note.Content = reader1["content"].ToString();
+                        if(Convert.ToBoolean(reader1["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+                        folder.Records.Add(note);
+                    }
+                }
+                else
+                {
+                    using(MySqlCommand cmd2 = new MySqlCommand(query2, connection))
+                    using(MySqlDataReader reader2 = cmd2.ExecuteReader())
+                    {
+                        reader2.Read();
+                        folder.Id = Convert.ToInt32(reader2["id"]);
+                    }
                 }
             }
             return folder;
@@ -163,7 +171,7 @@ public class DatabaseService : IRecordsService
         catch(Exception e)
         {
             //backup?
-            Console.WriteLine("This fucked up in GetFolder -->" + e.Message + "!!!");
+            Console.WriteLine("Error in GetFolder -->" + e.Message + "!!!");
             return folder;
         }
     }
@@ -289,12 +297,11 @@ public class DatabaseService : IRecordsService
             {
                 cmd.ExecuteNonQuery();
             }
-            Console.WriteLine("should be good!!!!!!!!!!!!!!?????????????!!!!!!!!");
             return;
         }
         catch(Exception e)
         {
-            Console.WriteLine("fucked in create ---->" + e.ToString() + "!!!!!!!!!!!!");
+            Console.WriteLine("Error in create ---->" + e.ToString() + "!!!!!!!!!!!!");
             return;
         }
     }
@@ -304,20 +311,21 @@ public class DatabaseService : IRecordsService
         if(!CheckIfFolderExists(folderName)) return;
         string query1 = $"SELECT id FROM folders WHERE title = '{folderName}'";
         string query2, query3;
-        MySqlDataReader reader;
         int id;
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
             connection.Open();
             using(MySqlCommand cmd = new MySqlCommand(query1, connection))
+            using(MySqlDataReader reader = cmd.ExecuteReader())
             {
-                reader = cmd.ExecuteReader();
+                
                 reader.Read();
                 id = Convert.ToInt32(reader["id"]);
             }
             query2 = $"DELETE FROM folders WHERE id = {id}";
             using(MySqlCommand cmd = new MySqlCommand(query2, connection))
+            using(MySqlDataReader reader = cmd.ExecuteReader())
             {
                 cmd.ExecuteNonQuery();
             }
@@ -373,6 +381,35 @@ public class DatabaseService : IRecordsService
         catch(Exception e)
         {
             Console.WriteLine(e.Message);
+        }
+    }
+
+    public List<NoteRecord> SearchByTitle(string searchQuery)
+    {
+        List<NoteRecord> list = new List<NoteRecord>();
+        NoteRecord note;
+        string query = $"SELECT * FROM notes WHERE UPPER(title) LIKE UPPER('%{searchQuery}%')";
+        try
+        {
+            using MySqlConnection connection = new MySqlConnection(DBConnection);
+            using MySqlCommand cmd = new MySqlCommand(query, connection);
+            using MySqlDataReader reader = cmd.ExecuteReader();
+            connection.Open();
+            while(reader.Read())
+            {
+                note = new NoteRecord(){
+                    Id = Convert.ToInt64(reader["id"]),
+                    Title = reader["title"].ToString() ?? "",
+                    Content = reader["content"].ToString()};
+                if(Convert.ToBoolean(reader["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+                list.Add(note);
+            }
+            return list;
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e.Message);
+            return list;
         }
     }
 }

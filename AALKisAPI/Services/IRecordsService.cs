@@ -23,4 +23,6 @@ public interface IRecordsService
     public void DeleteNote(string folderName, string noteTitle);
 
     public void UpdateNote(string folderName, NoteRecord record);
+
+    public List<NoteRecord> SearchByTitle(string searchQuery);
 }
