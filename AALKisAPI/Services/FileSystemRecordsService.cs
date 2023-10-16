@@ -111,4 +111,12 @@ public class FileSystemRecordsService : IRecordsService
         record.ToJsonFile($"{baseDirectory}/{folderName}");
         return;
     }
+
+    public List<NoteRecord> SearchByTitle(string searchQuery)
+    {
+        //this does nothing right now
+        //we'll need to change it if we're going to use it
+        //but we'll probably use DatabaseService instead anyway
+        return new List<NoteRecord>();
+    }
 }
