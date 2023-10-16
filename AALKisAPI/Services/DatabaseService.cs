@@ -144,7 +144,7 @@ public class DatabaseService : IRecordsService
                     note.Id = Convert.ToInt64(reader1["id"]);
                     note.Title = reader1["title"].ToString() ?? "";
                     note.Content = reader1["content"].ToString();
-                    if(Convert.ToBoolean(reader1["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+                    note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader1["public"]);
                     folder.Records.Add(note);
                     while(reader1.Read())
                     {
@@ -152,7 +152,7 @@ public class DatabaseService : IRecordsService
                         note.Id = Convert.ToInt64(reader1["id"]);
                         note.Title = reader1["title"].ToString() ?? "";
                         note.Content = reader1["content"].ToString();
-                        if(Convert.ToBoolean(reader1["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+                        note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader1["public"]);                        
                         folder.Records.Add(note);
                     }
                 }
@@ -191,7 +191,7 @@ public class DatabaseService : IRecordsService
             note.Id = Convert.ToInt64(reader["id"]);
             note.Title = reader["title"].ToString() ?? "";
             note.Content = reader["content"].ToString();
-            if(Convert.ToBoolean(reader["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+            note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader["public"]);
             return note;
         }
         catch(Exception)
@@ -366,11 +366,10 @@ public class DatabaseService : IRecordsService
     public void UpdateNote(string folderName, NoteRecord record)
     {
         if(!CheckIfNoteExists(folderName, record.Title)) return;
-        bool IsPublic = ((record.Flags & NoteRecord.NoteFlags.Public) == NoteRecord.NoteFlags.Public);
         try
         {
             FolderRecord<NoteRecord> folder = GetFolder(folderName, false);
-            string query = $"UPDATE notes SET content = '{record.Content}', title = '{record.Title}', public = {IsPublic}, folder_id = {folder.Id} WHERE id = {record.Id}";
+            string query = $"UPDATE notes SET content = '{record.Content}', title = '{record.Title}', public = {record.Flags}, folder_id = {folder.Id} WHERE id = {record.Id}";
             using (MySqlConnection connection = new MySqlConnection(DBConnection))
             using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {
@@ -400,8 +399,8 @@ public class DatabaseService : IRecordsService
                 note = new NoteRecord(){
                     Id = Convert.ToInt64(reader["id"]),
                     Title = reader["title"].ToString() ?? "",
-                    Content = reader["content"].ToString()};
-                if(Convert.ToBoolean(reader["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
+                    Content = reader["content"].ToString(),
+                    Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader["public"])};
                 list.Add(note);
             }
             return list;
