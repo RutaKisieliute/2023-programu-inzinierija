@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
+using Newtonsoft.Json;
 
 namespace AALKisAPI.Controllers;
 
@@ -83,9 +84,14 @@ public class NoteController : ControllerBase
         {
             var record = _recordsService.GetNote(folderName, noteTitle, false);
 
-            string body = await new StreamReader(Request.Body).ReadToEndAsync();
-
-            record.Content = body;
+            string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
+            NoteRecord fieldsToUpdate = JsonConvert.DeserializeObject<NoteRecord>(jsonString);
+            if (fieldsToUpdate.Title != null)
+                record.Title = fieldsToUpdate.Title;
+            if (fieldsToUpdate.Content != null)
+                record.Content = fieldsToUpdate.Content;
+            if (fieldsToUpdate.Flags != null)
+                record.Flags = record.Flags ^ fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
             record.EditDate = DateTime.Now;
 
             _recordsService.UpdateNote(folderName, record);

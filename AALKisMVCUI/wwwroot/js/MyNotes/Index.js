@@ -90,8 +90,10 @@ function onChangeFolderClick(folderName, noteName) {
 }
 
 function onArchiveNoteClick(folderName, noteName) {
-    console.log("Archive Note: " + folderName + " " + noteName);
+    archiveNote(folderName, noteName);
 }
+
+
 
 function onCreateFolderClick() {
     folderCreationDialog.showModal();
@@ -164,6 +166,26 @@ function createEmptyFolder(folderName) {
                 else
                     throw new Error("Js createEmptyFolder error");
 
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error("There was a problem with the fetch operation:", error);
+        });
+}
+
+function archiveNote(folderName, noteName) {
+    fetch(webOrigin + "/" + controller + "/ArchiveNote/" + folderName + "/" + noteName, {
+        method: "POST",
+        body: JSON.stringify({ folderName: folderName, noteName: noteName }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Js archiveNote error");
             } else {
                 location.reload();
             }

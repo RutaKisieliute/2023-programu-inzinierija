@@ -3,6 +3,7 @@ using AALKisMVCUI.Utility;
 using AALKisShared;
 using System.Text.Json;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -81,9 +82,16 @@ public class EditorController : Controller
             body = System.Web.HttpUtility.HtmlEncode(body)
                 .Replace("&amp;", "&");
 
+            // Passing json instead of string, so that PUT (/Note/{folderName}/{noteName}) can update not only content.
+            NoteRecord fieldsToUpdate = new NoteRecord();
+            fieldsToUpdate.Content = body;
+
+            string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
+
             await _client.Fetch($"Note/{folderName}/{noteName}",
                     HttpMethod.Put,
-                    new StringContent(body));
+                    new StringContent(jsonString, Encoding.UTF8, "application/json"));
+            
         }
         catch(HttpRequestException exception)
         {

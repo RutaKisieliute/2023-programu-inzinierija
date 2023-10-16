@@ -4,6 +4,7 @@ using AALKisMVCUI.Utility;
 using AALKisShared;
 using System.Net;
 using Microsoft.AspNetCore.Http.Extensions;
+using System.Text;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -96,6 +97,36 @@ public class MyNotesController : Controller
 
             return Ok();
 
+
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            return BadRequest();
+        }
+
+    }
+
+    [HttpPost("[action]/{folderName}/{noteName}")]
+    public async Task<IActionResult> ArchiveNote(string folderName, string noteName)
+    {
+        try
+        {
+            string targetUri = "/Note/" + noteName + "/" + folderName;
+
+            NoteRecord fieldsToUpdate = new NoteRecord();
+            fieldsToUpdate.Flags = NoteRecord.NoteFlags.Archived; // Not sets, but switches.
+
+            string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
+
+
+            // Update Note Archived Flag
+            await _client.Fetch($"Note/{folderName}/{noteName}",
+                    HttpMethod.Put,
+                    new StringContent(jsonString, Encoding.UTF8, "application/json"));
+
+            return Ok();
 
         }
         catch (Exception ex)

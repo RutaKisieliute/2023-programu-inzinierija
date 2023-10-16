@@ -7,23 +7,23 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
 {
     public long Id { get; set; } = -1;
 
-    public string Title { get; set; } = "";
+    public string? Title { get; set; } = null;
 
     public string? Content { get; set; } = null;
 
-    public DateTime EditDate { get; set; } = DateTime.Now;
+    public DateTime? EditDate { get; set; } = null;
 
     [Flags]
     public enum NoteFlags : int
     {
         None = 0b0,
-        MarkedForDeletion = 0b1,
+        Archived = 0b1,
         InheritKeywords = 0b10,
         ShareKeywords = 0b100,
         Public = 0b1000
     }
 
-    public NoteFlags Flags { get; set; } = NoteFlags.None;
+    public NoteFlags? Flags { get; set; } = null;
 
     public NoteRecord() { }
 
@@ -63,11 +63,11 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
 
     public int CompareTo(NoteRecord other)
     {
-        // If the MarkedForDeletion flags differ,
-        if(((this.Flags ^ other.Flags) & NoteFlags.MarkedForDeletion) == NoteFlags.MarkedForDeletion)
+        // If the Archived flags differ,
+        if(((this.Flags ^ other.Flags) & NoteFlags.Archived) == NoteFlags.Archived)
         {
             // If this is marked for deletion,
-            if((this.Flags & NoteFlags.MarkedForDeletion) == NoteFlags.MarkedForDeletion)
+            if((this.Flags & NoteFlags.Archived) == NoteFlags.Archived)
                 // Then this should go after
                 return 1;
             // Otherwise this should go before
