@@ -291,7 +291,7 @@ public class DatabaseService : IRecordsService
                 reader.Read();
                 FolderId = Convert.ToInt32(reader["id"]);
             }
-            query3 = $"INSERT INTO notes (id, title, public, content, folder_id) VALUES ({id}, '{noteTitle}', true, '', {FolderId})";
+            query3 = $"INSERT INTO notes (id, title, public, content, folder_id) VALUES ({id}, '{noteTitle}', 0, '', {FolderId})";
             using(MySqlCommand cmd = new MySqlCommand(query3, connection))
             {
                 cmd.ExecuteNonQuery();
