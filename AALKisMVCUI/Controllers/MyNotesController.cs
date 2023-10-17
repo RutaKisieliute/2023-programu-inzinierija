@@ -139,4 +139,29 @@ public class MyNotesController : Controller
 
     }
 
+    [HttpPost("[action]/{newFolderName}/{oldFolderName}/{noteName}")]
+    public async Task<IActionResult> ChangeFolderName(string newFolderName, string oldFolderName, string noteName)
+    {
+        try
+        {
+            string targetUri = "/Note/" + newFolderName + "/" + oldFolderName + "/" + noteName;
+
+
+            // Update Note Archived Flag
+            await _client.Fetch($"Note/{newFolderName}/{oldFolderName}/{noteName}",
+                    HttpMethod.Post,
+                    new StringContent(""));
+
+            return Ok();
+
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            return BadRequest();
+        }
+
+    }
+
 }

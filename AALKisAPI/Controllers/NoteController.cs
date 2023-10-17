@@ -86,25 +86,38 @@ public class NoteController : ControllerBase
 
             string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
             NoteRecord fieldsToUpdate = JsonConvert.DeserializeObject<NoteRecord>(jsonString);
-            _logger.LogError("ZZZZZZZZZZZZZ " + fieldsToUpdate);
             if (fieldsToUpdate.Title != null)
                 record.Title = fieldsToUpdate.Title;
             if (fieldsToUpdate.Content != null)
                 record.Content = fieldsToUpdate.Content;
             if (fieldsToUpdate.Flags != null)
             {
-                _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
                 record.Flags = record.Flags ^ fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
-                _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
             }
                 
             record.EditDate = DateTime.Now;
-            _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
             _recordsService.UpdateNote(folderName, record);
         }
         catch(Exception exception)
         {
             _logger.LogError($"Could not update note {noteTitle} in {folderName}: "
+                    + exception.ToString());
+            return BadRequest();
+        }
+        return new StatusCodeResult(StatusCodes.Status204NoContent);
+    }
+
+    [HttpPost("{newFolderName}/{oldFolderName}/{noteTitle}")]
+    public IActionResult ChangeNoteFolder(string newFolderName, string oldFolderName, string noteTitle)
+    {
+        try
+        {
+            var record = _recordsService.GetNote(oldFolderName, noteTitle, false);
+            _recordsService.UpdateNote(newFolderName, record);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError($"Could not move note {noteTitle} from {oldFolderName} ito {newFolderName}: "
                     + exception.ToString());
             return BadRequest();
         }

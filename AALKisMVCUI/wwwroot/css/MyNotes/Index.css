@@ -2,6 +2,10 @@
     margin: 0rem 1rem 1rem 1rem;
 }
 
+#archived-btn {
+    margin: 0rem 1rem 1rem 0rem;
+}
+
 .container {
     max-width: 100% !important; /*Remove boostrap container's default "margins" from the sides*/
 }
