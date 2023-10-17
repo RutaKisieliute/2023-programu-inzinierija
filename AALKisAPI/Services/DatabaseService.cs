@@ -368,7 +368,8 @@ public class DatabaseService : IRecordsService
         try
         {
             FolderRecord<NoteRecord> folder = GetFolder(folderName, false);
-            string query = $"UPDATE notes SET content = '{record.Content}', title = '{record.Title}', public = {record.Flags}, folder_id = {folder.Id} WHERE id = {record.Id}";
+            string query = $"UPDATE notes SET content = '{record.Content}', title = '{record.Title}', public = {(int) (record.Flags ?? 0)}, folder_id = {folder.Id} WHERE id = {record.Id}";
+            Console.WriteLine(record.Flags);
             using (MySqlConnection connection = new MySqlConnection(DBConnection))
             using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {
