@@ -5,7 +5,6 @@
 }
 
 <button id="create-folder-btn" class="btn btn-secondary">Create New Folder</button>
-<a href="/Archived" class="btn btn-secondary">Archived Notes</a>
 
 <dialog id="create-folder-dialog" class="dialog">
     <h6 for="exampleInputEmail1">Folder name</h6>
@@ -14,21 +13,6 @@
     <br />
     <button type="submit" class="btn btn-secondary">Create</button>
    
-</dialog>
-
-<dialog id="change-folder-dialog" class="dialog">
-    <h6 for="folder-selector"></h6>
-
-    <select id="folder-selector" class="form-control">
-        <option value="" selected disabled>Select folder</option>
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
-    </select>
-
-    <br />
-    <button type="submit" class="btn btn-secondary">Move</button>
-
 </dialog>
 
 @foreach(FolderRecord<NoteRecord> folder in Model)
@@ -75,6 +59,6 @@
 
 
 @section Scripts{
-    <script src="~/js/MyNotes/Index.js"></script>
+    <script src="~/js/Archived/Index.js"></script>
 }
 

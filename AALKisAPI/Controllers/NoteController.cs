@@ -92,7 +92,7 @@ public class NoteController : ControllerBase
                 record.Content = fieldsToUpdate.Content;
             if (fieldsToUpdate.Flags != null)
             {
-                record.Flags = record.Flags | fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
+                record.Flags = record.Flags ^ fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
             }
                 
             record.EditDate = DateTime.Now;
