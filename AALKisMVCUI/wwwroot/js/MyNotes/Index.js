@@ -34,6 +34,12 @@ function startup() {
         })
     })
 
+    document.querySelectorAll('.paragraph').forEach(paragraph => {
+        const content = decodeHtmlEntities(paragraph.innerHTML);
+        console.log(content);
+        paragraph.innerHTML = content;
+    });
+
     // Get html create elements with folder names.
     var folders = document.getElementsByClassName("folder");
     for (let folder of folders) {
@@ -77,6 +83,11 @@ function startup() {
         
 }
 
+
+function decodeHtmlEntities(input) {
+    var doc = new DOMParser().parseFromString(input, "text/html");
+    return doc.documentElement.textContent;
+}
 function onNoteClick(folderName) {
     createEmptyNote(folderName);
 }
@@ -187,7 +198,7 @@ function archiveNote(folderName, noteName) {
             if (!response.ok) {
                 throw new Error("Js archiveNote error");
             } else {
-                location.reload();
+                //location.reload();
             }
         })
         .catch(error => {

@@ -86,14 +86,20 @@ public class NoteController : ControllerBase
 
             string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
             NoteRecord fieldsToUpdate = JsonConvert.DeserializeObject<NoteRecord>(jsonString);
+            _logger.LogError("ZZZZZZZZZZZZZ " + fieldsToUpdate);
             if (fieldsToUpdate.Title != null)
                 record.Title = fieldsToUpdate.Title;
             if (fieldsToUpdate.Content != null)
                 record.Content = fieldsToUpdate.Content;
             if (fieldsToUpdate.Flags != null)
-                record.Flags = record.Flags ^ fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
+            {
+                _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
+                record.Flags = record.Flags | fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
+                _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
+            }
+                
             record.EditDate = DateTime.Now;
-
+            _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
             _recordsService.UpdateNote(folderName, record);
         }
         catch(Exception exception)

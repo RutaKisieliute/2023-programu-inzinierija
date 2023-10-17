@@ -1,5 +1,4 @@
 using System.Text;
-
 using AALKisAPI.Services;
 
 using AALKisShared;
@@ -117,7 +116,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine("ERROR ERROR HERE -->" + e.Message + "!!!!!");
+            Console.WriteLine("Error while getting all folders: " + e.Message);
             return folders;
         }
 
@@ -171,7 +170,7 @@ public class DatabaseService : IRecordsService
         catch(Exception e)
         {
             //backup?
-            Console.WriteLine("Error in GetFolder -->" + e.Message + "!!!");
+            Console.WriteLine("Error while getting folder: " + e.Message);
             return folder;
         }
     }
@@ -194,10 +193,10 @@ public class DatabaseService : IRecordsService
             note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader["public"]);
             return note;
         }
-        catch(Exception)
+        catch(Exception e)
         {
-            //backup?
-            return new NoteRecord(){Content = null};
+            Console.WriteLine("Error while getting note: " + e.Message);
+            throw;
         }
     }
 
@@ -213,9 +212,9 @@ public class DatabaseService : IRecordsService
             if(reader.Read()) return true;
             return false;
         }
-        catch(Exception)
+        catch(Exception e)
         {
-            //backup?
+            Console.WriteLine("Error while checking if folder exists: " + e.Message);
             return false;
         }
     }
@@ -232,9 +231,9 @@ public class DatabaseService : IRecordsService
             if(reader.Read()) return true;
             return false;
         }
-        catch(Exception)
+        catch(Exception e)
         {
-            //backup?
+            Console.WriteLine("Error while checking if note exists: " + e.Message);
             return false;
         }
 
@@ -265,7 +264,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error while creating folder: " + e.Message);
         }
     }
 
@@ -301,7 +300,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine("Error in create ---->" + e.ToString() + "!!!!!!!!!!!!");
+            Console.WriteLine("Error while creating note: " + e.ToString());
             return;
         }
     }
@@ -340,7 +339,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error while deleting folder: " + e.Message);
         }
     }
 
@@ -359,7 +358,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error while deleting note: " + e.Message);
         }
     }
 
@@ -379,7 +378,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error while updating note: " + e.Message);
         }
     }
 
@@ -407,7 +406,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error while searching by title: " + e.Message);
             return list;
         }
     }
@@ -426,7 +425,7 @@ public class DatabaseService : IRecordsService
         }
         catch(Exception e)
         {
-            Console.WriteLine(e.Message);
+            Console.WriteLine("Error while renaming folder: " + e.Message);
         }
     }
 }
