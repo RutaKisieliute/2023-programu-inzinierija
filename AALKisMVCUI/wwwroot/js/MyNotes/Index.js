@@ -80,7 +80,11 @@ function startup() {
     createFolderButton.addEventListener("click", (onCreateFolderClick));
     folderCreationDialog.addEventListener("click", (onDialogClick));
     folderCreationDialog.getElementsByTagName("button")[0]
-        .addEventListener("click", function () { onDialogButtonClick(folderCreationDialog.getElementsByTagName("input")[0].value); });
+        .addEventListener("click", function () { onCreateFolderDialogButtonClick(folderCreationDialog.getElementsByTagName("input")[0].value); });
+    folderChangeDialog.addEventListener("click", (onDialogClick));
+    folderChangeDialog.getElementsByTagName("button")[0]
+        .addEventListener("click", function () { onChangeFolderDialogButtonClick(folderChangeDialog.getElementsByTagName("select")[0].value); });
+
         
 }
 
@@ -99,14 +103,18 @@ function onOverflowClick(event, folderName, noteName) {
 }
 function onChangeFolderClick(folderName, noteName) {
     folderChangeDialog.showModal();
-    console.log("Change Folder: " + folderName + " " + noteName);
+    var html = `<option value="" selected disabled>${folderName}</option>`;
+    for (var dict of htmlCreateElements) {
+        if (dict.folderName != folderName)
+            html += `<option>${dict.folderName}</option>`
+    }
+    document.getElementById("folder-selector").innerHTML = html;
+    folderChangeDialog.getElementsByTagName("h6")[0].innerHTML = `Move note '<span>${noteName}</span>' to folder`;
 }
 
 function onArchiveNoteClick(folderName, noteName) {
     archiveNote(folderName, noteName);
 }
-
-
 
 function onCreateFolderClick() {
     folderCreationDialog.showModal();
@@ -129,11 +137,20 @@ function onDialogClick(e) {
         e.target.close();
 }
 
-function onDialogButtonClick(folderName) {
+function onCreateFolderDialogButtonClick(folderName) {
     if (isValidFolderName(folderName)) {
         createEmptyFolder(folderName);
     }
     else window.alert("Invalid folder name.");
+}
+
+function onChangeFolderDialogButtonClick(folderName) {
+    if (folderName !== null && folderName !== undefined) {
+        const noteName = folderChangeDialog.getElementsByTagName("h6")[0].getElementsByTagName("span")[0].innerHTML;
+        const oldFolderName = folderChangeDialog.getElementsByTagName("select")[0].getElementsByTagName("option")[0].innerHTML;
+        changeFolderName(folderName, oldFolderName, noteName);
+    }
+    else window.alert("Select folder to move your note.");
 }
 
 
@@ -200,7 +217,7 @@ function archiveNote(folderName, noteName) {
             if (!response.ok) {
                 throw new Error("Js archiveNote error");
             } else {
-                //location.reload();
+                location.reload();
             }
         })
         .catch(error => {
@@ -208,4 +225,23 @@ function archiveNote(folderName, noteName) {
         });
 }
 
+function changeFolderName(newFolderName, oldFolderName, noteName) {
+    fetch(webOrigin + "/" + controller + "/ChangeFolderName/" + newFolderName + "/" + oldFolderName + "/" + noteName, {
+        method: "POST",
+        body: JSON.stringify({ newFolderName: newFolderName, oldFolderName: oldFolderName, noteName: noteName }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Js archiveNote error");
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error("There was a problem with the fetch operation:", error);
+        });
+}
 startup();

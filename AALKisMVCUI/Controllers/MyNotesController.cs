@@ -32,7 +32,7 @@ public class MyNotesController : Controller
         foreach (var folder in folders)
         {
             folder.Records.Sort(); // = folder.Records.OrderByDescending(record => record.EditDate).ToList();
-            folder.Records = folder.Records.FindAll(record => (record.Flags & NoteRecord.NoteFlags.Archived) != 0);
+            folder.Records = folder.Records.FindAll(record => (record.Flags & NoteRecord.NoteFlags.Archived) == 0);
         }
         return View(folders);
     }
@@ -126,6 +126,31 @@ public class MyNotesController : Controller
             await _client.Fetch($"Note/{folderName}/{noteName}",
                     HttpMethod.Put,
                     new StringContent(jsonString, Encoding.UTF8, "application/json"));
+
+            return Ok();
+
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            return BadRequest();
+        }
+
+    }
+
+    [HttpPost("[action]/{newFolderName}/{oldFolderName}/{noteName}")]
+    public async Task<IActionResult> ChangeFolderName(string newFolderName, string oldFolderName, string noteName)
+    {
+        try
+        {
+            string targetUri = "/Note/" + newFolderName + "/" + oldFolderName + "/" + noteName;
+
+
+            // Update Note Archived Flag
+            await _client.Fetch($"Note/{newFolderName}/{oldFolderName}/{noteName}",
+                    HttpMethod.Post,
+                    new StringContent(""));
 
             return Ok();
 

@@ -364,7 +364,7 @@ public class DatabaseService : IRecordsService
 
     public void UpdateNote(string folderName, NoteRecord record)
     {
-        if(!CheckIfNoteExists(folderName, record.Title)) return;
+        //if(!CheckIfNoteExists(folderName, record.Title)) return;
         try
         {
             FolderRecord<NoteRecord> folder = GetFolder(folderName, false);
