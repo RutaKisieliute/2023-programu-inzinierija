@@ -5,6 +5,7 @@ var htmlCreateElements = [];
 // Dictionary list [{folderName: x, noteName: y, overflowButton: z}, ]
 var overflowButtonElements = [];
 const folderCreationDialog = document.getElementById("create-folder-dialog");
+const folderChangeDialog = document.getElementById("change-folder-dialog");
 const createFolderButton = document.getElementById("create-folder-btn");
 
 
@@ -97,6 +98,7 @@ function onOverflowClick(event, folderName, noteName) {
     console.log("Overflow: " + folderName + " " + noteName);    
 }
 function onChangeFolderClick(folderName, noteName) {
+    folderChangeDialog.showModal();
     console.log("Change Folder: " + folderName + " " + noteName);
 }
 

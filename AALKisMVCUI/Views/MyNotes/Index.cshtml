@@ -15,6 +15,21 @@
    
 </dialog>
 
+<dialog id="change-folder-dialog" class="dialog">
+    <h6 for="folder-selector">Move note to folder</h6>
+
+    <select id="folder-selector" class="form-control">
+        <option value="" selected disabled>Select folder</option>
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+    </select>
+
+    <br />
+    <button type="submit" class="btn btn-secondary">Move</button>
+
+</dialog>
+
 @foreach(FolderRecord<NoteRecord> folder in Model)
 {
 
