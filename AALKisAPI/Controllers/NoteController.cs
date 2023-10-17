@@ -94,7 +94,7 @@ public class NoteController : ControllerBase
             if (fieldsToUpdate.Flags != null)
             {
                 _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
-                record.Flags = record.Flags | fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
+                record.Flags = record.Flags ^ fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
                 _logger.LogError("ZZZZZZZZZZZZZZZ Flag: " + record.Flags + " " + fieldsToUpdate.Flags);
             }
                 

@@ -32,7 +32,7 @@ public class MyNotesController : Controller
         foreach (var folder in folders)
         {
             folder.Records.Sort(); // = folder.Records.OrderByDescending(record => record.EditDate).ToList();
-            folder.Records = folder.Records.FindAll(record => (record.Flags & NoteRecord.NoteFlags.Archived) != 0);
+            folder.Records = folder.Records.FindAll(record => (record.Flags & NoteRecord.NoteFlags.Archived) == 0);
         }
         return View(folders);
     }
