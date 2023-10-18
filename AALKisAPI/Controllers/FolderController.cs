@@ -78,6 +78,23 @@ public class FolderController : ControllerBase
         return new StatusCodeResult(StatusCodes.Status201Created);
     }
 
+    [HttpPatch("{folderName}/{newFolderName}")]
+    public IActionResult Rename(string folderName, string newFolderName)
+    {
+        try
+        {
+            _recordsService.RenameFolder(folderName, newFolderName);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError($"Failed to rename folder record \"{folderName}\" to \"{newFolderName}\": "
+                    + exception.ToString());
+            return new StatusCodeResult(StatusCodes.Status400BadRequest);
+        }
+        return new StatusCodeResult(StatusCodes.Status204NoContent);
+    }
+
+
     [HttpDelete("{folderName}")]
     public IActionResult Delete(string folderName, [FromQuery] bool force = false)
     {

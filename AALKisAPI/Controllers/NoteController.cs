@@ -82,19 +82,16 @@ public class NoteController : ControllerBase
     {
         try
         {
-            var record = _recordsService.GetNote(folderName, noteTitle, false);
+            NoteRecord record = _recordsService.GetNote(folderName, noteTitle, false);
 
             string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
             NoteRecord fieldsToUpdate = JsonConvert.DeserializeObject<NoteRecord>(jsonString);
-            if (fieldsToUpdate.Title != null)
-                record.Title = fieldsToUpdate.Title;
-            if (fieldsToUpdate.Content != null)
-                record.Content = fieldsToUpdate.Content;
-            if (fieldsToUpdate.Flags != null)
-            {
-                record.Flags = record.Flags ^ fieldsToUpdate.Flags; // To PUT pass not Flags end result, but which flags to switch.
-            }
-                
+
+            record.Update(
+                    flags: record.Flags ^ fieldsToUpdate.Flags,
+                    title: fieldsToUpdate.Title,
+                    content: fieldsToUpdate.Content);
+
             record.EditDate = DateTime.Now;
             _recordsService.UpdateNote(folderName, record);
         }

@@ -5,28 +5,38 @@ namespace AALKisShared;
 
 public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
 {
-    public long Id { get; set; }
+    public long Id { get; set; } = -1;
 
-    public string? Title { get; set; }
+    public string? Title { get; set; } = null;
 
-    public string? Content { get; set; }
+    public string? Content { get; set; } = null;
 
-    public DateTime? EditDate { get; set; }
+    public DateTime? EditDate { get; set; } = null;
 
-    public NoteFlags? Flags { get; set; }
+    public NoteFlags? Flags { get; set; } = null;
 
-    public NoteRecord(
-            long id = -1,
+    public NoteRecord() { }
+
+    public void Update(
             string? title = null,
             string? content = null,
             DateTime? editDate = null,
             NoteFlags? flags = null)
     {
-        Id = id;
-        Title = title;
-        Content = content;
-        EditDate = editDate;
-        Flags = flags;
+        Title = title ?? Title;
+        Content = content ?? Content;
+        EditDate = editDate ?? EditDate;
+        Flags = flags ?? Flags;
+        return;
+    }
+
+    public bool IsValid()
+    {
+        return Id > 0
+                && Title != null
+                && Content != null
+                && EditDate != null
+                && Flags != null;
     }
 
     public string ToJsonString()
