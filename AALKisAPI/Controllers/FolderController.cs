@@ -10,10 +10,10 @@ public class FolderController : ControllerBase
 {
     private readonly ILogger<FolderController> _logger;
 
-    private readonly IRecordsService _recordsService;
+    private readonly IFolderRecordsService _recordsService;
 
     public FolderController(ILogger<FolderController> logger,
-            IRecordsService recordsService)
+            IFolderRecordsService recordsService)
     {
         _logger = logger;
         _recordsService = recordsService;
@@ -83,7 +83,7 @@ public class FolderController : ControllerBase
     {
         try
         {
-            _recordsService.DeleteFolder(folderName, recursive: force);
+            _recordsService.DeleteFolder(folderName, force);
         }
         catch(Exception exception)
         {

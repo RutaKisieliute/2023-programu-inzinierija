@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class DatabaseService : IRecordsService
+public class FolderDatabaseService : IFolderRecordsService
 {
     private readonly string DBConnection;
 
@@ -19,80 +19,11 @@ public class DatabaseService : IRecordsService
         User,
         Content
     }
-    
-    public DatabaseService()
+
+    public FolderDatabaseService()
     {
         DBConnection = File.ReadAllText("./Services/databaselogin.txt");
     }
-
-    /*public List<string?> GetTags()
-    {
-        List<string?> list = new List<string?>();
-        try
-        {
-            using MySqlConnection connection = new MySqlConnection(DBConnection);
-            using MySqlCommand cmd = new MySqlCommand("SELECT DISTINCT tag FROM tags", connection);
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            while(reader.Read())
-            {
-                list.Add(reader["tag"].ToString());
-            }
-            return list;
-        }
-        catch(Exception)
-        {
-            return list;
-        }
-    }
-
-    public List<NoteRecord> GetNotesByTag(string tag)
-    {
-        List<NoteRecord> list = new List<NoteRecord>();
-        NoteRecord note = new NoteRecord();
-        string query = $"SELECT title, note_id FROM tags JOIN notes ON note_id = id WHERE public = true AND tag = '{tag}'";
-        try
-        {
-            using MySqlConnection connection = new MySqlConnection(DBConnection);
-            using MySqlCommand cmd = new MySqlCommand(query, connection);
-            using MySqlDataReader reader = cmd.ExecuteReader();
-            while(reader.Read())
-            {
-                note.Id = Convert.ToInt64(reader["id"]);
-                note.Title = reader["title"].ToString() ?? "";
-                note.Content = reader["content"].ToString();
-                if(Convert.ToBoolean(reader["public"])) note.Flags = note.Flags | NoteRecord.NoteFlags.Public;
-            }
-        }
-        catch(Exception)
-        {
-            return list;
-        }
-        return list;
-    }
-
-    /*public List<string?> GetNote(string id)
-    {
-        List<string?> list = new List<string?>();
-        string query = "SELECT name, author_id, note FROM notes WHERE id = " + id;
-        Con.Open();
-        MySqlCommand cmd = new MySqlCommand(query, Con);
-        MySqlDataReader reader;
-        try
-        {
-            reader = cmd.ExecuteReader();
-        }
-        catch(Exception)
-        {
-            return list;
-        }
-        reader.Read();
-        list.Add(reader["name"].ToString());
-        list.Add(reader["author_id"].ToString());
-        list.Add(reader["note"].ToString());
-        reader.Close();
-        Con.Close();
-        return list;
-    }*/
 
     public List<FolderRecord<NoteRecord>> GetAllFolders(bool previewOnly)
     {
@@ -143,7 +74,7 @@ public class DatabaseService : IRecordsService
                     note.Id = Convert.ToInt64(reader1["id"]);
                     note.Title = reader1["title"].ToString() ?? "";
                     note.Content = reader1["content"].ToString();
-                    note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader1["public"]);
+                    note.Flags = (NoteFlags) Convert.ToInt32(reader1["public"]);
                     folder.Records.Add(note);
                     while(reader1.Read())
                     {
@@ -151,7 +82,7 @@ public class DatabaseService : IRecordsService
                         note.Id = Convert.ToInt64(reader1["id"]);
                         note.Title = reader1["title"].ToString() ?? "";
                         note.Content = reader1["content"].ToString();
-                        note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader1["public"]);                        
+                        note.Flags = (NoteFlags) Convert.ToInt32(reader1["public"]);                        
                         folder.Records.Add(note);
                     }
                 }
@@ -190,7 +121,7 @@ public class DatabaseService : IRecordsService
             note.Id = Convert.ToInt64(reader["id"]);
             note.Title = reader["title"].ToString() ?? "";
             note.Content = reader["content"].ToString();
-            note.Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader["public"]);
+            note.Flags = (NoteFlags) Convert.ToInt32(reader["public"]);
             return note;
         }
         catch(Exception e)
@@ -400,7 +331,7 @@ public class DatabaseService : IRecordsService
                     Id = Convert.ToInt64(reader["id"]),
                     Title = reader["title"].ToString() ?? "",
                     Content = reader["content"].ToString(),
-                    Flags = (NoteRecord.NoteFlags) Convert.ToInt32(reader["public"])};
+                    Flags = (NoteFlags) Convert.ToInt32(reader["public"])};
                 list.Add(note);
             }
             return list;
@@ -412,11 +343,11 @@ public class DatabaseService : IRecordsService
         }
     }
 
-    public void RenameFolder(string OldFolderName, string NewFolderName)
+    public void RenameFolder(string oldFolderName, string newFolderName)
     {
         try
         {
-            string query = $"UPDATE folders SET title = '{NewFolderName}' WHERE title = '{OldFolderName}'";
+            string query = $"UPDATE folders SET title = '{newFolderName}' WHERE title = '{oldFolderName}'";
             using (MySqlConnection connection = new MySqlConnection(DBConnection))
             using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {

@@ -11,10 +11,10 @@ public class NoteController : ControllerBase
 {
     private readonly ILogger<NoteController> _logger;
 
-    private readonly IRecordsService _recordsService;
+    private readonly INoteRecordsService _recordsService;
 
     public NoteController(ILogger<NoteController> logger,
-            IRecordsService recordsService)
+            INoteRecordsService recordsService)
     {
         _logger = logger;
         _recordsService = recordsService;

@@ -31,8 +31,10 @@ public class MyNotesController : Controller
         // Order by access date descending.
         foreach (var folder in folders)
         {
-            folder.Records.Sort(); // = folder.Records.OrderByDescending(record => record.EditDate).ToList();
-            folder.Records = folder.Records.FindAll(record => (record.Flags & NoteRecord.NoteFlags.Archived) == 0);
+            folder.Records.Sort();
+            folder.Records = folder.Records
+                .Where(record => (record.Flags & NoteFlags.Archived) == 0)
+                .ToList();
         }
         return View(folders);
     }
@@ -117,7 +119,7 @@ public class MyNotesController : Controller
             string targetUri = "/Note/" + noteName + "/" + folderName;
 
             NoteRecord fieldsToUpdate = new NoteRecord();
-            fieldsToUpdate.Flags = NoteRecord.NoteFlags.Archived; // Not sets, but switches.
+            fieldsToUpdate.Flags = NoteFlags.Archived; // Not sets, but switches.
 
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
 

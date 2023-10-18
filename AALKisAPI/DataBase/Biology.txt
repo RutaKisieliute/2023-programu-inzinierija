@@ -1,3 +1,0 @@
-b-note1;1
-b-note2;2
-b-note3;3
