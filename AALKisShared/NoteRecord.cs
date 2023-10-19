@@ -1,5 +1,6 @@
 using AALKisShared.Utility;
 using Newtonsoft.Json;
+using System.Text.RegularExpressions;
 
 namespace AALKisShared;
 
@@ -33,10 +34,18 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
     public bool IsValid()
     {
         return Id > 0
-                && Title != null
+                && IsTitleValid()
                 && Content != null
                 && EditDate != null
                 && Flags != null;
+    }
+
+    public bool IsTitleValid()
+    {
+        Regex validationRegex = new Regex("[#./\\\n]+");
+
+        return !String.IsNullOrWhiteSpace(Title)
+                && !validationRegex.IsMatch(Title);
     }
 
     public string ToJsonString()

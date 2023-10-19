@@ -1,39 +1,46 @@
-const miliBeforeSave = 500; 
-const miliBeforeStatusClear = 4000;
+const miliBeforeSave = 500;
+const miliBeforeStatusClear = 2000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
 const folder = window.location.pathname.split('/')[2];
 const note = window.location.pathname.split('/')[3];
 
-const spanTextArea = document.getElementById("editor-textarea");
+const editorTextArea = document.getElementById("editor-textarea");
 var spanEditHTML;
 var caretPositionSpanEditHTML = 0;
 var shouldUpdateSpanViewHTML;
 var spanViewHTML;
 
+const titleTextArea = document.getElementById("title-textarea");
+var oldTitle;
+
 const statusDiv = document.getElementById("editor-status");
-var saveTimeoutId;
+var saveContentsTimeoutId;
 var statusClearTimeoutId;
 
 function startup()
 {
-    spanEditHTML = spanTextArea.innerHTML;
+    spanEditHTML = editorTextArea.innerHTML;
 
     shouldUpdateSpanViewHTML = true;
 
-    spanTextArea.innerHTML = spanEditHTML;
+    editorTextArea.innerHTML = spanEditHTML;
 
-    //setInterval((fetchTextArea), miliBetweenFetches, spanTextArea)
+    //setInterval((fetchTextArea), miliBetweenFetches, editorTextArea)
+    //
+    document.addEventListener("paste", (onPaste));
 
-    spanTextArea.addEventListener("input", (onInput));
-    spanTextArea.addEventListener("paste", (onPaste));
-    spanTextArea.addEventListener("focus", (onFocus));
-    spanTextArea.addEventListener("click", (onClick));
-    spanTextArea.addEventListener("dblclick", (onDoubleClick));
-    spanTextArea.addEventListener("focusout", (onFocusOut));
+    editorTextArea.addEventListener("input", (onEditorInput));
+    editorTextArea.addEventListener("focus", (onEditorFocus));
+    editorTextArea.addEventListener("click", (onEditorClick));
+    editorTextArea.addEventListener("dblclick", (onEditorDoubleClick));
+    editorTextArea.addEventListener("focusout", (onEditorFocusOut));
+    onEditorFocusOut();
 
-    onFocusOut();
+    titleTextArea.addEventListener("focus", (onTitleFocus));
+    titleTextArea.addEventListener("focusout", (onTitleFocusOut));
+
     scrollToHref();
 
     /*(event) => {
@@ -62,59 +69,53 @@ function scrollToHref(anchorTag)
     return false;
 }
 
-function saveTextArea()
+function showSuccessStatus()
+{
+    clearTimeout(statusClearTimeoutId);
+    statusDiv.innerHTML = "Saved successfully."
+    statusClearTimeoutId = setTimeout(() => { statusDiv.innerHTML = "" }, miliBeforeStatusClear);
+}
+
+function showFailureStatus()
+{
+    clearTimeout(statusClearTimeoutId);
+    statusDiv.innerHTML = "<b>!!FAILED TO SAVE!!</b>"
+    statusClearTimeoutId = setTimeout(() => { statusDiv.innerHTML = "" }, miliBeforeStatusClear);
+}
+
+
+function saveContents()
 {
     // Executed a save; clear the save timer
-    clearTimeout(saveTimeoutId);
-
-    function success()
-    {
-        clearTimeout(statusClearTimeoutId);
-        statusDiv.innerHTML = "Saved successfully."
-        statusClearTimeoutId = setTimeout(() => { statusDiv.innerHTML = "" }, miliBeforeStatusClear);
-    }
-
-    function failure()
-    {
-        clearTimeout(statusClearTimeoutId);
-        statusDiv.innerHTML = "<b>!!FAILED TO SAVE!!</b>"
-        statusClearTimeoutId = setTimeout(() => { statusDiv.innerHTML = "" }, miliBeforeStatusClear);
-    }
+    clearTimeout(saveContentsTimeoutId);
 
     fetch(webOrigin + "/" + controller + "/PostNoteRecord/"
         + folder + "/" + note,
         {
             "method": "POST",
-            "body": spanEditHTML,
+            "body": JSON.stringify({ "Content": spanEditHTML}),
             "headers": {"content-type": "application/json"}
-        }).then((response) => { if(!response.ok) failure(); else success(); },
-            (failure));
+        }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
+            (showFailureStatus));
 }
 
-//async function fetchTextArea(spanTextArea)
+//async function fetchTextArea(editorTextArea)
 //{
 //    let result = await fetch(webOrigin + "/" + controller + "/GetNoteRecord/"
 //        + folder + "/" + note);
 //}
 
-function onInput(event)
+function onEditorInput(event)
 {
-    console.log("Hello from onInput!");
     // Clear the timer to save
-    clearTimeout(saveTimeoutId);
+    clearTimeout(saveContentsTimeoutId);
 
-    // Update the HTML
-    if(spanTextArea.innerHTML == '<br>')
-    {
-        spanTextArea.innerHTML = '';
-    }
-
-    spanEditHTML = spanTextArea.innerHTML;
+    spanEditHTML = editorTextArea.innerHTML;
 
     shouldUpdateSpanViewHTML = true;
 
     // Set the timer to save
-    saveTimeoutId = setTimeout((saveTextArea), miliBeforeSave);
+    saveContentsTimeoutId = setTimeout((saveContents), miliBeforeSave);
 }
 
 function onPaste(event)
@@ -123,8 +124,6 @@ function onPaste(event)
     event.preventDefault();
 
     var text = '';
-
-    console.log(spanTextArea.selectionStart);
 
     if (event.clipboardData || event.originalEvent.clipboardData)
     {
@@ -148,10 +147,15 @@ function onPaste(event)
     }
 }
 
-function onFocus(event)
+function onEditorFocus(event)
 {
+    if(!editorTextArea.childNodes[0])
+    {
+        return;
+    }
+
     // Show editing HTML
-    spanTextArea.innerHTML = spanEditHTML;
+    editorTextArea.innerHTML = spanEditHTML;
 
     // Set the caret position
     // https://stackoverflow.com/a/6249440
@@ -159,17 +163,17 @@ function onFocus(event)
     var selection = window.getSelection();
 
     // `setStart` works by offset if node.nodeType == 3 (Text),
-    // so `spanTextArea` can't be passed directly,
+    // so `editorTextArea` can't be passed directly,
     // but the first child node of it is a Text node.
-    range.setStart(spanTextArea.childNodes[0], caretPositionSpanEditHTML);
-    range.setEnd(spanTextArea.childNodes[0], caretPositionSpanEditHTML);
+    range.setStart(editorTextArea.childNodes[0], caretPositionSpanEditHTML);
+    range.setEnd(editorTextArea.childNodes[0], caretPositionSpanEditHTML);
     range.collapse(true);
 
     selection.removeAllRanges();
     selection.addRange(range);
 }
 
-function onClick(event)
+function onEditorClick(event)
 {
     // Save the caret position
     try
@@ -183,22 +187,22 @@ function onClick(event)
     }
 }
 
-function onDoubleClick(event)
+function onEditorDoubleClick(event)
 {
     // Allow editing on double click
-    spanTextArea.setAttribute("contentEditable", "true");
-    spanTextArea.focus({ "focusVisible": "true" });
+    editorTextArea.setAttribute("contentEditable", "true");
+    editorTextArea.focus({ "focusVisible": "true" });
 }
 
-function onFocusOut(event)
+function onEditorFocusOut(event)
 {
     // Disable editing after losing focus
     // Can't click hyperlinks when content is editable
-    spanTextArea.setAttribute("contentEditable", "false");
+    editorTextArea.setAttribute("contentEditable", "false");
     // Early return
     if(!shouldUpdateSpanViewHTML)
     {
-        spanTextArea.innerHTML = spanViewHTML;
+        editorTextArea.innerHTML = spanViewHTML;
         return;
     }
 
@@ -206,7 +210,7 @@ function onFocusOut(event)
     shouldUpdateSpanViewHTML = false;
 
     // We only use regular expressions
-    // So we don't need to use spanTextArea.innerHTML
+    // So we don't need to use editorTextArea.innerHTML
     spanViewHTML = spanEditHTML;
 
     var keywords = new Map();
@@ -226,7 +230,7 @@ function onFocusOut(event)
     // Don't process if there are no keywords
     if(keywords.size == 0)
     {
-        spanTextArea.innerHTML = spanViewHTML;
+        editorTextArea.innerHTML = spanViewHTML;
         return;
     }
 
@@ -267,8 +271,46 @@ function onFocusOut(event)
         });
 
     // Finally update the innerHTML
-    spanTextArea.innerHTML = spanViewHTML;
+    editorTextArea.innerHTML = spanViewHTML;
+}
 
+function onTitleFocus(event)
+{
+    if(!oldTitle)
+        oldTitle = titleTextArea.innerHTML;
+}
+
+async function onTitleFocusOut(event)
+{
+    var newTitle = titleTextArea.innerHTML
+    var response;
+    try
+    {
+        response = await fetch(webOrigin + "/" + controller + "/PostNoteRecord/"
+                + folder + "/" + note,
+            {
+                "method": "POST",
+                "body": JSON.stringify({ "Title": newTitle }),
+                "headers": {"content-type": "application/json"}
+            });
+        if(!response.ok)
+            throw new Error();
+    }
+    catch(exception)
+    {
+        titleTextArea.innerHTML = oldTitle;
+        showFailureStatus();
+        return;
+    }
+
+    oldTitle = null;
+
+    newTitle = await response.text();
+    window.location.replace(webOrigin + "/"
+            + controller + "/"
+            + folder + "/"
+            + newTitle);
+    showSuccessStatus();
 }
 
 startup();

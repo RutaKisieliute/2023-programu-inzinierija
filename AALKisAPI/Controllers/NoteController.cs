@@ -78,7 +78,7 @@ public class NoteController : ControllerBase
     }
 
     [HttpPut("{folderName}/{noteTitle}")]
-    public async Task<IActionResult> Put(string folderName, string noteTitle)
+    public async Task<IActionResult> Update(string folderName, string noteTitle)
     {
         try
         {

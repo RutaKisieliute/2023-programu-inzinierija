@@ -75,17 +75,35 @@ public class EditorController : Controller
     [HttpPost("[action]/{folderName}/{noteName}")]
     public async Task<IActionResult> PostNoteRecord(string folderName, string noteName)
     {
+        IActionResult result = Ok();
         try
         {
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            body = System.Web.HttpUtility.HtmlEncode(body)
-                .Replace("&amp;", "&");
+            NoteRecord fieldsToUpdate = new NoteRecord();
+            fieldsToUpdate.SetFromJsonString(body);
+
+            if(fieldsToUpdate.Title != null)
+            {
+                if(!fieldsToUpdate.IsTitleValid())
+                {
+                    throw new BadHttpRequestException("Tried to set title to non-valid string.");
+                }
+                fieldsToUpdate.Title = System.Web.HttpUtility
+                    .HtmlEncode(fieldsToUpdate.Title)
+                    .Replace("&amp;", "&");
+                result = Content(fieldsToUpdate.Title);
+            }
+
+            if(fieldsToUpdate.Content != null)
+            {
+                fieldsToUpdate.Content = System.Web.HttpUtility
+                    .HtmlEncode(fieldsToUpdate.Content)
+                    .Replace("&amp;", "&");
+            }
+
 
             // Passing json instead of string, so that PUT (/Note/{folderName}/{noteName}) can update not only content.
-            NoteRecord fieldsToUpdate = new NoteRecord();
-            fieldsToUpdate.Content = body;
-
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
 
             await _client.Fetch($"Note/{folderName}/{noteName}",
@@ -106,6 +124,6 @@ public class EditorController : Controller
             return BadRequest();
         }
 
-        return Ok();
+        return result;
     }
 }
