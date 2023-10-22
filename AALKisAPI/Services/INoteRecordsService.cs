@@ -4,15 +4,15 @@ namespace AALKisAPI.Services;
 
 public interface INoteRecordsService
 {
-    public NoteRecord GetNote(string folderName, string noteTitle, bool previewOnly);
+    public NoteRecord GetNote(int id, bool previewOnly);
 
-    public bool CheckIfNoteExists(string folderName, string noteTitle);
+    public bool CheckIfNoteExists(int id);
 
-    public void CreateNote(string folderName, string noteTitle);
+    public int CreateNote(int folderId, string noteTitle);
 
-    public void DeleteNote(string folderName, string noteTitle);
+    public void DeleteNote(int id);
 
-    public void UpdateNote(string folderName, NoteRecord record);
+    public void UpdateNote(NoteRecord record, int folderId = -1);
 
     public List<NoteRecord> SearchByTitle(string searchQuery);
 }

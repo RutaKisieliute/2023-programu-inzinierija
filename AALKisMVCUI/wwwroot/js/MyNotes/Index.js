@@ -40,13 +40,15 @@ function startup() {
         console.log(content);
         paragraph.innerHTML = content;
     });
-
+ 
     // Get html create elements with folder names.
     var folders = document.getElementsByClassName("folder");
     for (let folder of folders) {
         const folderName = folder.getElementsByClassName("folder-name")[0].innerHTML;
+        const folderId = folder.getElementsByClassName("folder-id")[0].innerHTML;
         const createElement = folder.getElementsByClassName("scroller")[0].getElementsByClassName("create-element")[0];
         htmlCreateElements.push({ "folderName": folderName, htmlElementCreate: createElement });
+        htmlCreateElements.push({ "folderId": folderId, htmlElementCreate: createElement });
 
         var scrollerElements = folder.getElementsByClassName("scroller")[0].getElementsByClassName("scroller-element");
         var scrollerElements = Array.from(scrollerElements);
@@ -60,7 +62,7 @@ function startup() {
 
     // Set on click listeners
     for (let dict of htmlCreateElements) {
-        dict.htmlElementCreate.addEventListener("click", function () { onNoteClick(dict.folderName); })
+        dict.htmlElementCreate.addEventListener("click", function () { onNoteClick(dict.folderId); })
     }
     for (let dict of overflowButtonElements) {
         dict.overflowButton.addEventListener("click", function (event) { onOverflowClick(event, dict.folderName, dict.noteName); })
@@ -93,8 +95,8 @@ function decodeHtmlEntities(input) {
     var doc = new DOMParser().parseFromString(input, "text/html");
     return doc.documentElement.textContent;
 }
-function onNoteClick(folderName) {
-    createEmptyNote(folderName);
+function onNoteClick(folderId) {
+    createEmptyNote(folderId);
 }
 
 function onOverflowClick(event, folderName, noteName) {
@@ -158,10 +160,10 @@ function isValidFolderName(folderName) {
     var pattern = /^[a-zA-Z0-9 _-]{1,255}$/;
     return pattern.test(folderName);
 }
-function createEmptyNote(folderName) {
-    fetch(webOrigin + "/" + controller + "/CreateEmptyNote/" + folderName, {
+function createEmptyNote(folderId) {
+    fetch(webOrigin + "/" + controller + "/CreateEmptyNote/" + folderId, {
         method: "POST",
-        body: JSON.stringify({ folderName: folderName }),
+        body: JSON.stringify({ folderId: folderId }),
         headers: {
             "Content-Type": "application/json"
         }

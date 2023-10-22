@@ -20,12 +20,12 @@ public class NoteController : ControllerBase
         _recordsService = recordsService;
     }
 
-    [HttpGet("{folderName}/{noteTitle}")]
-    public NoteRecord? Get(string folderName, string noteTitle)
+    [HttpGet("{id}")]
+    public NoteRecord? Get(int id)
     {
         try
         {
-            return _recordsService.GetNote(folderName, noteTitle, previewOnly: false);
+            return _recordsService.GetNote(id, previewOnly: false);
         }
         catch(Exception exception)
         {
@@ -35,54 +35,54 @@ public class NoteController : ControllerBase
         return null;
     }
 
-    [HttpHead("{folderName}/{noteTitle}")]
-    public IActionResult Exists(string folderName, string noteTitle)
+    [HttpHead("{id}")]
+    public IActionResult Exists(int id)
     {
-        if(!_recordsService.CheckIfNoteExists(folderName, noteTitle))
+        if(!_recordsService.CheckIfNoteExists(id))
         {
             return new StatusCodeResult(StatusCodes.Status410Gone);
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
 
-    [HttpPost("{folderName}/{noteTitle}")]
-    public IActionResult Create(string folderName, string noteTitle)
+    [HttpPost("[action]/{folderId}/{noteTitle}")]
+    public IActionResult Create(int folderId, string noteTitle)
     {
         try
         {
-            _recordsService.CreateNote(folderName, noteTitle);
+            _recordsService.CreateNote(folderId, noteTitle);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to create note {noteTitle} in folder {folderName}: "
+            _logger.LogError($"Failed to create note {noteTitle} in folder {folderId}: "
                     + exception.ToString());
             return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status201Created);
     }
 
-    [HttpDelete("{folderName}/{noteTitle}")]
-    public IActionResult Delete(string folderName, string noteTitle)
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id)
     {
         try
         {
-            _recordsService.DeleteNote(folderName, noteTitle);
+            _recordsService.DeleteNote(id);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to delete note {noteTitle} in {folderName}: "
+            _logger.LogError($"Failed to delete note {id}: "
                     + exception.ToString());
             return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
 
-    [HttpPut("{folderName}/{noteTitle}")]
-    public async Task<IActionResult> Update(string folderName, string noteTitle)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id)
     {
         try
         {
-            NoteRecord record = _recordsService.GetNote(folderName, noteTitle, false);
+            NoteRecord record = _recordsService.GetNote(id, false);
 
             string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
             NoteRecord fieldsToUpdate = JsonConvert.DeserializeObject<NoteRecord>(jsonString);
@@ -93,28 +93,28 @@ public class NoteController : ControllerBase
                     content: fieldsToUpdate.Content);
 
             record.EditDate = DateTime.Now;
-            _recordsService.UpdateNote(folderName, record);
+            _recordsService.UpdateNote(record);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Could not update note {noteTitle} in {folderName}: "
+            _logger.LogError($"Could not update note {id}: "
                     + exception.ToString());
             return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
 
-    [HttpPost("{newFolderName}/{oldFolderName}/{noteTitle}")]
-    public IActionResult ChangeNoteFolder(string newFolderName, string oldFolderName, string noteTitle)
+    [HttpPost("{folderId}/{id}")]
+    public IActionResult ChangeNoteFolder(int folderId, int id)
     {
         try
         {
-            var record = _recordsService.GetNote(oldFolderName, noteTitle, false);
-            _recordsService.UpdateNote(newFolderName, record);
+            var record = _recordsService.GetNote(id, false);
+            _recordsService.UpdateNote(record, folderId);
         }
         catch (Exception exception)
         {
-            _logger.LogError($"Could not move note {noteTitle} from {oldFolderName} ito {newFolderName}: "
+            _logger.LogError($"Could not move note {id} from into {folderId}: "
                     + exception.ToString());
             return BadRequest();
         }

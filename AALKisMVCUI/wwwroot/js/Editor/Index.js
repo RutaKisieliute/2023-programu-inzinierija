@@ -3,8 +3,7 @@ const miliBeforeStatusClear = 2000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
-const folder = window.location.pathname.split('/')[2];
-const note = window.location.pathname.split('/')[3];
+const note = window.location.pathname.split('/')[2];
 
 const editorTextArea = document.getElementById("editor-textarea");
 var spanEditHTML;
@@ -90,7 +89,7 @@ function saveContents()
     clearTimeout(saveContentsTimeoutId);
 
     fetch(webOrigin + "/" + controller + "/PostNoteRecord/"
-        + folder + "/" + note,
+        + note,
         {
             "method": "POST",
             "body": JSON.stringify({ "Content": spanEditHTML}),
@@ -286,8 +285,7 @@ async function onTitleFocusOut(event)
     var response;
     try
     {
-        response = await fetch(webOrigin + "/" + controller + "/PostNoteRecord/"
-                + folder + "/" + note,
+        response = await fetch(webOrigin + "/" + controller + "/PostNoteRecord/" + note,
             {
                 "method": "POST",
                 "body": JSON.stringify({ "Title": newTitle }),
@@ -308,8 +306,7 @@ async function onTitleFocusOut(event)
     newTitle = await response.text();
     window.location.replace(webOrigin + "/"
             + controller + "/"
-            + folder + "/"
-            + newTitle);
+            + note);
     showSuccessStatus();
 }
 

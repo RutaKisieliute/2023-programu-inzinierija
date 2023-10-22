@@ -36,6 +36,7 @@
 
     <div class="folder">
         <p class="folder-name">@folder.Name</p>
+        <p class="folder-id" style="color:White;">@folder.Id</p>
         <div class="scroller snaps-inline">
 
             <div class="scroller-element create-element">
@@ -55,7 +56,7 @@
                             <circle cx="55" cy="100" r="12" />
                     </svg>
                     
-                    <a href="/Editor/@folder.Name/@note.Title">
+                    <a href="/Editor/@note.Id">
                         <p class="title prevent-select">@note.Title</p>
                         <div class="paragraph prevent-select">@note.Content</div>
                         <div class="fader"></div>

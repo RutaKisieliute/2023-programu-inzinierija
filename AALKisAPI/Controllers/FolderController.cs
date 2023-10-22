@@ -35,16 +35,16 @@ public class FolderController : ControllerBase
         return null;
     }
 
-    [HttpGet("{folderName}")]
-    public FolderRecord<NoteRecord>? Get(string folderName, [FromQuery] bool getContents = true)
+    [HttpGet("{folderId}")]
+    public FolderRecord<NoteRecord>? Get(int folderId, [FromQuery] bool getContents = true)
     {
         try
         {
-            return _recordsService.GetFolder(folderName, previewOnly: !getContents);
+            return _recordsService.GetFolder(folderId, previewOnly: !getContents);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to get folder record \"{folderName}\": "
+            _logger.LogError($"Failed to get folder record \"{folderId}\": "
                     + exception.ToString());
             Response.StatusCode = StatusCodes.Status400BadRequest;
         }
@@ -52,10 +52,10 @@ public class FolderController : ControllerBase
     }
 
 
-    [HttpHead("{folderName}")]
-    public IActionResult Exists(string folderName)
+    [HttpHead("{folderId}")]
+    public IActionResult Exists(int folderId)
     {
-        if(!_recordsService.CheckIfFolderExists(folderName))
+        if(!_recordsService.CheckIfFolderExists(folderId))
         {
             return new StatusCodeResult(StatusCodes.Status410Gone);
         }
@@ -95,16 +95,16 @@ public class FolderController : ControllerBase
     }
 
 
-    [HttpDelete("{folderName}")]
-    public IActionResult Delete(string folderName, [FromQuery] bool force = false)
+    [HttpDelete("{folderId}")]
+    public IActionResult Delete(int folderId, [FromQuery] bool force = false)
     {
         try
         {
-            _recordsService.DeleteFolder(folderName, force);
+            _recordsService.DeleteFolder(folderId, force);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to delete folder record \"{folderName}\": "
+            _logger.LogError($"Failed to delete folder record \"{folderId}\": "
                     + exception.ToString());
             return new StatusCodeResult(StatusCodes.Status400BadRequest);
         }

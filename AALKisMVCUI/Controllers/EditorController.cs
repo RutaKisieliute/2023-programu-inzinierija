@@ -24,20 +24,20 @@ public class EditorController : Controller
         return Redirect("Home/Error");
     }
 
-    [HttpGet("{folderName}/{noteName}")]
-    public async Task<IActionResult> Index(string folderName, string noteName)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Index(int id)
     {
         try
         {
-            var response = await _client.Fetch($"Note/{folderName}/{noteName}",
+            var response = await _client.Fetch($"Note/{id}",
                     HttpMethod.Head);
 
             if(!response.IsSuccessStatusCode)
             {
-                throw new Exception($"{noteName} in {folderName} does not exist, yet attempted to open it");
+                throw new Exception($"{id} does not exist, yet attempted to open it");
             }
 
-            return View(await GetNoteRecord(folderName, noteName));
+            return View(await GetNoteRecord(id));
         }
         catch(HttpRequestException e)
         {
@@ -51,14 +51,13 @@ public class EditorController : Controller
         return BadRequest();
     }
 
-    [HttpGet("[action]/{folderName}/{noteName}")]
-    public async Task<NoteRecord?> GetNoteRecord(string folderName, string noteName)
+    [HttpGet("[action]/{id}")]
+    public async Task<NoteRecord?> GetNoteRecord(int id)
     {
         try
         {
-            var record = await _client.Fetch<NoteRecord>($"Note/{folderName}/{noteName}",
+            var record = await _client.Fetch<NoteRecord>($"Note/{id}",
                     HttpMethod.Get);
-            record.Title = noteName;
 
             return record;
         }
@@ -66,14 +65,14 @@ public class EditorController : Controller
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            _logger.LogError($"Failed to get {folderName}/{noteName} NoteRecord;\n"
+            _logger.LogError($"Failed to get {id} NoteRecord;\n"
                     + e.ToString());
         }
         return null;
     }
 
-    [HttpPost("[action]/{folderName}/{noteName}")]
-    public async Task<IActionResult> PostNoteRecord(string folderName, string noteName)
+    [HttpPost("[action]/{id}")]
+    public async Task<IActionResult> PostNoteRecord(int id)
     {
         IActionResult result = Ok();
         try
@@ -106,7 +105,7 @@ public class EditorController : Controller
             // Passing json instead of string, so that PUT (/Note/{folderName}/{noteName}) can update not only content.
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
 
-            await _client.Fetch($"Note/{folderName}/{noteName}",
+            await _client.Fetch($"Note/{id}",
                     HttpMethod.Put,
                     new StringContent(jsonString, Encoding.UTF8, "application/json"));
             
@@ -118,7 +117,7 @@ public class EditorController : Controller
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to post {folderName}/{noteName} NoteRecord;\n"
+            _logger.LogError($"Failed to post {id} NoteRecord;\n"
                     + exception.ToString());
 
             return BadRequest();

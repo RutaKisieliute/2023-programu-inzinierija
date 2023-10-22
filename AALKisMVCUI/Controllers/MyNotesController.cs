@@ -39,16 +39,15 @@ public class MyNotesController : Controller
         return View(folders);
     }
 
-    [HttpPost("[action]/{folderName}")]
-    public async Task<IActionResult> CreateEmptyNote(string folderName)
+    [HttpPost("[action]/{folderId}")]
+    public async Task<IActionResult> CreateEmptyNote(int folderId)
     {
         try 
         {
-            string targetUri;
-            string noteName;
+            string targetUri = $"/Note/Create/{folderId}/Untitled";
 
             // If "Untitled" taken, get "Untitled 1", if taken - "Untitled 2" ...
-            for (int i = 0; ; i++) // breaks when status code = 410 - file doesn't exist.
+            /*for (int i = 0; ; i++) // breaks when status code = 410 - file doesn't exist.
             {
                 noteName = "Untitled" + (i == 0 ? "" : " " + i.ToString());
                 targetUri = "/Note/" + folderName + "/" + noteName;
@@ -67,14 +66,14 @@ public class MyNotesController : Controller
                     else
                         throw e;
                 }
-            }
+            }*/
 
             // Create Note
             var resposePost = await _client
                     .Fetch(targetUri, HttpMethod.Post)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
 
-            return Json(new { redirectToUrl = "/Editor/" + folderName + "/" + noteName});
+            return Json(new { redirectToUrl = "MyNotes"});
 
 
         }

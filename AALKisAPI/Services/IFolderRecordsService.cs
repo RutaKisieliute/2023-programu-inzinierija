@@ -6,13 +6,13 @@ public interface IFolderRecordsService
 {
     public List<FolderRecord<NoteRecord>> GetAllFolders(bool previewOnly);
 
-    public FolderRecord<NoteRecord> GetFolder(string folderName, bool previewOnly);
+    public FolderRecord<NoteRecord> GetFolder(int id, bool previewOnly);
 
-    public bool CheckIfFolderExists(string folderName);
+    public bool CheckIfFolderExists(int id);
 
     public void CreateFolder(string folderName);
 
-    public void DeleteFolder(string folderName, bool force);
+    public void DeleteFolder(int id, bool force);
 
     public void RenameFolder(string oldFolderName, string newFolderName);
 }
