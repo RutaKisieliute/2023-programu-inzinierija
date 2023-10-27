@@ -1,6 +1,7 @@
 using AALKisShared.Utility;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using AALKisShared.Enums;
 
 namespace AALKisShared;
 

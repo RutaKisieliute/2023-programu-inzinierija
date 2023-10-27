@@ -1,4 +1,4 @@
-namespace AALKisShared;
+namespace AALKisShared.Enums;
 
 [Flags]
 public enum NoteFlags : int

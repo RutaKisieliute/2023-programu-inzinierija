@@ -3,6 +3,7 @@ using AALKisAPI.Services;
 
 using AALKisShared;
 using AALKisShared.Utility;
+using AALKisShared.Enums;
 
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;

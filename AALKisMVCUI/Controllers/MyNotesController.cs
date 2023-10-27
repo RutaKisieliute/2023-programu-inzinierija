@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using AALKisMVCUI.Utility;
 using AALKisShared;
+using AALKisShared.Enums;
 using System.Net;
 using Microsoft.AspNetCore.Http.Extensions;
 using System.Text;
