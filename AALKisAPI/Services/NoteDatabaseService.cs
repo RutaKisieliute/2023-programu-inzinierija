@@ -4,6 +4,7 @@ using AALKisAPI.Services;
 using AALKisShared;
 using AALKisShared.Utility;
 using AALKisShared.Enums;
+using AALKisShared.Exceptions;
 
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
@@ -24,7 +25,7 @@ public class NoteDatabaseService : INoteRecordsService
 
     public NoteRecord GetNote(int id, bool previewOnly)
     {
-        if(!CheckIfNoteExists(id)) throw new Exception("The note doesn't exist");
+        if(!CheckIfNoteExists(id)) throw new NoteException($"Note with id={id} doesn't exist");
         string query = $"SELECT notes.* FROM notes WHERE id = '{id}'";
         NoteRecord note = new NoteRecord();
         try

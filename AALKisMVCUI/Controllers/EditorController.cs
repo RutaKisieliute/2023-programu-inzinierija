@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Utility;
 using AALKisShared;
+using AALKisShared.Exceptions;
 using System.Text.Json;
 using Newtonsoft.Json;
 using System.Text;
@@ -34,7 +35,7 @@ public class EditorController : Controller
 
             if(!response.IsSuccessStatusCode)
             {
-                throw new Exception($"{id} does not exist, yet attempted to open it");
+                throw new NoteException($"Note with {id} does not exist, yet attempted to open it");
             }
 
             return View(await GetNoteRecord(id));
@@ -86,7 +87,8 @@ public class EditorController : Controller
             {
                 if(!fieldsToUpdate.IsTitleValid())
                 {
-                    throw new BadHttpRequestException("Tried to set title to non-valid string.");
+                    throw new NoteException(fieldsToUpdate,
+                            $"Tried to set title to non-valid string \"{fieldsToUpdate.Title}\"");
                 }
                 fieldsToUpdate.Title = System.Web.HttpUtility
                     .HtmlEncode(fieldsToUpdate.Title)
