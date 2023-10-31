@@ -10,11 +10,11 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class FolderDatabaseService : IFolderRecordsService
+public class FolderRepository : IFolderRecordsService
 {
     private readonly string DBConnection;
 
-    public FolderDatabaseService()
+    public FolderRepository()
     {
         DBConnection = File.ReadAllText("./Services/databaselogin.txt");
     }

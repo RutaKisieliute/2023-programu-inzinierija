@@ -11,13 +11,13 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class NoteDatabaseService : INoteRecordsService
+public class NoteRepository : INoteRecordsService
 {
     private readonly IFolderRecordsService _folderService;
 
     private readonly string DBConnection;
 
-    public NoteDatabaseService(IFolderRecordsService folderService)
+    public NoteRepository(IFolderRecordsService folderService)
     {
         _folderService = folderService;
         DBConnection = File.ReadAllText("./Services/databaselogin.txt");
