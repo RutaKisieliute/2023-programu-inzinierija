@@ -92,8 +92,8 @@ function setOnClickListenerForCreateFolderDialog() {
     $createFolderDialog.on("click", (dismissDialogOnOutsideClick));
     $createFolderDialog.find("button")
         .on("click", function () {
-            const folderName = $createFolderDialog.find("input").first().value;
-            if (isValidFolderName(folderName)) {
+            const folderName = $createFolderDialog.find("input")[0].value;
+            if (isValidFolderName(folderName) && folderName !== undefined && folderName !== null) {
                 createEmptyFolder(folderName);
             }
             else window.alert("Invalid folder name.");
@@ -103,7 +103,7 @@ function setOnClickListenerForChangeFolderDialog() {
     $changeFolderDialog.on("click", (dismissDialogOnOutsideClick));
     $changeFolderDialog.find("button")
         .on("click", function () {
-            const toFolderName = $changeFolderDialog.find("select").first().value;
+            const toFolderName = $changeFolderDialog.find("select")[0].value;
             if (toFolderName !== null && toFolderName !== undefined) {
                 const noteName = $changeFolderDialog.find("h6 span").html();
                 const fromFolderName = $changeFolderDialog.find("select option").html();
