@@ -6,7 +6,7 @@ public class NoteException : Exception
 
     public NoteException(string message) : base(message) { }
 
-    public NoteException(NoteRecord record, string message) : base(
+    public NoteException(Note record, string message) : base(
             message + "; " + record.ToString()
         ) { }
 }

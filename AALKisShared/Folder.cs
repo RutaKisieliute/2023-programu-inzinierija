@@ -1,6 +1,6 @@
 namespace AALKisShared;
 
-public record class FolderRecord<T> : IComparable<FolderRecord<T>> where T : IJsonSerializable, new()
+public record class Folder<T> : IComparable<Folder<T>> where T : IJsonSerializable, new()
 {
     public int Id { get; set; } = -1;
 
@@ -8,9 +8,9 @@ public record class FolderRecord<T> : IComparable<FolderRecord<T>> where T : IJs
 
     public List<T> Records { get; set; } = new List<T>();
 
-    public FolderRecord() { }
+    public Folder() { }
 
-    public int CompareTo(FolderRecord<T>? other)
+    public int CompareTo(Folder<T>? other)
     {
         if(other == null)
             return -1;

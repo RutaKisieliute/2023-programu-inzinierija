@@ -10,17 +10,17 @@ public class FolderController : ControllerBase
 {
     private readonly ILogger<FolderController> _logger;
 
-    private readonly IFolderRecordsService _recordsService;
+    private readonly IFoldersService _recordsService;
 
     public FolderController(ILogger<FolderController> logger,
-            IFolderRecordsService recordsService)
+            IFoldersService recordsService)
     {
         _logger = logger;
         _recordsService = recordsService;
     }
 
     [HttpGet]
-    public IEnumerable<FolderRecord<NoteRecord>>? Get([FromQuery] bool getContents = true)
+    public IEnumerable<Folder<Note>>? Get([FromQuery] bool getContents = true)
     {
         try
         {
@@ -36,7 +36,7 @@ public class FolderController : ControllerBase
     }
 
     [HttpGet("{folderId}")]
-    public FolderRecord<NoteRecord>? Get(int folderId, [FromQuery] bool getContents = true)
+    public Folder<Note>? Get(int folderId, [FromQuery] bool getContents = true)
     {
         try
         {

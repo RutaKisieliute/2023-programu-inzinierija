@@ -1,4 +1,4 @@
-@model List<FolderRecord<NoteRecord>>
+@model List<Folder<Note>>
 
 @section ExtraHead{
     <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
@@ -31,7 +31,7 @@
 
 </dialog>
 
-@foreach(FolderRecord<NoteRecord> folder in Model)
+@foreach(Folder<Note> folder in Model)
 {
 
     <div class="folder" data-folder-id="@folder.Id">
@@ -44,7 +44,7 @@
                 <div class="bar" style="rotate: 90deg;"></div>
             </div>
 
-            @foreach(NoteRecord note in folder.Records)
+            @foreach(Note note in folder.Records)
             {
                 
                 <div class="scroller-element" data-note-id="@note.Id">

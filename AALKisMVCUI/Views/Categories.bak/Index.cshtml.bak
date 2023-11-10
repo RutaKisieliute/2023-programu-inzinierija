@@ -1,9 +1,0 @@
-@model AALKisMVCUI.Models.CategoriesModel
-
-<h1>Categories</h1>
-<h3><ul>
-    @foreach(string x in Model.Categs){
-        string link = "Categories/C/" + x;
-        <ul><a href=@link>@x</a></ul>
-    }
-</ul></h3>

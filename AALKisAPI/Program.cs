@@ -15,8 +15,8 @@ public static class Program
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        builder.Services.AddScoped<IFolderRecordsService, FolderRepository>();
-        builder.Services.AddScoped<INoteRecordsService, NoteRepository>();
+        builder.Services.AddScoped<IFoldersService, FolderRepository>();
+        builder.Services.AddScoped<INotesService, NoteRepository>();
 
 
         var app = builder.Build();

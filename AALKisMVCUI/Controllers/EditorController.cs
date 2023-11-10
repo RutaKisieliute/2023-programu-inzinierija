@@ -38,7 +38,7 @@ public class EditorController : Controller
                 throw new NoteException($"Note with {id} does not exist, yet attempted to open it");
             }
 
-            return View(await GetNoteRecord(id));
+            return View(await GetNote(id));
         }
         catch(HttpRequestException e)
         {
@@ -53,11 +53,11 @@ public class EditorController : Controller
     }
 
     [HttpGet("[action]/{id}")]
-    public async Task<NoteRecord?> GetNoteRecord(int id)
+    public async Task<Note?> GetNote(int id)
     {
         try
         {
-            var record = await _client.Fetch<NoteRecord>($"Note/{id}",
+            var record = await _client.Fetch<Note>($"Note/{id}",
                     HttpMethod.Get);
 
             return record;
@@ -66,21 +66,21 @@ public class EditorController : Controller
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            _logger.LogError($"Failed to get {id} NoteRecord;\n"
+            _logger.LogError($"Failed to get {id} Note;\n"
                     + e.ToString());
         }
         return null;
     }
 
     [HttpPost("[action]/{id}")]
-    public async Task<IActionResult> PostNoteRecord(int id)
+    public async Task<IActionResult> PostNote(int id)
     {
         IActionResult result = Ok();
         try
         {
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            NoteRecord fieldsToUpdate = new NoteRecord();
+            Note fieldsToUpdate = new Note();
             fieldsToUpdate.SetFromJsonString(body);
 
             if(fieldsToUpdate.Title != null)
@@ -119,7 +119,7 @@ public class EditorController : Controller
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to post {id} NoteRecord;\n"
+            _logger.LogError($"Failed to post {id} Note;\n"
                     + exception.ToString());
 
             return BadRequest();

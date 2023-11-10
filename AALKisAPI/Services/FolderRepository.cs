@@ -10,7 +10,7 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class FolderRepository : IFolderRecordsService
+public class FolderRepository : IFoldersService
 {
     private readonly string DBConnection;
 
@@ -19,9 +19,9 @@ public class FolderRepository : IFolderRecordsService
         DBConnection = File.ReadAllText("./Services/databaselogin.txt");
     }
 
-    public List<FolderRecord<NoteRecord>> GetAllFolders(bool previewOnly)
+    public List<Folder<Note>> GetAllFolders(bool previewOnly)
     {
-        List<FolderRecord<NoteRecord>> folders = new List<FolderRecord<NoteRecord>>();
+        List<Folder<Note>> folders = new List<Folder<Note>>();
         string query = "SELECT id FROM  folders";
         try
         {
@@ -47,12 +47,12 @@ public class FolderRepository : IFolderRecordsService
 
     }
 
-    public FolderRecord<NoteRecord> GetFolder(int id, bool previewOnly)
+    public Folder<Note> GetFolder(int id, bool previewOnly)
     {
         string query = $"SELECT notes.*, folders.title AS ftitle FROM folders, notes WHERE folders.id = {id} AND notes.folder_id = folders.id";
         string query2 = $"SELECT title FROM folders WHERE id = {id}";
-        NoteRecord note;
-        FolderRecord<NoteRecord> folder = new FolderRecord<NoteRecord>(){Id = id};
+        Note note;
+        Folder<Note> folder = new Folder<Note>(){Id = id};
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
@@ -63,7 +63,7 @@ public class FolderRepository : IFolderRecordsService
                 if(reader.Read())
                 {
                     folder.Name = reader["ftitle"].ToString() ??  "";
-                    note = new NoteRecord
+                    note = new Note
                     {
                         Id = Convert.ToInt64(reader["id"]),
                         Title = reader["title"].ToString() ?? ""
@@ -74,7 +74,7 @@ public class FolderRepository : IFolderRecordsService
                     folder.Records.Add(note);
                     while(reader.Read())
                     {
-                        note = new NoteRecord();
+                        note = new Note();
                         note.Id = Convert.ToInt64(reader["id"]);
                         note.Title = reader["title"].ToString() ?? "";
                         note.Content = reader["content"].ToString();

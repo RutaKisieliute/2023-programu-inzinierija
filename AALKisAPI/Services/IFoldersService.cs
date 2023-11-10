@@ -2,11 +2,11 @@ using AALKisShared;
 
 namespace AALKisAPI.Services;
 
-public interface IFolderRecordsService
+public interface IFoldersService
 {
-    public List<FolderRecord<NoteRecord>> GetAllFolders(bool previewOnly);
+    public List<Folder<Note>> GetAllFolders(bool previewOnly);
 
-    public FolderRecord<NoteRecord> GetFolder(int id, bool previewOnly);
+    public Folder<Note> GetFolder(int id, bool previewOnly);
 
     public bool CheckIfFolderExists(int id);
 

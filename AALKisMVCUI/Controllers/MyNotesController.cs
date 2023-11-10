@@ -26,7 +26,7 @@ public class MyNotesController : Controller
         string targetUri = "/Folder";
 
         var folders = await _client
-            .Fetch<List<FolderRecord<NoteRecord>>>(targetUri, HttpMethod.Get)
+            .Fetch<List<Folder<Note>>>(targetUri, HttpMethod.Get)
             ?? throw new JsonException($"Got empty response from {targetUri}");
         folders.Sort();
         // Order by access date descending.
@@ -88,7 +88,7 @@ public class MyNotesController : Controller
         {
             string targetUri = "/Note/" + noteId;
 
-            NoteRecord fieldsToUpdate = new NoteRecord();
+            Note fieldsToUpdate = new Note();
             fieldsToUpdate.Flags = NoteFlags.Archived; // Not sets, but switches.
 
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);

@@ -5,7 +5,7 @@ using AALKisShared.Enums;
 
 namespace AALKisShared;
 
-public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
+public record struct Note : IJsonSerializable, IComparable<Note>
 {
     public long Id { get; set; } = -1;
 
@@ -17,7 +17,7 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
 
     public NoteFlags? Flags { get; set; } = null;
 
-    public NoteRecord() { }
+    public Note() { }
 
     public void Update(
             string? title = null,
@@ -56,7 +56,7 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
 
     public void SetFromJsonString(string json)
     {
-        this = JsonConvert.DeserializeObject<NoteRecord>(json);
+        this = JsonConvert.DeserializeObject<Note>(json);
     }
 
     public void ToJsonFile(string directoryPath)
@@ -72,7 +72,7 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
     {
         using(var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
         {
-            this = stream.ReadJson<NoteRecord>();
+            this = stream.ReadJson<Note>();
         }
 
         if(previewOnly)
@@ -83,7 +83,7 @@ public record struct NoteRecord : IJsonSerializable, IComparable<NoteRecord>
         Title = Path.GetFileNameWithoutExtension(filePath);
     }
 
-    public int CompareTo(NoteRecord other)
+    public int CompareTo(Note other)
     {
         // If the Archived flags differ,
         if(((this.Flags ^ other.Flags) & NoteFlags.Archived) == NoteFlags.Archived)

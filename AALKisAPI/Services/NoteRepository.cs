@@ -11,23 +11,23 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class NoteRepository : INoteRecordsService
+public class NoteRepository : INotesService
 {
-    private readonly IFolderRecordsService _folderService;
+    private readonly IFoldersService _folderService;
 
     private readonly string DBConnection;
 
-    public NoteRepository(IFolderRecordsService folderService)
+    public NoteRepository(IFoldersService folderService)
     {
         _folderService = folderService;
         DBConnection = File.ReadAllText("./Services/databaselogin.txt");
     }
 
-    public NoteRecord GetNote(int id, bool previewOnly)
+    public Note GetNote(int id, bool previewOnly)
     {
         if(!CheckIfNoteExists(id)) throw new NoteException($"Note with id={id} doesn't exist");
         string query = $"SELECT notes.* FROM notes WHERE id = '{id}'";
-        NoteRecord note = new NoteRecord();
+        Note note = new Note();
         try
         {
             using MySqlConnection connection = new MySqlConnection(DBConnection);
@@ -117,10 +117,10 @@ public class NoteRepository : INoteRecordsService
         }
     }
 
-    public void UpdateNote(NoteRecord record, int folderId = -1)
+    public void UpdateNote(Note record, int folderId = -1)
     {
         //if(!CheckIfNoteExists(folderName, record.Title)) return;
-        //FolderRecord<NoteRecord> folder = _folderService.GetFolder()
+        //Folder<Note> folder = _folderService.GetFolder()
         string query = $"UPDATE notes SET content = '{record.Content}',title = '{record.Title}', " +
         $"flags = {(int) (record.Flags ?? 0)}{(folderId == -1 ? "" : ", folder_id = " + folderId)} WHERE id = {record.Id}";
         try
@@ -138,16 +138,16 @@ public class NoteRepository : INoteRecordsService
         }
     }
 
-    public void UpdateNote(NoteRecord record)
+    public void UpdateNote(Note record)
     {
 
     }
 
 
-    public List<NoteRecord> SearchByTitle(string searchQuery)
+    public List<Note> SearchByTitle(string searchQuery)
     {
-        List<NoteRecord> list = new List<NoteRecord>();
-        NoteRecord note;
+        List<Note> list = new List<Note>();
+        Note note;
         string query = $"SELECT * FROM notes WHERE UPPER(title) LIKE UPPER('%{searchQuery}%')";
         try
         {
@@ -157,7 +157,7 @@ public class NoteRepository : INoteRecordsService
             connection.Open();
             while(reader.Read())
             {
-                note = new NoteRecord(){
+                note = new Note(){
                     Id = Convert.ToInt64(reader["id"]),
                     Title = reader["title"].ToString() ?? "",
                     Content = reader["content"].ToString(),

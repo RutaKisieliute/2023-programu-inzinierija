@@ -11,17 +11,17 @@ public class NoteController : ControllerBase
 {
     private readonly ILogger<NoteController> _logger;
 
-    private readonly INoteRecordsService _recordsService;
+    private readonly INotesService _recordsService;
 
     public NoteController(ILogger<NoteController> logger,
-            INoteRecordsService recordsService)
+            INotesService recordsService)
     {
         _logger = logger;
         _recordsService = recordsService;
     }
 
     [HttpGet("{id}")]
-    public NoteRecord? Get(int id)
+    public Note? Get(int id)
     {
         try
         {
@@ -84,10 +84,10 @@ public class NoteController : ControllerBase
     {
         try
         {
-            NoteRecord record = _recordsService.GetNote(id, false);
+            Note record = _recordsService.GetNote(id, false);
 
             string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
-            NoteRecord fieldsToUpdate = JsonConvert.DeserializeObject<NoteRecord>(jsonString);
+            Note fieldsToUpdate = JsonConvert.DeserializeObject<Note>(jsonString);
 
             record.Update(
                     flags: record.Flags ^ fieldsToUpdate.Flags,
