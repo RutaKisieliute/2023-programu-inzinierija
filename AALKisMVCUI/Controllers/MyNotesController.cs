@@ -70,11 +70,11 @@ public class MyNotesController : Controller
             }*/
 
             // Create Note
-            var resposePost = await _client
-                    .Fetch(targetUri, HttpMethod.Post)
+            var id = await _client
+                    .Fetch<int?>(targetUri, HttpMethod.Post)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
 
-            return Json(new { redirectToUrl = "MyNotes"});
+            return Json(new { redirectToUrl = "Editor/" + id});
 
 
         }

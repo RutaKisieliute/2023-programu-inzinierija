@@ -46,19 +46,21 @@ public class NoteController : ControllerBase
     }
 
     [HttpPost("[action]/{folderId}/{noteTitle}")]
-    public IActionResult Create(int folderId, string noteTitle)
+    public int? Create(int folderId, string noteTitle)
     {
+        int? id = null;
         try
         {
-            _recordsService.CreateNote(folderId, noteTitle);
+            id = _recordsService.CreateNote(folderId, noteTitle);
         }
         catch(Exception exception)
         {
             _logger.LogError($"Failed to create note {noteTitle} in folder {folderId}: "
                     + exception.ToString());
-            return BadRequest();
+            return null;
         }
-        return new StatusCodeResult(StatusCodes.Status201Created);
+        if (id == -1) id = null;
+        return id;
     }
 
     [HttpDelete("{id}")]

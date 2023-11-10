@@ -144,7 +144,6 @@ function getFolderNames() {
     });
     return folderNames;
 }
-
 function showChangeFolderDialog(folderName, noteName) {
     $changeFolderDialog[0].showModal();
 
@@ -161,8 +160,7 @@ function showChangeFolderDialog(folderName, noteName) {
 
 
 
-
-
+// API Calls (To MVC endpoints, not API endpoints)
 function createEmptyNote(folderId) {
     fetch(webOrigin + "/" + controller + "/CreateEmptyNote/" + folderId, {
         method: "POST",
@@ -185,7 +183,6 @@ function createEmptyNote(folderId) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-
 function createEmptyFolder(folderName) {
     fetch(webOrigin + "/" + controller + "/CreateEmptyFolder/" + folderName, {
         method: "POST",
@@ -209,7 +206,6 @@ function createEmptyFolder(folderName) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-
 function archiveNote(folderName, noteName) {
     fetch(webOrigin + "/" + controller + "/ArchiveNote/" + folderName + "/" + noteName, {
         method: "POST",
@@ -229,7 +225,6 @@ function archiveNote(folderName, noteName) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-
 function changeFolderName(newFolderName, oldFolderName, noteName) {
     fetch(webOrigin + "/" + controller + "/ChangeFolderName/" + newFolderName + "/" + oldFolderName + "/" + noteName, {
         method: "POST",
@@ -249,4 +244,5 @@ function changeFolderName(newFolderName, oldFolderName, noteName) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
+
 main();
