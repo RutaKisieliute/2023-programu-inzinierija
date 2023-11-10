@@ -1,128 +1,122 @@
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
-// Dictionary list [{folderName: x, htmlElementCreate: y}, ]
-var htmlCreateElements = [];
-// Dictionary list [{folderName: x, noteName: y, overflowButton: z}, ]
-var overflowButtonElements = [];
-const folderCreationDialog = document.getElementById("create-folder-dialog");
-const folderChangeDialog = document.getElementById("change-folder-dialog");
-const createFolderButton = document.getElementById("create-folder-btn");
+const $createFolderDialog = $("#create-folder-dialog");
+const $changeFolderDialog = $("#change-folder-dialog");
 
 
-function startup() {
-    // Refresh page, if navigated with back button, to reflect edited note changes.
+
+
+function main() {
+    enableRefreshOnNavigateBack();
+    enablePopOvers();
+    renderNotesContentAsInnerHtml();
+    setOnClickListenersForCreateElements();
+    setOnClickListenersForOverflowButtons();
+    setOnClickListenerForCreateFolderButton()
+    setOnClickListenerForCreateFolderDialog();
+    setOnClickListenerForChangeFolderDialog();
+}
+
+// Start methods
+function enableRefreshOnNavigateBack() {
     var perfEntries = performance.getEntriesByType("navigation");
     if (perfEntries[0].type === "back_forward") {
         location.reload();
     }
-
-    // Enable popovers
-    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
-    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
-        return new bootstrap.Popover(popoverTriggerEl, {
+}
+function enablePopOvers() {
+    const content =
+        `<div class="popover-container">
+            <div class="popover-option popover-option-top">
+                Change Folder
+            </div>
+            <div class="popover-option popover-option-bottom">
+                Archive Note
+            </div>
+        </div>`
+    $('[data-bs-toggle="popover"]').each(function () {
+        new bootstrap.Popover(this, {
             trigger: 'focus',
-            content:
-            `<div class="popover-container">
-                <div class="popover-option popover-option-top">
-                    Change Folder
-                </div>
-                <div class="popover-option popover-option-bottom">
-                    Archive Note
-                </div>
-            </div>`
-            ,
+            content: content,
             html: true
-        })
-    })
-
-    document.querySelectorAll('.paragraph').forEach(paragraph => {
-        const content = decodeHtmlEntities(paragraph.innerHTML);
-        console.log(content);
-        paragraph.innerHTML = content;
-    });
- 
-    // Get html create elements with folder names.
-    var folders = document.getElementsByClassName("folder");
-    for (let folder of folders) {
-        const folderName = folder.getElementsByClassName("folder-name")[0].innerHTML;
-        const folderId = folder.getElementsByClassName("folder-id")[0].innerHTML;
-        const createElement = folder.getElementsByClassName("scroller")[0].getElementsByClassName("create-element")[0];
-        htmlCreateElements.push({ "folderName": folderName, htmlElementCreate: createElement });
-        htmlCreateElements.push({ "folderId": folderId, htmlElementCreate: createElement });
-
-        var scrollerElements = folder.getElementsByClassName("scroller")[0].getElementsByClassName("scroller-element");
-        var scrollerElements = Array.from(scrollerElements);
-        scrollerElements.shift(); // remove first - create-element
-        for (let scrollerElement of scrollerElements) {
-            const noteName = scrollerElement.getElementsByClassName("title")[0].innerHTML;
-            const overflowButton = scrollerElement.getElementsByClassName("overflow-btn")[0];
-            overflowButtonElements.push({ "folderName": folderName, "noteName": noteName, "overflowButton": overflowButton });
-        }
-    }
-
-    // Set on click listeners
-    for (let dict of htmlCreateElements) {
-        dict.htmlElementCreate.addEventListener("click", function () { onNoteClick(dict.folderId); })
-    }
-    for (let dict of overflowButtonElements) {
-        dict.overflowButton.addEventListener("click", function (event) { onOverflowClick(event, dict.folderName, dict.noteName); })
-        dict.overflowButton.addEventListener('shown.bs.popover', function () {
-            //dict.overflowButton.getElementsByClassName("popover-option")[0].addEventListener("click", function () { onChangeFolderClick(folderName, noteName); });
-            //dict.overflowButton.getElementsByClassName("popover-option")[1].addEventListener("click", function () { onArchiveNoteClick(folderName, noteName); });
-            $(".popover-option-top").off("click");
-            $(".popover-option-bottom").off("click");
-            $(".popover-option-top").on("click", function () {
-                onChangeFolderClick(dict.folderName, dict.noteName);
-            })
-            $(".popover-option-bottom").on("click", function () {
-                onArchiveNoteClick(dict.folderName, dict.noteName);
-            })
         });
-    }
-    createFolderButton.addEventListener("click", (onCreateFolderClick));
-    folderCreationDialog.addEventListener("click", (onDialogClick));
-    folderCreationDialog.getElementsByTagName("button")[0]
-        .addEventListener("click", function () { onCreateFolderDialogButtonClick(folderCreationDialog.getElementsByTagName("input")[0].value); });
-    folderChangeDialog.addEventListener("click", (onDialogClick));
-    folderChangeDialog.getElementsByTagName("button")[0]
-        .addEventListener("click", function () { onChangeFolderDialogButtonClick(folderChangeDialog.getElementsByTagName("select")[0].value); });
+    });
+}
+function renderNotesContentAsInnerHtml() {
+    $('.paragraph').each(function () {
+        var doc = new DOMParser().parseFromString($(this).html(), "text/html");
+        var content = doc.documentElement.textContent;
+        $(this).html(content);
+    });
+}
+function setOnClickListenersForCreateElements() {
+    $(".folder").each(function () {
+        const $createElement = $(this).find(".create-element");
+        const folderId = $(this).data("folder-id");
+        $createElement.on("click", function () {
+            createEmptyNote(folderId);
+        })
+    });
+}
+function setOnClickListenersForOverflowButtons() {
+    $(".folder").each(function () {
+        const $noteElements = $(this).find(".scroller-element").slice(1);
+        const folderName = $(this).find(".folder-name").html();
 
-        
+        $noteElements.each(function () {
+            const $overflowButton = $(this).find(".overflow-btn");
+            const noteName = $(this).find(".title").html();
+            $overflowButton.on("click", function (event) {
+                event.stopPropagation();
+            })
+            $overflowButton.on("shown.bs.popover", function () {
+                $(".popover-option-top").off("click");
+                $(".popover-option-bottom").off("click");
+                $(".popover-option-top").on("click", function () {
+                    showChangeFolderDialog(folderName, noteName);
+                })
+                $(".popover-option-bottom").on("click", function () {
+                    archiveNote(folderName, noteName);
+                })
+            })
+        })
+
+    });
+}
+function setOnClickListenerForCreateFolderButton() {
+    $("#create-folder-btn").on("click", function () {
+        $createFolderDialog[0].showModal();
+    });
+}
+function setOnClickListenerForCreateFolderDialog() {
+    $createFolderDialog.on("click", (dismissDialogOnOutsideClick));
+    $createFolderDialog.find("button")
+        .on("click", function () {
+            const folderName = $createFolderDialog.find("input").first().value;
+            if (isValidFolderName(folderName)) {
+                createEmptyFolder(folderName);
+            }
+            else window.alert("Invalid folder name.");
+        });
+}
+function setOnClickListenerForChangeFolderDialog() {
+    $changeFolderDialog.on("click", (dismissDialogOnOutsideClick));
+    $changeFolderDialog.find("button")
+        .on("click", function () {
+            const toFolderName = $changeFolderDialog.find("select").first().value;
+            if (toFolderName !== null && toFolderName !== undefined) {
+                const noteName = $changeFolderDialog.find("h6 span").html();
+                const fromFolderName = $changeFolderDialog.find("select option").html();
+                changeFolderName(toFolderName, fromFolderName, noteName);
+            }
+            else window.alert("Select folder to move your note.");
+
+        });
 }
 
 
-function decodeHtmlEntities(input) {
-    var doc = new DOMParser().parseFromString(input, "text/html");
-    return doc.documentElement.textContent;
-}
-function onNoteClick(folderId) {
-    createEmptyNote(folderId);
-}
-
-function onOverflowClick(event, folderName, noteName) {
-    event.stopPropagation();
-    console.log("Overflow: " + folderName + " " + noteName);    
-}
-function onChangeFolderClick(folderName, noteName) {
-    folderChangeDialog.showModal();
-    var html = `<option value="" selected disabled>${folderName}</option>`;
-    for (var dict of htmlCreateElements) {
-        if (dict.folderName != folderName)
-            html += `<option>${dict.folderName}</option>`
-    }
-    document.getElementById("folder-selector").innerHTML = html;
-    folderChangeDialog.getElementsByTagName("h6")[0].innerHTML = `Move note '<span>${noteName}</span>' to folder`;
-}
-
-function onArchiveNoteClick(folderName, noteName) {
-    archiveNote(folderName, noteName);
-}
-
-function onCreateFolderClick() {
-    folderCreationDialog.showModal();
-}
-
-function onDialogClick(e) {
+// Utility methods
+function dismissDialogOnOutsideClick(e) {
     if (e.target.tagName !== 'DIALOG') //This prevents issues with forms
         return;
 
@@ -138,28 +132,37 @@ function onDialogClick(e) {
     if (clickedInDialog === false)
         e.target.close();
 }
-
-function onCreateFolderDialogButtonClick(folderName) {
-    if (isValidFolderName(folderName)) {
-        createEmptyFolder(folderName);
-    }
-    else window.alert("Invalid folder name.");
-}
-
-function onChangeFolderDialogButtonClick(folderName) {
-    if (folderName !== null && folderName !== undefined) {
-        const noteName = folderChangeDialog.getElementsByTagName("h6")[0].getElementsByTagName("span")[0].innerHTML;
-        const oldFolderName = folderChangeDialog.getElementsByTagName("select")[0].getElementsByTagName("option")[0].innerHTML;
-        changeFolderName(folderName, oldFolderName, noteName);
-    }
-    else window.alert("Select folder to move your note.");
-}
-
-
 function isValidFolderName(folderName) {
     var pattern = /^[a-zA-Z0-9 _-]{1,255}$/;
     return pattern.test(folderName);
 }
+function getFolderNames() {
+    var folderNames = [];
+    $(".folder").each(function () {
+        const folderName = $(this).find(".folder-name").html();
+        folderNames.push(folderName);
+    });
+    return folderNames;
+}
+
+function showChangeFolderDialog(folderName, noteName) {
+    $changeFolderDialog[0].showModal();
+
+    var folderNames = getFolderNames();
+    var dropDownOptions = `<option value="" selected disabled>${folderName}</option>`;
+    for (var name of folderNames)
+        if (name != folderName)
+            dropDownOptions += `<option>${name}</option>`;
+    
+    $("#folder-selector").html(dropDownOptions);
+    $changeFolderDialog.find("h6").html(`Move note '<span>${noteName}</span>' to folder`);
+}
+
+
+
+
+
+
 function createEmptyNote(folderId) {
     fetch(webOrigin + "/" + controller + "/CreateEmptyNote/" + folderId, {
         method: "POST",
@@ -246,4 +249,4 @@ function changeFolderName(newFolderName, oldFolderName, noteName) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-startup();
+main();
