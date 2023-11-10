@@ -66,6 +66,7 @@ function setOnClickListenersForOverflowButtons() {
         $noteElements.each(function () {
             const $overflowButton = $(this).find(".overflow-btn");
             const noteName = $(this).find(".title").html();
+            const noteId = $(this).data("note-id")
             $overflowButton.on("click", function (event) {
                 event.stopPropagation();
             })
@@ -76,7 +77,7 @@ function setOnClickListenersForOverflowButtons() {
                     showChangeFolderDialog(folderName, noteName);
                 })
                 $(".popover-option-bottom").on("click", function () {
-                    archiveNote(folderName, noteName);
+                    archiveNote(noteId);
                 })
             })
         })
@@ -206,10 +207,10 @@ function createEmptyFolder(folderName) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-function archiveNote(folderName, noteName) {
-    fetch(webOrigin + "/" + controller + "/ArchiveNote/" + folderName + "/" + noteName, {
+function archiveNote(noteId) {
+    fetch(webOrigin + "/" + controller + "/ArchiveNote/" + noteId, {
         method: "POST",
-        body: JSON.stringify({ folderName: folderName, noteName: noteName }),
+        body: JSON.stringify({ noteId: noteId }),
         headers: {
             "Content-Type": "application/json"
         }
