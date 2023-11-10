@@ -105,18 +105,14 @@ public class MyNotesController : Controller
 
     }
 
-    [HttpPost("[action]/{newFolderName}/{oldFolderName}/{noteName}")]
-    public async Task<IActionResult> ChangeFolderName(string newFolderName, string oldFolderName, string noteName)
+    [HttpPost("[action]/{folderId}/{noteId}")]
+    public async Task<IActionResult> ChangeFolderName(int folderId, int noteId)
     {
         try
         {
-            string targetUri = "/Note/" + newFolderName + "/" + oldFolderName + "/" + noteName;
-
-
-            // Update Note Archived Flag
-            await _client.Fetch($"Note/{newFolderName}/{oldFolderName}/{noteName}",
-                    HttpMethod.Post,
-                    new StringContent(""));
+            string targetUri = "/Note/" + folderId + "/" + noteId;
+            var response = await _client.Fetch(targetUri, HttpMethod.Post)
+                ?? throw new JsonException($"Got empty response from {targetUri}");
 
             return Ok();
 
