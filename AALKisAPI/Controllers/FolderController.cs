@@ -78,16 +78,16 @@ public class FolderController : ControllerBase
         return new StatusCodeResult(StatusCodes.Status201Created);
     }
 
-    [HttpPatch("{folderName}/{newFolderName}")]
-    public IActionResult Rename(string folderName, string newFolderName)
+    [HttpPatch("{folderId}/{newFolderName}")]
+    public IActionResult Rename(int folderId, string newFolderName)
     {
         try
         {
-            _recordsService.RenameFolder(folderName, newFolderName);
+            _recordsService.RenameFolder(folderId, newFolderName);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to rename folder record \"{folderName}\" to \"{newFolderName}\": "
+            _logger.LogError($"Failed to rename folder record {folderId} to \"{newFolderName}\": "
                     + exception.ToString());
             return new StatusCodeResult(StatusCodes.Status400BadRequest);
         }

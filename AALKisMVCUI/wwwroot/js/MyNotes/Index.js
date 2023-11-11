@@ -1,7 +1,7 @@
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
 const $createFolderDialog = $("#create-folder-dialog");
-const $changeFolderDialog = $("#change-folder-dialog");
+const $moveNoteToFolderDialog = $("#move-note-to-folder-dialog");
 var overflowSelectedNoteId = null;
 
 
@@ -15,7 +15,8 @@ function main() {
     setOnClickListenersForOverflowButtons();
     setOnClickListenerForCreateFolderButton()
     setOnClickListenerForCreateFolderDialog();
-    setOnClickListenerForChangeFolderDialog();
+    setOnClickListenerForMoveNoteToFolderDialog();
+    setOnClickListenersForFolderNameTexts();
 }
 
 // Start methods
@@ -29,7 +30,7 @@ function enablePopOvers() {
     const content =
         `<div class="popover-container">
             <div class="popover-option popover-option-top">
-                Change Folder
+                Move Note To Folder
             </div>
             <div class="popover-option popover-option-bottom">
                 Archive Note
@@ -76,7 +77,7 @@ function setOnClickListenersForOverflowButtons() {
                 $(".popover-option-bottom").off("click");
                 $(".popover-option-top").on("click", function () {
                     overflowSelectedNoteId = noteId;
-                    showChangeFolderDialog(folderName, noteName);
+                    showMoveNoteToFolderDialog(folderName, noteName);
                 })
                 $(".popover-option-bottom").on("click", function () {
                     archiveNote(noteId);
@@ -102,20 +103,53 @@ function setOnClickListenerForCreateFolderDialog() {
             else window.alert("Invalid folder name.");
         });
 }
-function setOnClickListenerForChangeFolderDialog() {
-    $changeFolderDialog.on("click", (dismissDialogOnOutsideClick));
-    $changeFolderDialog.find("button")
+function setOnClickListenerForMoveNoteToFolderDialog() {
+    $moveNoteToFolderDialog.on("click", (dismissDialogOnOutsideClick));
+    $moveNoteToFolderDialog.find("button")
         .on("click", function () {
-            const selectedFolderName = $changeFolderDialog.find("select")[0].value;
-            const selectedFolderId = $changeFolderDialog.find("select option:selected").data("folder-id");
+            const selectedFolderName = $moveNoteToFolderDialog.find("select")[0].value;
+            const selectedFolderId = $moveNoteToFolderDialog.find("select option:selected").data("folder-id");
             if (selectedFolderName !== null && selectedFolderName !== undefined) {
-                changeFolderName(selectedFolderId, overflowSelectedNoteId);
+                moveNoteToFolder(selectedFolderId, overflowSelectedNoteId);
             }
             else window.alert("Select folder to move your note.");
         });
 }
+function setOnClickListenersForFolderNameTexts() {
+    $(".folder-name").dblclick(function () {
+        if ($(this).find('input').length > 0) {
+            return;
+        }
+        const oldName = $(this).text();
+        const folderId = $(this).parent().data("folder-id");
+        var input = $("<input>", {
+            type: "text",
+            value: oldName,
+            blur: function () {
+                const newName = $(this).val();
+                if (isValidFolderName(newName)) {
+                    $(this).parent().html(newName);
+                    if (oldName !== newName) {
+                        renameFolder(folderId, newName);
+                    }
+                }
+                else {
+                    $(this).parent().html(oldName);
+                    window.alert("Invalid folder name.");
+                }
+            },
+            keypress: function (e) {
+                if (e.which === 13) { // 13 = ENTER
+                    $(this).blur();
+                }
+            }
+        });
 
-
+        $(this).html("");
+        $(this).append(input);
+        input.focus();
+    });
+}
 // Utility methods
 function dismissDialogOnOutsideClick(e) {
     if (e.target.tagName !== 'DIALOG') //This prevents issues with forms
@@ -135,7 +169,7 @@ function dismissDialogOnOutsideClick(e) {
 }
 function isValidFolderName(folderName) {
     var pattern = /^[a-zA-Z0-9 _-]{1,255}$/;
-    return pattern.test(folderName);
+    return pattern.test(folderName.trim());
 }
 function getFolderNamesIdsDictionary() {
     var dict = [];
@@ -146,8 +180,8 @@ function getFolderNamesIdsDictionary() {
     });
     return dict;
 }
-function showChangeFolderDialog(folderName, noteName) {
-    $changeFolderDialog[0].showModal();
+function showMoveNoteToFolderDialog(folderName, noteName) {
+    $moveNoteToFolderDialog[0].showModal();
 
     var dict = getFolderNamesIdsDictionary();
     var dropDownOptions = `<option value="" selected disabled>${folderName}</option>`;
@@ -156,7 +190,7 @@ function showChangeFolderDialog(folderName, noteName) {
             dropDownOptions += `<option data-folder-id="${obj.folderId}">${obj.folderName}</option>`;
     
     $("#folder-selector").html(dropDownOptions);
-    $changeFolderDialog.find("h6").html(`Move note '<span>${noteName}</span>' to folder`);
+    $moveNoteToFolderDialog.find("h6").html(`Move note '<span>${noteName}</span>' to folder`);
 }
 
 
@@ -224,9 +258,8 @@ function archiveNote(noteId) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-function changeFolderName(folderId, noteId) {
-    console.log(folderId + " " + noteId);
-    fetch(webOrigin + "/" + controller + "/ChangeFolderName/" + folderId + "/" + noteId, {
+function moveNoteToFolder(folderId, noteId) {
+    fetch(webOrigin + "/" + controller + "/MoveNoteToFolder/" + folderId + "/" + noteId, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -234,9 +267,28 @@ function changeFolderName(folderId, noteId) {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Js archiveNote error");
+                throw new Error("Js moveNoteToFolder error");
             } else {
                 location.reload();
+            }
+        })
+        .catch(error => {
+            console.error("There was a problem with the fetch operation:", error);
+        });
+}
+
+function renameFolder(folderId, newName) {
+    fetch(webOrigin + "/" + controller + "/RenameFolder/" + folderId + "/" + newName, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Js renameFolder error");
+            } else {
+                console.log("Renamed. " + folderId + " " + newName);
             }
         })
         .catch(error => {

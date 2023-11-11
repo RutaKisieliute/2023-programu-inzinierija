@@ -56,7 +56,7 @@ public class MyNotesController : Controller
         }
         catch (Exception ex) {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
-            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            _logger.LogError($"Failed to create empty note\n" + ex.ToString());
             return BadRequest();
         }
 
@@ -76,7 +76,7 @@ public class MyNotesController : Controller
         catch (Exception ex)
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
-            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            _logger.LogError($"Failed to create empty folder\n" + ex.ToString());
             return BadRequest();
         }
     }
@@ -99,14 +99,14 @@ public class MyNotesController : Controller
         catch (Exception ex)
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
-            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            _logger.LogError($"Failed to archive note\n" + ex.ToString());
             return BadRequest();
         }
 
     }
 
     [HttpPost("[action]/{folderId}/{noteId}")]
-    public async Task<IActionResult> ChangeFolderName(int folderId, int noteId)
+    public async Task<IActionResult> MoveNoteToFolder(int folderId, int noteId)
     {
         try
         {
@@ -120,7 +120,28 @@ public class MyNotesController : Controller
         catch (Exception ex)
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
-            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            _logger.LogError($"Failed to move note to other folder\n" + ex.ToString());
+            return BadRequest();
+        }
+
+    }
+
+    [HttpPost("[action]/{folderId}/{newName}")]
+    public async Task<IActionResult> RenameFolder(int folderId, string newName)
+    {
+        try
+        {
+            string targetUri = "/Folder/" + folderId + "/" + newName;
+            var response = await _client.Fetch(targetUri, HttpMethod.Patch)
+                ?? throw new JsonException($"Got empty response from {targetUri}");
+
+            return Ok();
+
+        }
+        catch (Exception ex)
+        {
+            Response.StatusCode = StatusCodes.Status500InternalServerError;
+            _logger.LogError($"Failed to rename folder\n" + ex.ToString());
             return BadRequest();
         }
 

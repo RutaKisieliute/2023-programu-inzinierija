@@ -14,5 +14,5 @@ public interface IFoldersService
 
     public void DeleteFolder(int id, bool force);
 
-    public void RenameFolder(string oldFolderName, string newFolderName);
+    public void RenameFolder(int id, string newFolderName);
 }

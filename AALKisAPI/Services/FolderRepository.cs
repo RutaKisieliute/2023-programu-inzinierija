@@ -175,11 +175,11 @@ public class FolderRepository : IFoldersService
         }
     }
 
-    public void RenameFolder(string oldFolderName, string newFolderName)
+    public void RenameFolder(int id, string newFolderName)
     {
         try
         {
-            string query = $"UPDATE folders SET title = '{newFolderName}' WHERE title = '{oldFolderName}'";
+            string query = $"UPDATE folders SET title = '{newFolderName}' WHERE id = {id}";
             using (MySqlConnection connection = new MySqlConnection(DBConnection))
             using (MySqlCommand cmd = new MySqlCommand(query, connection))
             {
