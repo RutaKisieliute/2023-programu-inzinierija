@@ -4,6 +4,7 @@ namespace AALKisMVCUI;
 
 public static class Program
 {
+    public static readonly string LogFileName = "./AALKisMVCUI.log";
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ public static class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
         builder.Services.AddHttpClient<APIClient>();
+        builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+
 
         var app = builder.Build();
 

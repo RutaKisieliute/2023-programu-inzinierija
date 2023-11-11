@@ -2,7 +2,6 @@ using System.Text;
 using AALKisAPI.Services;
 
 using AALKisShared;
-using AALKisShared.Utility;
 using AALKisShared.Enums;
 using AALKisShared.Exceptions;
 
@@ -17,10 +16,10 @@ public class NoteRepository : INotesService
 
     private readonly string DBConnection;
 
-    public NoteRepository(IFoldersService folderService)
+    public NoteRepository(IFoldersService folderService, string? databaseConnectionString = null)
     {
         _folderService = folderService;
-        DBConnection = File.ReadAllText("./Services/databaselogin.txt");
+        DBConnection = databaseConnectionString ?? File.ReadAllText("./Services/databaselogin.txt");
     }
 
     public Note GetNote(int id, bool previewOnly)

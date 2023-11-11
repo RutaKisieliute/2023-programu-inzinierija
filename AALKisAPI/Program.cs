@@ -5,6 +5,8 @@ namespace AALKisAPI;
 
 public static class Program
 {
+    public static readonly string LogFileName = "./AALKisAPI.log";
+
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +19,7 @@ public static class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IFoldersService, FolderRepository>();
         builder.Services.AddScoped<INotesService, NoteRepository>();
-
+        builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
 
         var app = builder.Build();
 

@@ -12,6 +12,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="MySQL.Data" Version="8.1.0" />
+		<PackageReference Include="NReco.Logging.File" Version="1.1.7" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 	</ItemGroup>
 

@@ -2,7 +2,6 @@ using System.Text;
 using AALKisAPI.Services;
 
 using AALKisShared;
-using AALKisShared.Utility;
 using AALKisShared.Enums;
 
 using Microsoft.AspNetCore.Mvc;
@@ -14,9 +13,9 @@ public class FolderRepository : IFoldersService
 {
     private readonly string DBConnection;
 
-    public FolderRepository()
+    public FolderRepository(string? dataBaseConnectionString = null)
     {
-        DBConnection = File.ReadAllText("./Services/databaselogin.txt");
+        DBConnection = dataBaseConnectionString ?? File.ReadAllText("./Services/databaselogin.txt");
     }
 
     public List<Folder<Note>> GetAllFolders(bool previewOnly)

@@ -1,4 +1,3 @@
-using AALKisShared.Utility;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using AALKisShared.Enums;
@@ -43,7 +42,9 @@ public record struct Note : IJsonSerializable, IComparable<Note>
 
     public bool IsTitleValid()
     {
-        Regex validationRegex = new Regex("[#./\\\n]+");
+        // No characters that break links and no funny bytes
+        // Only one is needed to invalidate the entire title
+        Regex validationRegex = new Regex("[#.\\/\\\\<>?\x0-\x1F\x7F\x80-\xFF]{1}");
 
         return !String.IsNullOrWhiteSpace(Title)
                 && !validationRegex.IsMatch(Title);
@@ -59,30 +60,6 @@ public record struct Note : IJsonSerializable, IComparable<Note>
         this = JsonConvert.DeserializeObject<Note>(json);
     }
 
-    public void ToJsonFile(string directoryPath)
-    {
-        using(var stream = new FileStream($"{directoryPath}/{Title}.json",
-                    FileMode.Create, FileAccess.Write))
-        {
-            stream.WriteJson(this);
-        }
-    }
-
-    public void SetFromJsonFile(string filePath, bool previewOnly = false)
-    {
-        using(var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-        {
-            this = stream.ReadJson<Note>();
-        }
-
-        if(previewOnly)
-        {
-            this.Content = null;
-        }
-
-        Title = Path.GetFileNameWithoutExtension(filePath);
-    }
-
     public int CompareTo(Note other)
     {
         // If the Archived flags differ,
@@ -96,7 +73,7 @@ public record struct Note : IJsonSerializable, IComparable<Note>
             return -1;
         }
         // Otherwise, fall back to title string comparison
-        return this.Title.CompareTo(other.Title);
+        return (this.Title ?? "").CompareTo(other.Title);
     }
 }
 
