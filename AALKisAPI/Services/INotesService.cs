@@ -8,7 +8,7 @@ public interface INotesService
 
     public bool CheckIfNoteExists(int id);
 
-    public int CreateNote(int folderId, string noteTitle);
+    public int? CreateNote(int folderId, string noteTitle);
 
     public void DeleteNote(int id);
 

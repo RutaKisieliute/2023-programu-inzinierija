@@ -57,9 +57,7 @@ public class NoteController : ControllerBase
         {
             _logger.LogError($"Failed to create note {noteTitle} in folder {folderId}: "
                     + exception.ToString());
-            return null;
         }
-        if (id == -1) id = null;
         return id;
     }
 

@@ -68,7 +68,7 @@ public class NoteRepository : INotesService
 
     }
 
-    public int CreateNote(int folderId, string noteTitle)
+    public int? CreateNote(int folderId, string noteTitle)
     {
         if(!_folderService.CheckIfFolderExists(folderId)) return -1;
         string query1 = "SELECT MAX(id) AS max FROM notes";
@@ -94,7 +94,7 @@ public class NoteRepository : INotesService
         catch(Exception e)
         {
             Console.WriteLine("Error while creating note: " + e.ToString());
-            return -1;
+            return null;
         }
     }
 

@@ -88,7 +88,7 @@ function saveContents()
     // Executed a save; clear the save timer
     clearTimeout(saveContentsTimeoutId);
 
-    fetch(webOrigin + "/" + controller + "/PostNoteRecord/"
+    fetch(webOrigin + "/" + controller + "/PostNote/"
         + note,
         {
             "method": "POST",
@@ -100,7 +100,7 @@ function saveContents()
 
 //async function fetchTextArea(editorTextArea)
 //{
-//    let result = await fetch(webOrigin + "/" + controller + "/GetNoteRecord/"
+//    let result = await fetch(webOrigin + "/" + controller + "/GetNote/"
 //        + folder + "/" + note);
 //}
 
@@ -285,7 +285,7 @@ async function onTitleFocusOut(event)
     var response;
     try
     {
-        response = await fetch(webOrigin + "/" + controller + "/PostNoteRecord/" + note,
+        response = await fetch(webOrigin + "/" + controller + "/PostNote/" + note,
             {
                 "method": "POST",
                 "body": JSON.stringify({ "Title": newTitle }),
