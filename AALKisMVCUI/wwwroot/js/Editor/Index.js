@@ -304,9 +304,6 @@ async function onTitleFocusOut(event)
     oldTitle = null;
 
     newTitle = await response.text();
-    window.location.replace(webOrigin + "/"
-            + controller + "/"
-            + note);
     showSuccessStatus();
 }
 
