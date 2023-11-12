@@ -2,7 +2,7 @@ using Xunit;
 using AALKisShared;
 using AALKisShared.Enums;
 
-namespace Tests;
+namespace UnitTests;
 
 public class UnitTestNote
 {

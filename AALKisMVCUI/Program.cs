@@ -2,7 +2,7 @@ using AALKisMVCUI.Utility;
 
 namespace AALKisMVCUI;
 
-public static class Program
+public class Program
 {
     public static readonly string LogFileName = "./AALKisMVCUI.log";
     public static void Main(string[] args)

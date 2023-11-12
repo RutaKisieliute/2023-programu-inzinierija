@@ -1,7 +1,8 @@
 using Xunit;
 using AALKisShared;
 
-namespace Tests;
+
+namespace UnitTests;
 
 public class UnitTestFolder
 {

@@ -1,40 +1,51 @@
 using AALKisAPI.Services;
 using AALKisAPI.Utility;
+using Microsoft.AspNetCore.Builder;
 
 namespace AALKisAPI;
 
-public static class Program
+public class Program
 {
     public static readonly string LogFileName = "./AALKisAPI.log";
 
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        CreateHostBuilder(args).Build().Run();
+    }
 
-        // Add services to the container.
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Program>();
+                webBuilder.UseEnvironment("Development");
+            });
 
-        builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-        builder.Services.AddScoped<IFoldersService, FolderRepository>();
-        builder.Services.AddScoped<INotesService, NoteRepository>();
-        builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        services.AddScoped<IFoldersService, FolderRepository>();
+        services.AddScoped<INotesService, NoteRepository>();
+        services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+    }
 
-        var app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-#if DEBUG
-        app.UseSwagger();
-        app.UseSwaggerUI();
-#endif
-
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
         app.UseHttpsRedirection();
-
+        app.UseRouting();
         app.UseAuthorization();
 
-        app.MapControllers();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
 
-        app.Run();
     }
 }
