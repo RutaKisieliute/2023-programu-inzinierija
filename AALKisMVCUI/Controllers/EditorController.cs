@@ -80,37 +80,18 @@ public class EditorController : Controller
         {
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            Note fieldsToUpdate = new Note();
-            fieldsToUpdate.SetFromJsonString(body);
+            Note fieldsToUpdate = CreateValidatedNote(body);
 
-            if(fieldsToUpdate.Title != null)
-            {
-                if(!fieldsToUpdate.IsTitleValid())
-                {
-                    throw new NoteException(fieldsToUpdate,
-                            $"Tried to set title to non-valid string \"{fieldsToUpdate.Title}\"");
-                }
-                fieldsToUpdate.Title = System.Web.HttpUtility
-                    .HtmlEncode(fieldsToUpdate.Title)
-                    .Replace("&amp;", "&");
-                result = Content(fieldsToUpdate.Title);
-            }
-
-            if(fieldsToUpdate.Content != null)
-            {
-                fieldsToUpdate.Content = System.Web.HttpUtility
-                    .HtmlEncode(fieldsToUpdate.Content)
-                    .Replace("&amp;", "&");
-            }
-
-
-            // Passing json instead of string, so that PUT (/Note/{folderName}/{noteName}) can update not only content.
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
 
             await _client.Fetch($"Note/{id}",
                     HttpMethod.Put,
                     new StringContent(jsonString, Encoding.UTF8, "application/json"));
-            
+
+            if(fieldsToUpdate.Title != null)
+            {
+                result = Content(fieldsToUpdate.Title);
+            }
         }
         catch(HttpRequestException exception)
         {
@@ -126,5 +107,33 @@ public class EditorController : Controller
         }
 
         return result;
+    }
+
+    public Note CreateValidatedNote(string json)
+    {
+        Note validatedNote = new Note();
+
+        validatedNote.SetFromJsonString(json);
+
+        if(validatedNote.Title != null)
+        {
+            if(!validatedNote.IsTitleValid())
+            {
+                throw new NoteException(validatedNote,
+                        $"Tried to set title to non-valid string \"{validatedNote.Title}\"");
+            }
+            validatedNote.Title = System.Web.HttpUtility
+                .HtmlEncode(validatedNote.Title)
+                .Replace("&amp;", "&");
+        }
+
+        if(validatedNote.Content != null)
+        {
+            validatedNote.Content = System.Web.HttpUtility
+                .HtmlEncode(validatedNote.Content)
+                .Replace("&amp;", "&");
+        }
+
+        return validatedNote;
     }
 }
