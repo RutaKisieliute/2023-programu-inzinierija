@@ -7,13 +7,17 @@ namespace UnitTests;
 public class UnitTestNote
 {
     [Fact]
-    public void IsValid()
+    public void IsValid_InvalidNotes_ReturnsFalse()
     {
         Assert.False(new Note().IsValid());
         Assert.False(new Note{Id = 1}.IsValid());
         Assert.False(new Note{Content = "foo"}.IsValid());
         Assert.False(new Note{Title = "foo", Content = "bar"}.IsValid());
+    }
 
+    [Fact]
+    public void IsValid_InvalidTitle_ReturnsFalse()
+    {
         Assert.False(new Note{Id = 1,
                     Title = "foo#",
                     Content = "bar",
@@ -68,9 +72,11 @@ public class UnitTestNote
                     EditDate = DateTime.Now,
                     Flags = 0}
                 .IsValid());
+    }
 
-
-
+    [Fact]
+    public void IsValid_ValidNotes_ReturnsTrue()
+    {
         Assert.True(new Note{Id = 1,
                     Title = "due to all known laws of aviation,",
                     Content = "bar",
@@ -105,7 +111,7 @@ public class UnitTestNote
     }
 
     [Fact]
-    public void Update()
+    public void Update_SinglePropertyUpdates_AllEqual()
     {
         Note testNote = new Note{};
         Assert.Equal(testNote.Id, -1);
@@ -128,7 +134,7 @@ public class UnitTestNote
     }
 
     [Fact]
-    public void CompareTo()
+    public void CompareTo_ArchivedVersusNormal_ArchivedMoreThanNormal()
     {
         Note archivedNote = new Note{Flags = NoteFlags.Archived, Title = "short title"};
         Note normalNote = new Note{Flags = NoteFlags.None, Title = "short title"};
@@ -136,6 +142,13 @@ public class UnitTestNote
         Assert.True(archivedNote.CompareTo(normalNote) > 0);
         Assert.True(normalNote.CompareTo(archivedNote) < 0);
 
+    }
+
+    [Fact]
+    public void CompareTo_TitleLength_ShorterMoreThanLonger()
+    {
+        Note archivedNote = new Note{Flags = NoteFlags.Archived, Title = "short title"};
+        Note normalNote = new Note{Flags = NoteFlags.None, Title = "short title"};
         Note otherArchivedNote = new Note{Flags = NoteFlags.Archived, Title = "loooong title"};
         Note otherNormalNote = new Note{Flags = NoteFlags.None, Title = "loooong title"};
 

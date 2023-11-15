@@ -109,18 +109,24 @@ public class EditorController : Controller
         return result;
     }
 
-    public Note CreateValidatedNote(string json)
+    public static Note CreateValidatedNote(string json)
     {
         Note validatedNote = new Note();
 
         validatedNote.SetFromJsonString(json);
+
+        if(validatedNote.Id < 0)
+        {
+            throw new NoteException(validatedNote,
+                    $"Invalid id while validating note");
+        }
 
         if(validatedNote.Title != null)
         {
             if(!validatedNote.IsTitleValid())
             {
                 throw new NoteException(validatedNote,
-                        $"Tried to set title to non-valid string \"{validatedNote.Title}\"");
+                        $"Invalid title \"{validatedNote.Title}\" while validating note");
             }
             validatedNote.Title = System.Web.HttpUtility
                 .HtmlEncode(validatedNote.Title)
@@ -129,6 +135,11 @@ public class EditorController : Controller
 
         if(validatedNote.Content != null)
         {
+            if(!validatedNote.IsContentValid())
+            {
+                throw new NoteException(validatedNote,
+                        $"Invalid content while validating note");
+            }
             validatedNote.Content = System.Web.HttpUtility
                 .HtmlEncode(validatedNote.Content)
                 .Replace("&amp;", "&");

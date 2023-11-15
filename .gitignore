@@ -1,7 +1,7 @@
 # Ignore build artifacts
 */obj/*
 */build/*
-*/bin/Debug/*
+*/bin/*
 *.log
 .vs/
 AALKisAPI/Services/databaselogin.txt

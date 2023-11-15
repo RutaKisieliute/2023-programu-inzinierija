@@ -35,7 +35,7 @@ public record struct Note : IJsonSerializable, IComparable<Note>
     {
         return Id > 0
                 && IsTitleValid()
-                && Content != null
+                && IsContentValid()
                 && EditDate != null
                 && Flags != null;
     }
@@ -44,10 +44,19 @@ public record struct Note : IJsonSerializable, IComparable<Note>
     {
         // No characters that break links and no funny bytes
         // Only one is needed to invalidate the entire title
-        Regex validationRegex = new Regex("[#.\\/\\\\<>?\x0-\x1F\x7F\x80-\xFF]{1}");
+        Regex validationRegex = new Regex("[#.\\/\\\\<>?\0-\x1F\x7F-\xFF]{1}");
 
         return !String.IsNullOrWhiteSpace(Title)
                 && !validationRegex.IsMatch(Title);
+    }
+
+    public bool IsContentValid()
+    {
+        // No funny characters
+        Regex validationRegex = new Regex("[\0-\x09\x0B-\x1F\x7F-\xFF]{1}");
+
+        return Content != null
+            && !validationRegex.IsMatch(Content);
     }
 
     public string ToJsonString()
