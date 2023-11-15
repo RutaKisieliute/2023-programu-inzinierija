@@ -4,7 +4,9 @@
 
 	function escape(t)
 	{
-		return new Option(t).innerHTML;
+        //var foo = new Option(t).innerHTML
+        //console.log(foo);
+		return t;
 	}
 	function inlineEscape(s)
 	{

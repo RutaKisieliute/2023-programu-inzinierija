@@ -81,7 +81,7 @@ public class EditorController : Controller
         {
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            Note fieldsToUpdate = CreateValidatedNote(body);
+            Note fieldsToUpdate = CreateValidatedNote(body, id);
 
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
 
@@ -110,10 +110,11 @@ public class EditorController : Controller
         return result;
     }
 
-    public static Note CreateValidatedNote(string json)
+    public static Note CreateValidatedNote(string json, int? id = null)
     {
         Note validatedNote = new Note();
         validatedNote.SetFromJsonString(json);
+        validatedNote.Id = id ?? validatedNote.Id;
 
 
         if(validatedNote.Id < 0)

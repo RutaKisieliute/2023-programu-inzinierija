@@ -1,6 +1,7 @@
 using Xunit;
 using AALKisMVCUI.Controllers;
-using AALKisShared;
+using AALKisShared.Records;
+using AALKisShared.Utility;
 
 namespace UnitTests.MVCUI;
 

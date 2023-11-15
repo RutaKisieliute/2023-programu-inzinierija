@@ -156,6 +156,7 @@ function onEditorFocus(event)
     // Show editing HTML
     editorTextArea.innerHTML = spanEditHTML;
 
+    /*
     // Set the caret position
     // https://stackoverflow.com/a/6249440
     var range = document.createRange();
@@ -170,6 +171,7 @@ function onEditorFocus(event)
 
     selection.removeAllRanges();
     selection.addRange(range);
+    */
 }
 
 function onEditorClick(event)
@@ -193,29 +195,12 @@ function onEditorDoubleClick(event)
     editorTextArea.focus({ "focusVisible": "true" });
 }
 
-function onEditorFocusOut(event)
+function parseAndMarkKeywords(text)
 {
-    // Disable editing after losing focus
-    // Can't click hyperlinks when content is editable
-    editorTextArea.setAttribute("contentEditable", "false");
-    // Early return
-    if(!shouldUpdateSpanViewHTML)
-    {
-        editorTextArea.innerHTML = spanViewHTML;
-        return;
-    }
-
-    // Updating the span view means we don't do it again unless we need to
-    shouldUpdateSpanViewHTML = false;
-
-    // We only use regular expressions
-    // So we don't need to use editorTextArea.innerHTML
-    spanViewHTML = spanEditHTML;
-
     var keywords = new Map();
 
     // Capture all keyword definitions
-    spanViewHTML = spanViewHTML
+    text = text
         .replaceAll(/#(\w+)/gi, (...match) => {
             let keyword = match[1].toLowerCase();
 
@@ -229,8 +214,7 @@ function onEditorFocusOut(event)
     // Don't process if there are no keywords
     if(keywords.size == 0)
     {
-        editorTextArea.innerHTML = spanViewHTML;
-        return;
+        return text;
     }
 
     // Helper function to convert an iterator into an array
@@ -257,8 +241,8 @@ function onEditorFocusOut(event)
             + "(\\w+)*",
         "gi");
 
-    // Capture all used keywords
-    spanViewHTML = spanViewHTML
+    // Capture and mark all used keywords
+    return text
         .replaceAll(targetRegExp, (...match) => {
             if(match[0] != match[2])
             {
@@ -268,8 +252,35 @@ function onEditorFocusOut(event)
                 + match[0]
                 + "</a>";
         });
+}
 
-    // Finally update the innerHTML
+function onEditorFocusOut(event)
+{
+    // Disable editing after losing focus
+    // Can't click hyperlinks when content is editable
+    editorTextArea.setAttribute("contentEditable", "false");
+    // Early return
+    if(!shouldUpdateSpanViewHTML)
+    {
+        editorTextArea.innerHTML = spanViewHTML;
+        return;
+    }
+
+    // Updating the span view means we don't do it again unless we need to
+    shouldUpdateSpanViewHTML = false;
+
+    // Prepare for updating
+    spanViewHTML = spanEditHTML;
+
+    // Update
+    spanViewHTML = mmd(spanViewHTML);
+    spanViewHTML = parseAndMarkKeywords(spanViewHTML);
+    if(spanViewHTML == "<p></p>")
+    {
+        spanViewHTML = ""
+    }
+
+    // Finally port the changes to innerHTML
     editorTextArea.innerHTML = spanViewHTML;
 }
 

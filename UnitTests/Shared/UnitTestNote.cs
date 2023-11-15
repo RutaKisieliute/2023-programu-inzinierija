@@ -1,5 +1,5 @@
 using Xunit;
-using AALKisShared;
+using AALKisShared.Records;
 using AALKisShared.Enums;
 
 namespace UnitTests;
