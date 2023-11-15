@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Utility;
-using AALKisShared;
+using AALKisShared.Records;
 using AALKisShared.Exceptions;
+using AALKisShared.Utility;
 using System.Text.Json;
 using Newtonsoft.Json;
 using System.Text;
@@ -112,8 +113,8 @@ public class EditorController : Controller
     public static Note CreateValidatedNote(string json)
     {
         Note validatedNote = new Note();
-
         validatedNote.SetFromJsonString(json);
+
 
         if(validatedNote.Id < 0)
         {

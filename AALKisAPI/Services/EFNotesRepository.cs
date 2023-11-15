@@ -1,6 +1,5 @@
 using AALKisAPI.Data;
 using AALKisAPI.Models;
-using AALKisShared;
 using Microsoft.EntityFrameworkCore;
 
 namespace AALKisAPI.Services;
@@ -14,12 +13,12 @@ public class EFNotesRepository : INotesRepository
         _database = database;
     }
     
-    public AALKisShared.Note GetNote(int id, bool previewOnly)
+    public AALKisShared.Records.Note GetNote(int id, bool previewOnly)
     {
         Console.WriteLine("The time now is:"+ DateTime.Now+"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
         var note = _database.Notes.Find(id);
         Console.WriteLine("The note's time is:"+ note.Modified +"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
-        return note != null ? ToSharedNote(note) : new AALKisShared.Note(); 
+        return note != null ? ToSharedNote(note) : new AALKisShared.Records.Note(); 
     }
 
     public bool CheckIfNoteExists(int id)
@@ -47,7 +46,7 @@ public class EFNotesRepository : INotesRepository
         _database.SaveChanges();
     }
 
-    public void UpdateNote(AALKisShared.Note record, int folderId = -1)
+    public void UpdateNote(AALKisShared.Records.Note record, int folderId = -1)
     {
         Models.Note note = _database.Notes.Find(record.Id);
         if(note == null) throw new Exception();
@@ -60,10 +59,10 @@ public class EFNotesRepository : INotesRepository
         _database.SaveChanges();
     }
 
-    public List<AALKisShared.Note> SearchByTitle(string searchQuery)
+    public List<AALKisShared.Records.Note> SearchByTitle(string searchQuery)
     {
         var list1 = (List<Models.Note>) _database.Notes.Where(note => note.Title.Contains(searchQuery));
-        var list2 = new List<AALKisShared.Note>();
+        var list2 = new List<AALKisShared.Records.Note>();
         foreach(Models.Note note in list1)
         {
             list2.Add(ToSharedNote(note));
@@ -71,9 +70,9 @@ public class EFNotesRepository : INotesRepository
         return list2;
     }
 
-    public static AALKisShared.Note ToSharedNote(AALKisAPI.Models.Note note)
+    public static AALKisShared.Records.Note ToSharedNote(AALKisAPI.Models.Note note)
     {
-        return new AALKisShared.Note(){
+        return new AALKisShared.Records.Note(){
             Id = note.Id,
             Title = note.Title,
             Content = note.Content,

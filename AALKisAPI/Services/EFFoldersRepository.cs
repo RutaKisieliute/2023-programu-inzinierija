@@ -1,9 +1,9 @@
 using AALKisShared;
 using AALKisAPI.Data;
 using AALKisAPI.Models;
-using Note = AALKisShared.Note;
+using Note = AALKisShared.Records.Note;
 using NoteEntity = AALKisAPI.Models.Note;
-using Folder = AALKisShared.Folder<AALKisShared.Note>;
+using Folder = AALKisShared.Records.Folder<AALKisShared.Records.Note>;
 using FolderEntity = AALKisAPI.Models.Folder;
 using System.Reflection.Metadata.Ecma335;
 using Microsoft.EntityFrameworkCore;

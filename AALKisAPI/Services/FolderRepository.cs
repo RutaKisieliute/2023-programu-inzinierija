@@ -1,7 +1,7 @@
 using System.Text;
 using AALKisAPI.Services;
 
-using AALKisShared;
+using AALKisShared.Records;
 using AALKisShared.Enums;
 
 using Microsoft.AspNetCore.Mvc;

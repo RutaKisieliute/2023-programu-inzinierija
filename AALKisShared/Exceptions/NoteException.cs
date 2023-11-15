@@ -1,3 +1,5 @@
+using AALKisShared.Records;
+
 namespace AALKisShared.Exceptions;
 
 public class NoteException : Exception

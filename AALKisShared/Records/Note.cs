@@ -1,10 +1,11 @@
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using AALKisShared.Enums;
+using AALKisShared.Interfaces;
 
-namespace AALKisShared;
+namespace AALKisShared.Records;
 
-public record struct Note : IJsonSerializable, IComparable<Note>
+public record struct Note : IComparable<Note>, IJsonSerializable
 {
     public int Id { get; set; } = -1;
 
@@ -57,16 +58,6 @@ public record struct Note : IJsonSerializable, IComparable<Note>
 
         return Content != null
             && !validationRegex.IsMatch(Content);
-    }
-
-    public string ToJsonString()
-    {
-        return JsonConvert.SerializeObject(this);
-    }
-
-    public void SetFromJsonString(string json)
-    {
-        this = JsonConvert.DeserializeObject<Note>(json);
     }
 
     public int CompareTo(Note other)
