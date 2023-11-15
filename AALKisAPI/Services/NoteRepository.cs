@@ -34,7 +34,7 @@ public class NoteRepository : INotesService
             connection.Open();
             MySqlDataReader reader = cmd.ExecuteReader();
             reader.Read();
-            note.Id = Convert.ToInt64(reader["id"]);
+            note.Id = Convert.ToInt32(reader["id"]);
             note.Title = reader["title"].ToString() ?? "";
             if(previewOnly) note.Content = "";
             else note.Content = reader["content"].ToString();
@@ -157,7 +157,7 @@ public class NoteRepository : INotesService
             while(reader.Read())
             {
                 note = new Note(){
-                    Id = Convert.ToInt64(reader["id"]),
+                    Id = Convert.ToInt32(reader["id"]),
                     Title = reader["title"].ToString() ?? "",
                     Content = reader["content"].ToString(),
                     Flags = (NoteFlags) Convert.ToInt32(reader["flags"])};

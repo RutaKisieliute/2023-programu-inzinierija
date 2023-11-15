@@ -64,7 +64,7 @@ public class FolderRepository : IFoldersService
                     folder.Name = reader["ftitle"].ToString() ??  "";
                     note = new Note
                     {
-                        Id = Convert.ToInt64(reader["id"]),
+                        Id = Convert.ToInt32(reader["id"]),
                         Title = reader["title"].ToString() ?? ""
                     };
                     if(previewOnly) note.Content = "";
@@ -74,7 +74,7 @@ public class FolderRepository : IFoldersService
                     while(reader.Read())
                     {
                         note = new Note();
-                        note.Id = Convert.ToInt64(reader["id"]);
+                        note.Id = Convert.ToInt32(reader["id"]);
                         note.Title = reader["title"].ToString() ?? "";
                         note.Content = reader["content"].ToString();
                         note.Flags = (NoteFlags) Convert.ToInt32(reader["flags"]);                        

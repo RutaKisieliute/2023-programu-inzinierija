@@ -1,6 +1,8 @@
+using AALKisAPI.Data;
 using AALKisAPI.Services;
 using AALKisAPI.Utility;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 
 namespace AALKisAPI;
 
@@ -23,12 +25,23 @@ public class Program
 
     public void ConfigureServices(IServiceCollection services)
     {
+        var _dbConnection = File.ReadAllText("./Services/databaselogin.txt");
+        var serverVersion = new MySqlServerVersion("5.2.9");
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddScoped<IFoldersService, FolderRepository>();
-        services.AddScoped<INotesService, NoteRepository>();
+        //services.AddScoped<NoteDB>();
+        services.AddDbContext<NoteDB>(
+        dbContextOptions => dbContextOptions
+            .UseMySql(_dbConnection, serverVersion)                
+        );
+        services.AddScoped<IFoldersService, EFFoldersService>();
+        services.AddScoped<INotesService, EFNotesService>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+        /*services.AddDbContext<Models.Database>(options => {
+            var connectionString = File.ReadAllText("./Services/databaselogin.txt");
+            options.UseSqlServer(connectionString);
+        });*/
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

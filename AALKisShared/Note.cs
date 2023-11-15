@@ -6,7 +6,7 @@ namespace AALKisShared;
 
 public record struct Note : IJsonSerializable, IComparable<Note>
 {
-    public long Id { get; set; } = -1;
+    public int Id { get; set; } = -1;
 
     public string? Title { get; set; } = null;
 
