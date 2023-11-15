@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class FolderRepository : IFoldersService
+public class FolderRepository : IFoldersRepository
 {
     private readonly string DBConnection;
 

@@ -10,15 +10,15 @@ using MySql.Data.MySqlClient;
 
 namespace AALKisAPI.Utility;
 
-public class NoteRepository : INotesService
+public class NoteRepository : INotesRepository
 {
-    private readonly IFoldersService _folderService;
+    private readonly IFoldersRepository _foldersRepository;
 
     private readonly string DBConnection;
 
-    public NoteRepository(IFoldersService folderService, string? databaseConnectionString = null)
+    public NoteRepository(IFoldersRepository foldersRepository, string? databaseConnectionString = null)
     {
-        _folderService = folderService;
+        _foldersRepository = foldersRepository;
         DBConnection = databaseConnectionString ?? File.ReadAllText("./Services/databaselogin.txt");
     }
 
@@ -70,7 +70,7 @@ public class NoteRepository : INotesService
 
     public int? CreateNote(int folderId, string noteTitle)
     {
-        if(!_folderService.CheckIfFolderExists(folderId)) return -1;
+        if(!_foldersRepository.CheckIfFolderExists(folderId)) return -1;
         string query1 = "SELECT MAX(id) AS max FROM notes";
         string query2;
         int id;

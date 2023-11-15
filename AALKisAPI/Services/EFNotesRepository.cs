@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AALKisAPI.Services;
 
-public class EFNotesService : INotesService
+public class EFNotesRepository : INotesRepository
 {
     private readonly NoteDB _database;
     
-    public EFNotesService(NoteDB database)
+    public EFNotesRepository(NoteDB database)
     {
         _database = database;
     }

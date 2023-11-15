@@ -2,7 +2,7 @@ using AALKisShared;
 
 namespace AALKisAPI.Services;
 
-public interface IFoldersService
+public interface IFoldersRepository
 {
     public List<Folder<Note>> GetAllFolders(bool previewOnly);
 

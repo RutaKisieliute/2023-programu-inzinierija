@@ -35,8 +35,8 @@ public class Program
         dbContextOptions => dbContextOptions
             .UseMySql(_dbConnection, serverVersion)                
         );
-        services.AddScoped<IFoldersService, EFFoldersService>();
-        services.AddScoped<INotesService, EFNotesService>();
+        services.AddScoped<IFoldersRepository, EFFoldersRepository>();
+        services.AddScoped<INotesRepository, EFNotesRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
         /*services.AddDbContext<Models.Database>(options => {
             var connectionString = File.ReadAllText("./Services/databaselogin.txt");

@@ -10,11 +10,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AALKisAPI.Services;
 
-public class EFFoldersService : IFoldersService
+public class EFFoldersRepository : IFoldersRepository
 {
     private readonly NoteDB _database;
     
-    public EFFoldersService(NoteDB database)
+    public EFFoldersRepository(NoteDB database)
     {
         _database = database;
     }
@@ -82,7 +82,7 @@ public class EFFoldersService : IFoldersService
         foreach(NoteEntity note in entity.Notes)
         {
             Console.WriteLine("!!!!!!!!!!" + note.ToString());
-            list.Add(EFNotesService.ToSharedNote(note)); 
+            list.Add(EFNotesRepository.ToSharedNote(note)); 
         }
                 Console.WriteLine("end!!!!!!!!!!!!!!!!!!11");
 
