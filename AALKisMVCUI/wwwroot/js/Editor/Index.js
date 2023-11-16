@@ -1,4 +1,4 @@
-const miliBeforeSave = 500;
+const miliBeforeSave = 1000;
 const miliBeforeStatusClear = 2000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
@@ -35,6 +35,7 @@ function startup()
     editorTextArea.addEventListener("click", (onEditorClick));
     editorTextArea.addEventListener("dblclick", (onEditorDoubleClick));
     editorTextArea.addEventListener("focusout", (onEditorFocusOut));
+    editorTextArea.addEventListener("onmouseleave", (saveContents));
     onEditorFocusOut();
 
     titleTextArea.addEventListener("focus", (onTitleFocus));
@@ -47,7 +48,7 @@ function startup()
     });*/
 }
 
-const getKeywordId = (keyword) => { return "keyword-" + keyword; };
+const getKeywordId = (keyword) => { return "keyword!" + keyword; };
 
 // Helper function to scroll to element
 function scrollToHref(anchorTag)
@@ -135,7 +136,7 @@ function onPaste(event)
 
     // `execCommand` is obsolete/deprecated,
     // but there are no alternatives as I've read,
-    // so it `execCommand` stays.
+    // so `execCommand` stays.
     if (document.queryCommandSupported('insertText'))
     {
         document.execCommand('insertText', false, text);
@@ -156,6 +157,7 @@ function onEditorFocus(event)
     // Show editing HTML
     editorTextArea.innerHTML = spanEditHTML;
 
+    // Commented out because of mmd
     /*
     // Set the caret position
     // https://stackoverflow.com/a/6249440
@@ -200,58 +202,30 @@ function parseAndMarkKeywords(text)
     var keywords = new Map();
 
     // Capture all keyword definitions
-    text = text
-        .replaceAll(/#(\w+)/gi, (...match) => {
+    return text.replaceAll(/\${0,1}([A-z]+)/gi, (...match) => {
+        if(match[0][0] == '$')
+        {
+            //console.log(match);
+            //console.log("matched as keyword");
             let keyword = match[1].toLowerCase();
 
             keywords.set(keyword, getKeywordId(keyword));
 
-            return "<b id=\"" + keywords.get(keyword) + "\">"
+            return "<div class=\"keyword\" id=\"" + keywords.get(keyword) + "\">"
                 + match[0]
-                + "</b>";
-        });
-
-    // Don't process if there are no keywords
-    if(keywords.size == 0)
-    {
-        return text;
-    }
-
-    // Helper function to convert an iterator into an array
-    // (FireFox lacks one)
-    function iteratorToArray(iterator)
-    {
-        let result = [];
-        for(let element = iterator.next().value;
-                element;
-                element = iterator.next().value)
-        {
-            result.push(element);
+                + "</div>";
         }
-        return result;
-    }
-
-
-    // Create a regular expression which captures all uses of keywords
-    // Without their definitions
-    var targetRegExp = new RegExp("([-#]|\\w+)*"
-            + "("
-                + "(" + iteratorToArray(keywords.keys()).join(")|(") + ")"
-            + ")"
-            + "(\\w+)*",
-        "gi");
-
-    // Capture and mark all used keywords
-    return text
-        .replaceAll(targetRegExp, (...match) => {
-            if(match[0] != match[2])
-            {
-                return match[0];
-            }
-            return "<a href=\"#" + keywords.get(match[0].toLowerCase()) + "\" onclick=\"scrollToHref(this)\">"
-                + match[0]
-                + "</a>";
-        });
+        var keyword = keywords.get(match[0].toLowerCase());
+        if(!keyword)
+        {
+            return match[0];
+        }
+        //console.log(match);
+        //console.log("matched as used keyword");
+        return "<a href=\"#" + keyword + "\" onclick=\"scrollToHref(this)\">"
+            + match[0]
+            + "</a>";
+    });
 }
 
 function onEditorFocusOut(event)
@@ -273,8 +247,8 @@ function onEditorFocusOut(event)
     spanViewHTML = spanEditHTML;
 
     // Update
-    spanViewHTML = mmd(spanViewHTML);
     spanViewHTML = parseAndMarkKeywords(spanViewHTML);
+    spanViewHTML = mmd(spanViewHTML);
     if(spanViewHTML == "<p></p>")
     {
         spanViewHTML = ""

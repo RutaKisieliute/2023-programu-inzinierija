@@ -6,6 +6,7 @@ using AALKisShared.Utility;
 using System.Text.Json;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -81,9 +82,16 @@ public class EditorController : Controller
         {
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            Note fieldsToUpdate = CreateValidatedNote(body, id);
+            Note fieldsToUpdate = CreateValidatedNote(body);
+            fieldsToUpdate.Id = id;
 
-            string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
+            HashSet<Keyword> keywords = GetKeywordsFromString(fieldsToUpdate.Content);
+            foreach(Keyword keyword in keywords)
+            {
+                _logger.LogDebug($"Found keyword {keyword}");
+            }
+
+            string jsonString = fieldsToUpdate.ToJsonString();
 
             await _client.Fetch($"Note/{id}",
                     HttpMethod.Put,
@@ -110,18 +118,10 @@ public class EditorController : Controller
         return result;
     }
 
-    public static Note CreateValidatedNote(string json, int? id = null)
+    public static Note CreateValidatedNote(string json)
     {
         Note validatedNote = new Note();
         validatedNote.SetFromJsonString(json);
-        validatedNote.Id = id ?? validatedNote.Id;
-
-
-        if(validatedNote.Id < 0)
-        {
-            throw new NoteException(validatedNote,
-                    $"Invalid id while validating note");
-        }
 
         if(validatedNote.Title != null)
         {
@@ -148,5 +148,19 @@ public class EditorController : Controller
         }
 
         return validatedNote;
+    }
+
+    public static HashSet<Keyword> GetKeywordsFromString(string? content)
+    {
+        HashSet<Keyword> result = new HashSet<Keyword>();
+        if(content != null)
+        {
+            var regex = new Regex(@"\$([A-z]+)", RegexOptions.IgnoreCase);
+            foreach(Match match in regex.Matches(content))
+            {
+                result.Add(new Keyword{Name = match.Groups[1].Value});
+            }
+        }
+        return result;
     }
 }
