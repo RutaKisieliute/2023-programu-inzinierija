@@ -20,4 +20,6 @@ public partial class Note
     public virtual Folder? Folder { get; set; }
 
     public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
+    public virtual ICollection<Keyword> Keywords { get; set; } = new List<Keyword>();
 }

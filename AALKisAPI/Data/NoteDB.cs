@@ -108,6 +108,26 @@ public partial class NoteDB : DbContext
                 .HasConstraintName("tags_ibfk_1");
         });
 
+        modelBuilder.Entity<Keyword>(entity =>
+        {
+            entity.HasKey(e => new { e.Name, e.NoteId }).HasName("PRIMARY");
+
+            entity.ToTable("keywords");
+
+            entity.Property(e => e.NoteId)
+                .HasColumnType("int(11)")
+                .HasColumnName("note_id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("''")
+                .HasColumnName("name");
+
+            entity.HasOne(d => d.Note).WithMany(p => p.Keywords)
+                .HasForeignKey(d => d.NoteId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("keywords_ibfk_1");
+        });
+
         OnModelCreatingPartial(modelBuilder);
     }
 
