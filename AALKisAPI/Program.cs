@@ -1,9 +1,6 @@
 using AALKisAPI.Services;
 using AALKisAPI.Utility;
 using Microsoft.AspNetCore.Builder;
-
-namespace AALKisAPI;
-
 public class Program
 {
     public static readonly string LogFileName = "./AALKisAPI.log";
@@ -46,6 +43,5 @@ public class Program
         {
             endpoints.MapControllers();
         });
-
     }
 }
