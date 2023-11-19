@@ -1,0 +1,77 @@
+using Microsoft.AspNetCore.Mvc;
+using AALKisAPI.Services;
+using AALKisShared;
+using Newtonsoft.Json;
+
+namespace AALKisAPI.Controllers;
+
+[ApiController]
+[Route("[controller]")]
+public class KeywordController : ControllerBase
+{
+    private readonly ILogger<KeywordController> _logger;
+
+    private readonly IKeywordsRepository _keywordsRepository;
+
+    public KeywordController(ILogger<KeywordController> logger,
+            IKeywordsRepository keywordsRepository)
+    {
+        _logger = logger;
+        _keywordsRepository = keywordsRepository;
+    }
+
+    [HttpGet("{noteId}/{name}")]
+    public Keyword? Get(int noteId, string name)
+    {
+        try
+        {
+            return _KeywordsRepository.GetKeyword(name, noteId);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+        return null;
+    }
+
+    [HttpHead("{name}")]
+    public IActionResult Exists(string name)
+    {
+        if(!_KeywordsRepository.CheckIfKeywordExists(name))
+        {
+            return new StatusCodeResult(StatusCodes.Status410Gone);
+        }
+        return new StatusCodeResult(StatusCodes.Status204NoContent);
+    }
+
+    [HttpPost("{noteId}/{name}")]
+    public void Create(int noteId, string name)
+    {
+        try
+        {
+            _KeywordsRepository.CreateKeyword(name, noteId);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError($"Failed to create Keyword {KeywordTitle} in folder {folderId}: "
+                    + exception.ToString());
+        }
+    }
+
+    [HttpDelete("{noteId}/{name}")]
+    public IActionResult Delete(int noteId, string name)
+    {
+        try
+        {
+            _KeywordsRepository.DeleteKeyword(name, noteId);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError($"Failed to delete Keyword {id}: "
+                    + exception.ToString());
+            return BadRequest();
+        }
+        return new StatusCodeResult(StatusCodes.Status204NoContent);
+    }
+}

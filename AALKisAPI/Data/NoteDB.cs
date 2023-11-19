@@ -29,6 +29,8 @@ public partial class NoteDB : DbContext
 
     public virtual DbSet<Note> Notes { get; set; }
 
+    public virtual DbSet<Keyword> Keywords { get; set; }
+
     public virtual DbSet<Tag> Tags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
