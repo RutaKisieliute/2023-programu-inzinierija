@@ -15,9 +15,7 @@ public class EFNotesRepository : INotesRepository
     
     public AALKisShared.Records.Note GetNote(int id, bool previewOnly)
     {
-        Console.WriteLine("The time now is:"+ DateTime.Now+"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
         var note = _database.Notes.Find(id);
-        Console.WriteLine("The note's time is:"+ note.Modified +"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
         return note != null ? ToSharedNote(note) : new AALKisShared.Records.Note(); 
     }
 
@@ -35,9 +33,9 @@ public class EFNotesRepository : INotesRepository
             FolderId = folderId,
             Modified = DateTime.UtcNow
         };
-        int ret = _database.Notes.Add(note).Entity.Id;
+        _database.Notes.Add(note);
         _database.SaveChanges();
-        return ret;
+        return note.Id;
     }
 
     public void DeleteNote(int id)
@@ -55,7 +53,6 @@ public class EFNotesRepository : INotesRepository
         note.Flags = (sbyte?) record.Flags;
         if(folderId != -1) note.Folder = _database.Folders.Find(folderId);
         note.Modified = DateTime.UtcNow;
-        Console.WriteLine("The modification time is:"+ note.Modified+"IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII");
         _database.SaveChanges();
     }
 
