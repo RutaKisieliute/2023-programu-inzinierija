@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
+using AALKisShared.Records;
 
 namespace AALKisAPI.Controllers;
 
@@ -10,13 +11,13 @@ public class FolderController : ControllerBase
 {
     private readonly ILogger<FolderController> _logger;
 
-    private readonly IFoldersService _recordsService;
+    private readonly IFoldersRepository _foldersRepository;
 
     public FolderController(ILogger<FolderController> logger,
-            IFoldersService recordsService)
+            IFoldersRepository foldersRepository)
     {
         _logger = logger;
-        _recordsService = recordsService;
+        _foldersRepository = foldersRepository;
     }
 
     [HttpGet]
@@ -24,7 +25,7 @@ public class FolderController : ControllerBase
     {
         try
         {
-            return _recordsService.GetAllFolders(previewOnly: !getContents);
+            return _foldersRepository.GetAllFolders(previewOnly: !getContents);
         }
         catch(Exception exception)
         {
@@ -40,7 +41,7 @@ public class FolderController : ControllerBase
     {
         try
         {
-            return _recordsService.GetFolder(folderId, previewOnly: !getContents);
+            return _foldersRepository.GetFolder(folderId, previewOnly: !getContents);
         }
         catch(Exception exception)
         {
@@ -55,7 +56,7 @@ public class FolderController : ControllerBase
     [HttpHead("{folderId}")]
     public IActionResult Exists(int folderId)
     {
-        if(!_recordsService.CheckIfFolderExists(folderId))
+        if(!_foldersRepository.CheckIfFolderExists(folderId))
         {
             return new StatusCodeResult(StatusCodes.Status410Gone);
         }
@@ -67,7 +68,7 @@ public class FolderController : ControllerBase
     {
         try
         {
-            _recordsService.CreateFolder(folderName);
+            _foldersRepository.CreateFolder(folderName);
         }
         catch(Exception exception)
         {
@@ -83,7 +84,7 @@ public class FolderController : ControllerBase
     {
         try
         {
-            _recordsService.RenameFolder(folderId, newFolderName);
+            _foldersRepository.RenameFolder(folderId, newFolderName);
         }
         catch(Exception exception)
         {
@@ -100,7 +101,7 @@ public class FolderController : ControllerBase
     {
         try
         {
-            _recordsService.DeleteFolder(folderId, force);
+            _foldersRepository.DeleteFolder(folderId, force);
         }
         catch(Exception exception)
         {

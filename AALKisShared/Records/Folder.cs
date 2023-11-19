@@ -1,6 +1,8 @@
-namespace AALKisShared;
+using AALKisShared.Interfaces;
 
-public record class Folder<T> : IComparable<Folder<T>>
+namespace AALKisShared.Records;
+
+public record class Folder<T> : IComparable<Folder<T>>, IJsonSerializable
 {
     public int Id { get; set; } = -1;
 

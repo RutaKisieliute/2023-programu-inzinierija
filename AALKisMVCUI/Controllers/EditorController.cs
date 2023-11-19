@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Utility;
-using AALKisShared;
+using AALKisShared.Records;
 using AALKisShared.Exceptions;
+using AALKisShared.Utility;
 using System.Text.Json;
 using Newtonsoft.Json;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -81,8 +83,15 @@ public class EditorController : Controller
             string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
             Note fieldsToUpdate = CreateValidatedNote(body);
+            fieldsToUpdate.Id = id;
 
-            string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
+            HashSet<Keyword> keywords = GetKeywordsFromString(fieldsToUpdate.Content);
+            foreach(Keyword keyword in keywords)
+            {
+                _logger.LogDebug($"Found keyword {keyword}");
+            }
+
+            string jsonString = fieldsToUpdate.ToJsonString();
 
             await _client.Fetch($"Note/{id}",
                     HttpMethod.Put,
@@ -109,10 +118,9 @@ public class EditorController : Controller
         return result;
     }
 
-    public Note CreateValidatedNote(string json)
+    public static Note CreateValidatedNote(string json)
     {
         Note validatedNote = new Note();
-
         validatedNote.SetFromJsonString(json);
 
         if(validatedNote.Title != null)
@@ -120,7 +128,7 @@ public class EditorController : Controller
             if(!validatedNote.IsTitleValid())
             {
                 throw new NoteException(validatedNote,
-                        $"Tried to set title to non-valid string \"{validatedNote.Title}\"");
+                        $"Invalid title \"{validatedNote.Title}\" while validating note");
             }
             validatedNote.Title = System.Web.HttpUtility
                 .HtmlEncode(validatedNote.Title)
@@ -129,11 +137,30 @@ public class EditorController : Controller
 
         if(validatedNote.Content != null)
         {
+            if(!validatedNote.IsContentValid())
+            {
+                throw new NoteException(validatedNote,
+                        $"Invalid content while validating note");
+            }
             validatedNote.Content = System.Web.HttpUtility
                 .HtmlEncode(validatedNote.Content)
                 .Replace("&amp;", "&");
         }
 
         return validatedNote;
+    }
+
+    public static HashSet<Keyword> GetKeywordsFromString(string? content)
+    {
+        HashSet<Keyword> result = new HashSet<Keyword>();
+        if(content != null)
+        {
+            var regex = new Regex(@"\$([A-z]+)", RegexOptions.IgnoreCase);
+            foreach(Match match in regex.Matches(content))
+            {
+                result.Add(new Keyword{Name = match.Groups[1].Value});
+            }
+        }
+        return result;
     }
 }

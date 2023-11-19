@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
+using AALKisShared.Records;
 using Newtonsoft.Json;
 
 namespace AALKisAPI.Controllers;
@@ -11,13 +12,13 @@ public class NoteController : ControllerBase
 {
     private readonly ILogger<NoteController> _logger;
 
-    private readonly INotesService _recordsService;
+    private readonly INotesRepository _notesRepository;
 
     public NoteController(ILogger<NoteController> logger,
-            INotesService recordsService)
+            INotesRepository notesRepository)
     {
         _logger = logger;
-        _recordsService = recordsService;
+        _notesRepository = notesRepository;
     }
 
     [HttpGet("{id}")]
@@ -25,7 +26,7 @@ public class NoteController : ControllerBase
     {
         try
         {
-            return _recordsService.GetNote(id, previewOnly: false);
+            return _notesRepository.GetNote(id, previewOnly: false);
         }
         catch(Exception exception)
         {
@@ -38,7 +39,7 @@ public class NoteController : ControllerBase
     [HttpHead("{id}")]
     public IActionResult Exists(int id)
     {
-        if(!_recordsService.CheckIfNoteExists(id))
+        if(!_notesRepository.CheckIfNoteExists(id))
         {
             return new StatusCodeResult(StatusCodes.Status410Gone);
         }
@@ -51,7 +52,7 @@ public class NoteController : ControllerBase
         int? id = null;
         try
         {
-            id = _recordsService.CreateNote(folderId, noteTitle);
+            id = _notesRepository.CreateNote(folderId, noteTitle);
         }
         catch(Exception exception)
         {
@@ -66,7 +67,7 @@ public class NoteController : ControllerBase
     {
         try
         {
-            _recordsService.DeleteNote(id);
+            _notesRepository.DeleteNote(id);
         }
         catch(Exception exception)
         {
@@ -82,7 +83,7 @@ public class NoteController : ControllerBase
     {
         try
         {
-            Note record = _recordsService.GetNote(id, false);
+            Note record = _notesRepository.GetNote(id, false);
 
             string jsonString = await new StreamReader(Request.Body).ReadToEndAsync();
             Note fieldsToUpdate = JsonConvert.DeserializeObject<Note>(jsonString);
@@ -93,7 +94,7 @@ public class NoteController : ControllerBase
                     content: fieldsToUpdate.Content);
 
             record.EditDate = DateTime.Now;
-            _recordsService.UpdateNote(record);
+            _notesRepository.UpdateNote(record);
         }
         catch(Exception exception)
         {
@@ -109,8 +110,8 @@ public class NoteController : ControllerBase
     {
         try
         {
-            var record = _recordsService.GetNote(id, false);
-            _recordsService.UpdateNote(record, folderId);
+            var record = _notesRepository.GetNote(id, false);
+            _notesRepository.UpdateNote(record, folderId);
         }
         catch (Exception exception)
         {

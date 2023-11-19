@@ -1,8 +1,8 @@
-using AALKisShared;
+using AALKisShared.Records;
 
 namespace AALKisAPI.Services;
 
-public interface INotesService
+public interface INotesRepository
 {
     public Note GetNote(int id, bool previewOnly);
 

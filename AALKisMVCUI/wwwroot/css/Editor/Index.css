@@ -10,9 +10,9 @@
     outline: 0px solid transparent;
 }
 
-b {
-    font-weight: normal;
-    text-shadow: 0px 0px 0 #000f;
+div.keyword {
+    display: inline;
+    text-shadow: 1px 1px 0 #212529c0;
 }
 
 .textarea {
