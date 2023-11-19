@@ -1,7 +1,5 @@
 using AALKisAPI.Data;
 using AALKisAPI.Services;
-using AALKisAPI.Utility;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 
 namespace AALKisAPI;
@@ -59,6 +57,5 @@ public class Program
         {
             endpoints.MapControllers();
         });
-
     }
 }
