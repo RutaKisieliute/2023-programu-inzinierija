@@ -134,6 +134,8 @@ function onPaste(event)
         text = window.clipboardData.getData('Text');
     }
 
+    text.replaceAll("<br>", "\n");
+
     // `execCommand` is obsolete/deprecated,
     // but there are no alternatives as I've read,
     // so `execCommand` stays.
@@ -244,15 +246,17 @@ function onEditorFocusOut(event)
     shouldUpdateSpanViewHTML = false;
 
     // Prepare for updating
-    spanViewHTML = spanEditHTML;
+    spanViewHTML = DOMPurify.sanitize(spanEditHTML);//new Option(spanEditHTML).innerHTML;
 
-    // Update
     spanViewHTML = parseAndMarkKeywords(spanViewHTML);
-    spanViewHTML = mmd(spanViewHTML);
+    spanViewHTML = marked.parse(spanViewHTML);
+
     if(spanViewHTML == "<p></p>")
     {
         spanViewHTML = ""
     }
+
+    //spanViewHTML.replaceAll("&amp;", "&");
 
     // Finally port the changes to innerHTML
     editorTextArea.innerHTML = spanViewHTML;

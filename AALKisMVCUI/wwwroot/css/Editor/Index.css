@@ -1,9 +1,6 @@
 .editor-container {
     min-height: 100%;
     padding-bottom: var(--footer-line-height);
-
-    display: flex;
-    flex-flow: column;
 }
 
 [contenteditable] {
@@ -59,6 +56,36 @@ div.keyword {
     height: 100%;
 
     flex: 1 1 auto;
+}
+
+#editor-textarea * {
+    display: inline-block;
+}
+
+ul p {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+ol p {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+ul,ol {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#editor-textarea li {
+    line-height: 0.75em;
+    display: list-item;
 }
 
 #editor-textarea:empty::before {
