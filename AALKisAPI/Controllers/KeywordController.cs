@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared;
 using Newtonsoft.Json;
+using AALKisAPI.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AALKisAPI.Controllers;
 
@@ -10,14 +13,16 @@ namespace AALKisAPI.Controllers;
 public class KeywordController : ControllerBase
 {
     private readonly ILogger<KeywordController> _logger;
-
+    private readonly INotesRepository _notesRepository;
     private readonly IKeywordsRepository _keywordsRepository;
 
     public KeywordController(ILogger<KeywordController> logger,
-            IKeywordsRepository keywordsRepository)
+            IKeywordsRepository keywordsRepository,
+            INotesRepository notesRepository)
     {
         _logger = logger;
         _keywordsRepository = keywordsRepository;
+        _notesRepository = notesRepository;
     }
 
     [HttpGet("{noteId}/{name}")]
@@ -25,7 +30,7 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            return _KeywordsRepository.GetKeyword(name, noteId);
+            return _keywordsRepository.GetKeyword(name, noteId);
         }
         catch(Exception exception)
         {
@@ -38,7 +43,7 @@ public class KeywordController : ControllerBase
     [HttpHead("{name}")]
     public IActionResult Exists(string name)
     {
-        if(!_KeywordsRepository.CheckIfKeywordExists(name))
+        if(!_keywordsRepository.CheckIfKeywordExists(name))
         {
             return new StatusCodeResult(StatusCodes.Status410Gone);
         }
@@ -50,11 +55,11 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            _KeywordsRepository.CreateKeyword(name, noteId);
+            _keywordsRepository.CreateKeyword(name, noteId);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to create Keyword {KeywordTitle} in folder {folderId}: "
+            _logger.LogError($"Failed to create Keyword {name} in folder {noteId}: "
                     + exception.ToString());
         }
     }
@@ -64,14 +69,17 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            _KeywordsRepository.DeleteKeyword(name, noteId);
+            _keywordsRepository.DeleteKeyword(name, noteId);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to delete Keyword {id}: "
+            _logger.LogError($"Failed to delete Keyword {name}: "
                     + exception.ToString());
             return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
+
+    
 }
+

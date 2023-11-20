@@ -40,6 +40,11 @@ public class MyNotesController : Controller
         return View(folders);
     }
 
+    public IActionResult KeywordList()
+    {
+        return RedirectToAction("KeywordList", "Keyword");
+    }
+
     [HttpPost("[action]/{folderId}")]
     public async Task<IActionResult> CreateEmptyNote(int folderId)
     {
