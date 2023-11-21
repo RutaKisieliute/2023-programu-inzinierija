@@ -1,4 +1,4 @@
-using AALKisAPI.Models;
+using AALKisShared.Records;
 
 namespace AALKisAPI.Services;
 
