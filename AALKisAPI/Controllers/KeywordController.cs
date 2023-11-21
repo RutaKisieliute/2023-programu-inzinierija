@@ -40,7 +40,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet("name/{name}")]
-    public IEnumerable<Keyword>? GetFolderKeywords(string name)
+    public IEnumerable<Keyword>? GetNameKeywords(string name)
     {
         try
         {

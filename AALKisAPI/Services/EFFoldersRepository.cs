@@ -46,7 +46,7 @@ public class EFFoldersRepository : IFoldersRepository
         return _database.Folders.Find(id) != null;
     }
 
-    public void CreateFolder(string folderName)
+    public int CreateFolder(string folderName)
     {
         FolderEntity folder = new FolderEntity(){
             Title = folderName,
@@ -54,6 +54,7 @@ public class EFFoldersRepository : IFoldersRepository
         };
         _database.Folders.Add(folder);
         _database.SaveChanges();
+        return folder.Id;
     }
 
     public void DeleteFolder(int id, bool force)
@@ -78,14 +79,10 @@ public class EFFoldersRepository : IFoldersRepository
     {
         if(entity == null) return new Folder();
         List<Note> list = new List<Note>();
-        Console.WriteLine("startAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa" + entity.Notes.Count);
         foreach(NoteEntity note in entity.Notes)
         {
-            Console.WriteLine("!!!!!!!!!!" + note.ToString());
             list.Add(EFNotesRepository.ToSharedNote(note)); 
         }
-                Console.WriteLine("end!!!!!!!!!!!!!!!!!!11");
-
         return new Folder(){
             Id = entity.Id,
             Name = entity.Title ?? "",
