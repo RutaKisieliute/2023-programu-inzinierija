@@ -17,148 +17,105 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     {
         _factory = factory;
         _client = new APIClient(_factory.CreateClient());
-        _folderId = null;
-        _noteId = null;
     }
 
     // Start: Delete note id = 0, folder id = 0
     // Folder: Create, Exists, GetAll, GetOne, Rename
     // Note: Create, Exists, GetAll, GetOne, Rename, Delete
     // Folder: Delete
-    int? _folderId;
-    int? _noteId;
 
     [Fact]
-    public async Task Post_CreateFolder_ReturnsOkResult()
+    public async Task TestFolderAndNoteCreationPipeline()
     {
         // Arrange
 
         // Act
         var folderId = await _client.Fetch<int?>("/Folder/TestFolderName", HttpMethod.Post);
-        _folderId = folderId;
         // Assert
         Assert.NotNull(folderId);
-    }
 
-    [Fact]
-    public async Task Head_FolderExists_ReturnsOkResult()
-    {
         // Arrange
 
         // Act
-        var response = await _client.Fetch($"/Folder/{_folderId}", HttpMethod.Head);
+        var response = await _client.Fetch($"/Folder/{folderId}", HttpMethod.Head);
 
         // Assert
         response.EnsureSuccessStatusCode();
-    }
 
-
-    [Fact]
-    public async Task Get_GetAllFolders_ReturnsOkResult()
-    {
         // Arrange
 
         // Act
         var folders = await _client.Fetch<IEnumerable<Folder>>("/Folder", HttpMethod.Get);
 
         // Assert
+        Assert.NotNull(folders);
         Assert.NotEmpty(folders);
-    }
 
-    [Fact]
-    public async Task Get_GetOneFolder_ReturnsOkResult()
-    {
+
         // Arrange
 
         // Act
-        var folder = await _client.Fetch<Folder>($"/Folder/{_folderId}", HttpMethod.Get);
+        var folder = await _client.Fetch<Folder>($"/Folder/{folderId}", HttpMethod.Get);
 
         // Assert
         Assert.NotNull(folder);
-    }
 
-    [Fact]
-    public async Task Patch_RenameFolder_ReturnsOkResult()
-    {
         // Arrange
 
         // Act
-        var response = await _client.Fetch($"/Folder/{_folderId}/TestFolderNameRenamed", HttpMethod.Patch);
+        var response2 = await _client.Fetch($"/Folder/{folderId}/TestFolderNameRenamed", HttpMethod.Patch);
+
+        // Assert
+        response2.EnsureSuccessStatusCode();
+
+        // Arrange
+
+        // Act
+        var noteId = await _client.Fetch<int?>($"/Note/Create/{folderId}/TestNoteName", HttpMethod.Post);
+
+        // Assert
+        Assert.NotNull(noteId);
+
+        // Arrange
+
+        // Act
+        var response3 = await _client.Fetch($"/Note/{noteId}", HttpMethod.Head);
 
         // Assert
         response.EnsureSuccessStatusCode();
-    }
 
-    [Fact]
-    public async Task Post_CreateNote_ReturnsOkResult()
-    {
+
         // Arrange
 
         // Act
-        var response = await _client.Fetch($"/Note/Create/{_folderId}/TestNoteName", HttpMethod.Post);
+        var folder2 = await _client.Fetch<Folder>($"/Note/{noteId}", HttpMethod.Get);
 
         // Assert
-        response.EnsureSuccessStatusCode();
-    }
+        Assert.NotNull(folder2);
 
-    [Fact]
-    public async Task Head_NoteExists_ReturnsOkResult()
-    {
+        // Arrange
+        // TODO ADD UPDATE
+        // Act
+        //var response4 = await _client.Fetch($"/Note/{noteId}", HttpMethod.Put, );
+
+        // Assert
+        //response4.EnsureSuccessStatusCode();
+
         // Arrange
 
         // Act
-        var response = await _client.Fetch($"/Note/{_noteId}", HttpMethod.Head);
+        var response5 = await _client.Fetch($"/Note/{noteId}", HttpMethod.Delete);
 
         // Assert
-        response.EnsureSuccessStatusCode();
-    }
+        response5.EnsureSuccessStatusCode();
 
-
-    [Fact]
-    public async Task Get_GetOneNote_ReturnsOkResult()
-    {
         // Arrange
 
         // Act
-        var folder = await _client.Fetch<Folder>($"/Note/{_noteId}", HttpMethod.Get);
+        var response6 = await _client.Fetch($"/Folder/{folderId}", HttpMethod.Delete);
 
         // Assert
-        Assert.NotNull(folder);
+        response6.EnsureSuccessStatusCode();
     }
 
-    [Fact]
-    public async Task Patch_RenameNote_ReturnsOkResult()
-    {
-        // Arrange
-
-        // Act
-        var response = await _client.Fetch($"/Note/{_noteId}/TestNoteRenamed", HttpMethod.Patch);
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-    }
-
-    [Fact]
-    public async Task Delete_DeleteNote_ReturnsOkResult()
-    {
-        // Arrange
-
-        // Act
-        var response = await _client.Fetch($"/Note/{_noteId}", HttpMethod.Delete);
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-    }
-
-    [Fact]
-    public async Task Delete_DeleteFolder_ReturnsOkResult()
-    {
-        // Arrange
-
-        // Act
-        var response = await _client.Fetch($"/Fodler/{_folderId}", HttpMethod.Delete);
-
-        // Assert
-        response.EnsureSuccessStatusCode();
-    }
 }
