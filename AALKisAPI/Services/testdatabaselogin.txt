@@ -1,0 +1,1 @@
+server=sql11.freesqldatabase.com;user=sql11663674;database=sql11663674;port=3306;password=CJpgb9UH8P
