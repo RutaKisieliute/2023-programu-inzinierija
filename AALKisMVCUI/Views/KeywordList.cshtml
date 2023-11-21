@@ -1,0 +1,25 @@
+@model List<KeywordViewModel>
+
+    @{
+    ViewData["Title"] = "Keyword List";
+    }
+
+    <h2>Keyword List</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Keyword</th>
+                <th>Associated Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var keyword in Model)
+        {
+            <tr>
+                <td>@keyword.Name</td>
+                <td>@Html.ActionLink(keyword.NoteTitle, "Details", "Note", new { id = keyword.NoteId }, null)</td>
+            </tr>
+        }
+        </tbody>
+    </table>

@@ -1,3 +1,0 @@
-i-note1;13
-i-note2;14
-i-note3;15

@@ -1,32 +1,74 @@
+using AALKisAPI.Data;
+using AALKisAPI.Services;
+using Microsoft.EntityFrameworkCore;
+
 namespace AALKisAPI;
 
 public class Program
 {
+    public static readonly string LogFileName = "./AALKisAPI.log";
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        CreateHostBuilder(args).Build().Run();
+    }
 
-        // Add services to the container.
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Program>();
+                webBuilder.UseEnvironment("Development");
+            });
 
-        builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+    public Program(IWebHostEnvironment env)
+    {
+        CurrentEnvironment = env;
+    }
 
-        var app = builder.Build();
+    private IWebHostEnvironment CurrentEnvironment { get; set; }
 
-        // Configure the HTTP request pipeline.
-#if DEBUG
-        app.UseSwagger();
-        app.UseSwaggerUI();
-#endif
+    public void ConfigureServices(IServiceCollection services)
+    {
+        var isTestDb = "Test" == CurrentEnvironment.EnvironmentName;
+        string projectDirectory = CurrentEnvironment.ContentRootPath;
+        var _dbConnection = File.ReadAllText(
+            projectDirectory +
+            (isTestDb
+            ?
+            "/Services/testdatabaselogin.txt"
+            :
+            "/Services/databaselogin.txt"
+            ));
+        var serverVersion = new MySqlServerVersion("5.2.9");
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+        services.AddSingleton(new ConnectionString { Value = _dbConnection });
+        //services.AddScoped<NoteDB>();
 
+        services.AddDbContext<NoteDB>(
+        dbContextOptions => dbContextOptions
+            .UseMySql(_dbConnection, serverVersion)                
+        );
+        services.AddScoped<IFoldersRepository, EFFoldersRepository>();
+        services.AddScoped<INotesRepository, EFNotesRepository>();
+        services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
         app.UseHttpsRedirection();
-
+        app.UseRouting();
         app.UseAuthorization();
 
-        app.MapControllers();
-
-        app.Run();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

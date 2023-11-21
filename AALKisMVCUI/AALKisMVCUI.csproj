@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<OutputPath>./build/$(Configuration)</OutputPath>
+		<OutputPath>build/$(Configuration)</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<DefineConstants Condition="'$(Configuration)' == 'Debug'">DEBUG</DefineConstants>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
@@ -17,6 +17,16 @@
 			<HintPath>../AALKisShared/build/AALKisShared.dll</HintPath>
 			<Private>False</Private>
 		</Reference>-->
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.22" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="NReco.Logging.File" Version="1.1.7" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<InternalsVisibleTo Include="IntegrationTests"/>
 	</ItemGroup>
 
 </Project>

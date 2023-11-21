@@ -1,0 +1,23 @@
+@model Note
+
+@{
+    ViewData["Title"] = "Editor";
+}
+
+@section ExtraHead {
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/Editor/Index.css">
+}
+
+<div class="container editor-container">
+    <h1>Currently editing "<span id="title-textarea" class="textarea" role="textbox" contenteditable=true>@Html.Raw(Model.Title)</span>"</h1>
+    <span id="editor-textarea" class="textarea" role="textbox" contenteditable=false>@Html.Raw(Model.Content)</span>
+</div>
+<footer>
+        <div id="editor-status"></div>
+</footer>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="~/lib/dompurify/dist/purify.min.js"></script>
+    <script src="~/js/Editor/Index.js"></script>
+}
