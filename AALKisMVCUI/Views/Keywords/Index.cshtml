@@ -1,0 +1,11 @@
+﻿@model IEnumerable<AALKisShared.Records.Keyword>;
+
+<table>
+@foreach(AALKisShared.Records.Keyword keyword in Model)
+{
+    <tr>
+        <td style="padding: 5px;">@keyword.Name</td> 
+        <td><a href="/Editor/@keyword.Origin?.Id">@keyword.Origin?.Id</a></td>
+    </tr>
+}
+</table>

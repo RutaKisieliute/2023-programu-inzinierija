@@ -44,14 +44,13 @@ public class Program
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddSingleton(new ConnectionString { Value = _dbConnection });
-        //services.AddScoped<NoteDB>();
-
         services.AddDbContext<NoteDB>(
         dbContextOptions => dbContextOptions
             .UseMySql(_dbConnection, serverVersion)                
         );
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();
+        services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
     }
 
