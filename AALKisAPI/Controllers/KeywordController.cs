@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using Newtonsoft.Json;
-using AALKisAPI.Models;
+using AALKisShared.Records;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,27 +24,48 @@ public class KeywordController : ControllerBase
         _notesRepository = notesRepository;
     }
 
-    // TODO: Implement me!
     [HttpGet]
-    public IEnumerable<Keyword> GetAllKeywords(int folderId)
+    public IEnumerable<Keyword>? GetAllKeywords(int folderId)
     {
-        Response.StatusCode = StatusCodes.Status501NotImplemented;
+        try
+        {
+            return _keywordsRepository.GetAllKeywords();
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
         return null;
     }
 
-    // TODO: Implement me!
     [HttpGet("folder/{folderId}")]
-    public IEnumerable<Keyword> GetFolderKeywords(int folderId)
+    public IEnumerable<Keyword>? GetFolderKeywords(int folderId)
     {
-        Response.StatusCode = StatusCodes.Status501NotImplemented;
+        try
+        {
+            return _keywordsRepository.GetAllKeywordsByFolder(folderId);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
         return null;
     }
 
-    // TODO: Implement me!
     [HttpGet("note/{noteId}")]
-    public IEnumerable<Keyword> GetNoteKeywords(int noteId)
+    public IEnumerable<Keyword>? GetNoteKeywords(int noteId)
     {
-        Response.StatusCode = StatusCodes.Status501NotImplemented;
+        try
+        {
+            return _keywordsRepository.GetAllKeywordsByNote(noteId);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
         return null;
     }
 

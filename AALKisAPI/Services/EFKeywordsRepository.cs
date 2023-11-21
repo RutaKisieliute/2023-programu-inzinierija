@@ -1,6 +1,8 @@
 using AALKisAPI.Data;
 using AALKisAPI.Models;
 using AALKisShared.Records;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Keyword = AALKisShared.Records.Keyword;
 using KeywordEntity = AALKisAPI.Models.Keyword;
@@ -16,9 +18,42 @@ public class EFKeywordsRepository : IKeywordsRepository
         _database = database;
     }
     
+    public IEnumerable<Keyword> GetAllKeywords()
+    {
+        var list1 = _database.Keywords.AsEnumerable();
+        List<Keyword> list2 = new List<Keyword>();
+        foreach(KeywordEntity entity in list1)
+        {
+            list2.Add(ToSharedKeyword(entity));
+        }
+        return list2;
+    }
+    
     public IEnumerable<Keyword> GetAllKeywordsByName(string name)
     {
         var list1 = _database.Keywords.Where(a => a.Name == name).AsEnumerable();
+        List<Keyword> list2 = new List<Keyword>();
+        foreach(KeywordEntity entity in list1)
+        {
+            list2.Add(ToSharedKeyword(entity));
+        }
+        return list2;
+    }
+
+    public IEnumerable<Keyword> GetAllKeywordsByNote(int noteId)
+    {
+        var list1 = _database.Keywords.Where(a => a.NoteId == noteId).AsEnumerable();
+        List<Keyword> list2 = new List<Keyword>();
+        foreach(KeywordEntity entity in list1)
+        {
+            list2.Add(ToSharedKeyword(entity));
+        }
+        return list2;
+    }
+
+    public IEnumerable<Keyword> GetAllKeywordsByFolder(int folderId)
+    {
+        var list1 = _database.Keywords.Include(o => o.Note).Where(a => a.Note.FolderId == folderId).AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();
         foreach(KeywordEntity entity in list1)
         {

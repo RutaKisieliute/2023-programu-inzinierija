@@ -35,6 +35,7 @@ public class Program
         );
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();
+        services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
         /*services.AddDbContext<Models.Database>(options => {
             var connectionString = File.ReadAllText("./Services/databaselogin.txt");
