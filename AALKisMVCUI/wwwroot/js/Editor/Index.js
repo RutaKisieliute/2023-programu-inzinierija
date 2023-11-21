@@ -110,6 +110,8 @@ function onEditorInput(event)
     // Clear the timer to save
     clearTimeout(saveContentsTimeoutId);
 
+    editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("<br>", "\n");
+
     spanEditHTML = editorTextArea.innerHTML;
 
     shouldUpdateSpanViewHTML = true;
@@ -133,8 +135,6 @@ function onPaste(event)
     {
         text = window.clipboardData.getData('Text');
     }
-
-    text.replaceAll("<br>", "\n");
 
     // `execCommand` is obsolete/deprecated,
     // but there are no alternatives as I've read,
