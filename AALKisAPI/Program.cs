@@ -28,7 +28,6 @@ public class Program
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        //services.AddScoped<NoteDB>();
         services.AddDbContext<NoteDB>(
         dbContextOptions => dbContextOptions
             .UseMySql(_dbConnection, serverVersion)                
@@ -37,10 +36,6 @@ public class Program
         services.AddScoped<INotesRepository, EFNotesRepository>();
         services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
-        /*services.AddDbContext<Models.Database>(options => {
-            var connectionString = File.ReadAllText("./Services/databaselogin.txt");
-            options.UseSqlServer(connectionString);
-        });*/
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

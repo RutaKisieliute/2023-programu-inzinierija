@@ -25,11 +25,11 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<Keyword>? GetAllKeywords(int folderId)
+    public IEnumerable<Keyword>? GetAllKeywords()
     {
         try
         {
-            return _keywordsRepository.GetAllKeywords();
+            return _keywordsRepository.Filter(EFKeywordsRepository.nothing, 0);
         }
         catch(Exception exception)
         {
@@ -39,12 +39,27 @@ public class KeywordController : ControllerBase
         return null;
     }
 
+    [HttpGet("name/{name}")]
+    public IEnumerable<Keyword>? GetFolderKeywords(string name)
+    {
+        try
+        {
+            return _keywordsRepository.Filter(EFKeywordsRepository.name, name);
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+        return null;
+    }
+    
     [HttpGet("folder/{folderId}")]
     public IEnumerable<Keyword>? GetFolderKeywords(int folderId)
     {
         try
         {
-            return _keywordsRepository.GetAllKeywordsByFolder(folderId);
+            return _keywordsRepository.Filter(EFKeywordsRepository.folder, folderId);
         }
         catch(Exception exception)
         {
@@ -59,7 +74,7 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            return _keywordsRepository.GetAllKeywordsByNote(noteId);
+            return _keywordsRepository.Filter(EFKeywordsRepository.note, noteId);
         }
         catch(Exception exception)
         {
