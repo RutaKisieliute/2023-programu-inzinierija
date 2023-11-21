@@ -53,10 +53,6 @@ public class Program
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
-        /*services.AddDbContext<Models.Database>(options => {
-            var connectionString = File.ReadAllText("./Services/databaselogin.txt");
-            options.UseSqlServer(connectionString);
-        });*/
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

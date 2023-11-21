@@ -64,19 +64,19 @@ public class FolderController : ControllerBase
     }
 
     [HttpPost("{folderName}")]
-    public IActionResult Create(string folderName)
+    public int Create(string folderName)
     {
         try
         {
-            _foldersRepository.CreateFolder(folderName);
+            return _foldersRepository.CreateFolder(folderName);
         }
         catch(Exception exception)
         {
             _logger.LogError($"Failed to create folder record \"{folderName}\": "
                     + exception.ToString());
-            return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+            return -1;
         }
-        return new StatusCodeResult(StatusCodes.Status201Created);
     }
 
     [HttpPatch("{folderId}/{newFolderName}")]

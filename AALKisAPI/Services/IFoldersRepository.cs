@@ -10,7 +10,7 @@ public interface IFoldersRepository
 
     public bool CheckIfFolderExists(int id);
 
-    public void CreateFolder(string folderName);
+    public int CreateFolder(string folderName);
 
     public void DeleteFolder(int id, bool force);
 
