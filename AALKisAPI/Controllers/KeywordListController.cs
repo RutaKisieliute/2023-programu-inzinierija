@@ -26,7 +26,7 @@ namespace AALKisAPI.Controllers
         {
             try
             {
-                return _keywordsRepository.GetAllKeywords();
+                return _keywordsRepository.Filter(EFKeywordsRepository.nothing, 0);
             }
             catch (Exception exception)
             {
