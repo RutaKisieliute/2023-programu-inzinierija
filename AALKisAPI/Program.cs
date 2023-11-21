@@ -7,7 +7,6 @@ namespace AALKisAPI;
 public class Program
 {
     public static readonly string LogFileName = "./AALKisAPI.log";
-
     public static void Main(string[] args)
     {
         CreateHostBuilder(args).Build().Run();
@@ -21,21 +20,38 @@ public class Program
                 webBuilder.UseEnvironment("Development");
             });
 
+    public Program(IWebHostEnvironment env)
+    {
+        CurrentEnvironment = env;
+    }
+
+    private IWebHostEnvironment CurrentEnvironment { get; set; }
+
     public void ConfigureServices(IServiceCollection services)
     {
-        var _dbConnection = File.ReadAllText("./Services/databaselogin.txt");
+        var isTestDb = "Test" == CurrentEnvironment.EnvironmentName;
+        string projectDirectory = CurrentEnvironment.ContentRootPath;
+        var _dbConnection = File.ReadAllText(
+            projectDirectory +
+            (isTestDb
+            ?
+            "/Services/testdatabaselogin.txt"
+            :
+            "/Services/databaselogin.txt"
+            ));
         var serverVersion = new MySqlServerVersion("5.2.9");
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
+        services.AddSingleton(new ConnectionString { Value = _dbConnection });
         //services.AddScoped<NoteDB>();
+
         services.AddDbContext<NoteDB>(
         dbContextOptions => dbContextOptions
             .UseMySql(_dbConnection, serverVersion)                
         );
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();
-        services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
         /*services.AddDbContext<Models.Database>(options => {
             var connectionString = File.ReadAllText("./Services/databaselogin.txt");

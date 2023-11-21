@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using AALKisAPI.Models;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql;
 
 namespace AALKisAPI.Data;
 
@@ -12,16 +10,16 @@ public partial class NoteDB : DbContext
 
     private readonly MySqlServerVersion _serverVersion;
     
-    public NoteDB()
+    public NoteDB(ConnectionString connectionString)
     {
-        _dbConnection = File.ReadAllText("./Services/databaselogin.txt");
+        _dbConnection = connectionString.Value!;
         _serverVersion = new MySqlServerVersion(new Version(5, 5, 62));
     }
 
-    public NoteDB(DbContextOptions<NoteDB> options)
+    public NoteDB(DbContextOptions<NoteDB> options, ConnectionString connectionString)
         : base(options)
     {
-        _dbConnection = File.ReadAllText("./Services/databaselogin.txt");
+        _dbConnection = connectionString.Value!;
         _serverVersion = new MySqlServerVersion(new Version(5, 5, 62));
     }
 

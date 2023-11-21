@@ -1,9 +1,6 @@
-using AALKisMVCUI;
 using AALKisMVCUI.Utility;
 
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.EntityFrameworkCore;
 
 namespace IntegrationTests;
 public class AppFactory<TProgram> : WebApplicationFactory<TProgram>
@@ -11,9 +8,12 @@ public class AppFactory<TProgram> : WebApplicationFactory<TProgram>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("Test");
+        /*
         builder.ConfigureServices(services =>
         {
-            // Configure services if any
+            services.AddSingleton(new APIClient(this.CreateClient()));
         });
+        */
     }
 }
