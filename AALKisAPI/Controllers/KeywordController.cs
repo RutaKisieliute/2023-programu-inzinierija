@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
-using AALKisShared;
 using Newtonsoft.Json;
 using AALKisAPI.Models;
 using System.Collections.Generic;
@@ -23,6 +22,30 @@ public class KeywordController : ControllerBase
         _logger = logger;
         _keywordsRepository = keywordsRepository;
         _notesRepository = notesRepository;
+    }
+
+    // TODO: Implement me!
+    [HttpGet]
+    public IEnumerable<Keyword> GetAllKeywords(int folderId)
+    {
+        Response.StatusCode = StatusCodes.Status501NotImplemented;
+        return null;
+    }
+
+    // TODO: Implement me!
+    [HttpGet("folder/{folderId}")]
+    public IEnumerable<Keyword> GetFolderKeywords(int folderId)
+    {
+        Response.StatusCode = StatusCodes.Status501NotImplemented;
+        return null;
+    }
+
+    // TODO: Implement me!
+    [HttpGet("note/{noteId}")]
+    public IEnumerable<Keyword> GetNoteKeywords(int noteId)
+    {
+        Response.StatusCode = StatusCodes.Status501NotImplemented;
+        return null;
     }
 
     [HttpGet("{noteId}/{name}")]
@@ -51,7 +74,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpPost("{noteId}/{name}")]
-    public void Create(int noteId, string name)
+    public IActionResult Create(int noteId, string name)
     {
         try
         {
@@ -59,9 +82,11 @@ public class KeywordController : ControllerBase
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to create Keyword {name} in folder {noteId}: "
+            _logger.LogError($"Failed to create Keyword {name} in note {noteId}: "
                     + exception.ToString());
+            return BadRequest();
         }
+        return new StatusCodeResult(StatusCodes.Status201Created);
     }
 
     [HttpDelete("{noteId}/{name}")]
@@ -79,7 +104,5 @@ public class KeywordController : ControllerBase
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
-
-    
 }
 
