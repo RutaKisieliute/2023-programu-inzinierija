@@ -15,4 +15,8 @@ public interface IKeywordsRepository
     public void DeleteKeyword(string name, int noteId);
 
     public IEnumerable<Keyword> Filter(FilterPredicate predicate, object a);
+
+    void CreateKeywordList(IEnumerable<string> keywordNames);
+
+    void DeleteKeywordList(IEnumerable<string> keywordNames);
 }
