@@ -98,4 +98,33 @@ public class EFKeywordsRepository : IKeywordsRepository
             Origin = EFNotesRepository.ToSharedNote(entity.Note)
         };
     }
+
+    public void CreateKeywordList(IEnumerable<string> keywordNames)
+    {
+        foreach (var name in keywordNames)
+        {
+            _database.Keywords.Add(new KeywordEntity()
+            {
+                Name = name,
+                NoteId = 0
+            });
+        }
+
+        _database.SaveChanges();
+    }
+
+    public void DeleteKeywordList(IEnumerable<string> keywordNames)
+    {
+        foreach (var name in keywordNames)
+        {
+            var keywordToRemove = _database.Keywords.FirstOrDefault(k => k.Name == name && k.NoteId == 0);
+
+            if (keywordToRemove != null)
+            {
+                _database.Keywords.Remove(keywordToRemove);
+            }
+        }
+
+        _database.SaveChanges();
+    }
 }

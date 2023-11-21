@@ -19,4 +19,8 @@ public interface IKeywordsRepository
     public void CreateKeyword(string name, int noteId);
 
     public void DeleteKeyword(string name, int noteId);
+
+    void CreateKeywordList(IEnumerable<string> keywordNames);
+
+    void DeleteKeywordList(IEnumerable<string> keywordNames);
 }
