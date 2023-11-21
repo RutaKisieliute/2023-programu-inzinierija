@@ -4,13 +4,7 @@ namespace AALKisAPI.Services;
 
 public interface IKeywordsRepository
 {
-    public IEnumerable<Keyword> GetAllKeywords();
-    
-    public IEnumerable<Keyword> GetAllKeywordsByName(string name);
-
-    public IEnumerable<Keyword> GetAllKeywordsByFolder(int folderId);
-
-    public IEnumerable<Keyword> GetAllKeywordsByNote(int noteId);
+    public delegate bool FilterPredicate(AALKisAPI.Models.Keyword entity, object a);
 
     public Keyword GetKeyword(string name, int noteId);
 
@@ -19,4 +13,6 @@ public interface IKeywordsRepository
     public void CreateKeyword(string name, int noteId);
 
     public void DeleteKeyword(string name, int noteId);
+
+    public IEnumerable<Keyword> Filter(FilterPredicate predicate, object a);
 }
