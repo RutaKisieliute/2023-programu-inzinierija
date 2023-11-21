@@ -17,13 +17,16 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     {
         _factory = factory;
         _client = new APIClient(_factory.CreateClient());
+        _folderId = null;
+        _noteId = null;
     }
 
     // Start: Delete note id = 0, folder id = 0
     // Folder: Create, Exists, GetAll, GetOne, Rename
     // Note: Create, Exists, GetAll, GetOne, Rename, Delete
     // Folder: Delete
-    int? _folderId = null;
+    int? _folderId;
+    int? _noteId;
 
     [Fact]
     public async Task Post_CreateFolder_ReturnsOkResult()
@@ -33,7 +36,6 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
         // Act
         var folderId = await _client.Fetch<int?>("/Folder/TestFolderName", HttpMethod.Post);
         _folderId = folderId;
-
         // Assert
         Assert.NotNull(folderId);
     }
@@ -69,7 +71,7 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
         // Arrange
 
         // Act
-        var folder = await _client.Fetch<Folder>("/Folder/", HttpMethod.Get);
+        var folder = await _client.Fetch<Folder>($"/Folder/{_folderId}", HttpMethod.Get);
 
         // Assert
         Assert.NotNull(folder);
@@ -91,10 +93,9 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     public async Task Post_CreateNote_ReturnsOkResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
 
         // Act
-        var response = await client.PostAsync("/Note/Create/0/TestNoteName", null);
+        var response = await _client.Fetch($"/Note/Create/{_folderId}/TestNoteName", HttpMethod.Post);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -104,10 +105,9 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     public async Task Head_NoteExists_ReturnsOkResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
 
         // Act
-        var response = await client.SendAsync(new HttpRequestMessage(HttpMethod.Head, "Note/0"));
+        var response = await _client.Fetch($"/Note/{_noteId}", HttpMethod.Head);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -118,23 +118,21 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     public async Task Get_GetOneNote_ReturnsOkResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
 
         // Act
-        var response = await client.GetAsync("/Note/0");
+        var folder = await _client.Fetch<Folder>($"/Note/{_noteId}", HttpMethod.Get);
 
         // Assert
-        response.EnsureSuccessStatusCode();
+        Assert.NotNull(folder);
     }
 
     [Fact]
     public async Task Patch_RenameNote_ReturnsOkResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
 
         // Act
-        var response = await client.PatchAsync("/Note/0/TestNoteNameRenamed", null);
+        var response = await _client.Fetch($"/Note/{_noteId}/TestNoteRenamed", HttpMethod.Patch);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -144,10 +142,9 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     public async Task Delete_DeleteNote_ReturnsOkResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
 
         // Act
-        var response = await client.DeleteAsync("/Note/0");
+        var response = await _client.Fetch($"/Note/{_noteId}", HttpMethod.Delete);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -157,10 +154,9 @@ public class NoteFolderApiControllerTests : IClassFixture<AppFactory<AALKisAPI.P
     public async Task Delete_DeleteFolder_ReturnsOkResult()
     {
         // Arrange
-        var client = _factory.CreateClient();
 
         // Act
-        var response = await client.DeleteAsync("/Folder/0");
+        var response = await _client.Fetch($"/Fodler/{_folderId}", HttpMethod.Delete);
 
         // Assert
         response.EnsureSuccessStatusCode();

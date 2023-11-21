@@ -120,7 +120,7 @@ public class FolderRepository : IFoldersRepository
         }
     }
 
-    public void CreateFolder(string folderName)
+    public int CreateFolder(string folderName)
     {
         string query1 = "SELECT MAX(id) AS max FROM folders";
         string query2;
@@ -147,6 +147,7 @@ public class FolderRepository : IFoldersRepository
         {
             Console.WriteLine("Error while creating folder: " + e.Message);
         }
+        return 0;
     }
 
     public void DeleteFolder(int id, bool force)
