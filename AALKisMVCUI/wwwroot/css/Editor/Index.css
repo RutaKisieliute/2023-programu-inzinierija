@@ -26,14 +26,9 @@ div.keyword {
     font-family: inherit;
     font-size: inherit;
 
-    white-space: pre;
-
     border: 1px solid #ccc;
     border-radius: 2px;
     padding: 4px;
-
-    white-space: pre;
-
 }
 
 .textarea:hover {

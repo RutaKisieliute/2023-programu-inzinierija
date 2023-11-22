@@ -20,6 +20,9 @@ var statusClearTimeoutId;
 
 function startup()
 {
+    editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("\n", "<br>");
+    titleTextArea.innerHTML = titleTextArea.innerHTML.replaceAll("\n", "<br>");
+
     spanEditHTML = editorTextArea.innerHTML;
 
     shouldUpdateSpanViewHTML = true;
@@ -28,7 +31,7 @@ function startup()
 
     //setInterval((fetchTextArea), miliBetweenFetches, editorTextArea)
     //
-    document.addEventListener("paste", (onPaste));
+    editorTextArea.addEventListener("paste", (onPaste));
 
     editorTextArea.addEventListener("input", (onEditorInput));
     editorTextArea.addEventListener("focus", (onEditorFocus));
@@ -93,7 +96,7 @@ function saveContents()
         + note,
         {
             "method": "POST",
-            "body": JSON.stringify({ "Content": spanEditHTML}),
+            "body": JSON.stringify({ "Content": spanEditHTML.replaceAll("<br>", "\n") }),
             "headers": {"content-type": "application/json"}
         }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
             (showFailureStatus));
@@ -110,7 +113,9 @@ function onEditorInput(event)
     // Clear the timer to save
     clearTimeout(saveContentsTimeoutId);
 
-    editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("<br>", "\n");
+    console.log(event);
+
+    //editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("<br>", "\n");
 
     spanEditHTML = editorTextArea.innerHTML;
 
@@ -160,7 +165,7 @@ function onEditorFocus(event)
     editorTextArea.innerHTML = spanEditHTML;
 
     // Commented out because of mmd
-    /*
+    
     // Set the caret position
     // https://stackoverflow.com/a/6249440
     var range = document.createRange();
@@ -175,7 +180,6 @@ function onEditorFocus(event)
 
     selection.removeAllRanges();
     selection.addRange(range);
-    */
 }
 
 function onEditorClick(event)
@@ -277,7 +281,7 @@ async function onTitleFocusOut(event)
         response = await fetch(webOrigin + "/" + controller + "/PostNote/" + note,
             {
                 "method": "POST",
-                "body": JSON.stringify({ "Title": newTitle }),
+                "body": JSON.stringify({ "Title": newTitle.replaceAll("<br>", "\n") }),
                 "headers": {"content-type": "application/json"}
             });
         if(!response.ok)
