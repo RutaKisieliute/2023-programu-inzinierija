@@ -21,7 +21,7 @@ public class FolderController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<Folder<Note>>? Get([FromQuery] bool getContents = true)
+    public async Task<IEnumerable<Folder<Note>>?> Get([FromQuery] bool getContents = true)
     {
         try
         {
@@ -37,7 +37,7 @@ public class FolderController : ControllerBase
     }
 
     [HttpGet("{folderId}")]
-    public Folder<Note>? Get(int folderId, [FromQuery] bool getContents = true)
+    public async Task<Folder<Note>?> Get(int folderId, [FromQuery] bool getContents = true)
     {
         try
         {
@@ -54,7 +54,7 @@ public class FolderController : ControllerBase
 
 
     [HttpHead("{folderId}")]
-    public IActionResult Exists(int folderId)
+    public async Task<IActionResult> Exists(int folderId)
     {
         if(!_foldersRepository.CheckIfFolderExists(folderId))
         {
@@ -64,7 +64,7 @@ public class FolderController : ControllerBase
     }
 
     [HttpPost("{folderName}")]
-    public int Create(string folderName)
+    public async Task<int> Create(string folderName)
     {
         try
         {
@@ -80,7 +80,7 @@ public class FolderController : ControllerBase
     }
 
     [HttpPatch("{folderId}/{newFolderName}")]
-    public IActionResult Rename(int folderId, string newFolderName)
+    public async Task<IActionResult> Rename(int folderId, string newFolderName)
     {
         try
         {
@@ -97,7 +97,7 @@ public class FolderController : ControllerBase
 
 
     [HttpDelete("{folderId}")]
-    public IActionResult Delete(int folderId, [FromQuery] bool force = false)
+    public async Task<IActionResult> Delete(int folderId, [FromQuery] bool force = false)
     {
         try
         {

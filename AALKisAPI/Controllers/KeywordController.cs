@@ -25,7 +25,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<Keyword>? GetAllKeywords()
+    public async Task<IEnumerable<Keyword>?> GetAllKeywords()
     {
         try
         {
@@ -40,7 +40,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet("name/{name}")]
-    public IEnumerable<Keyword>? GetNameKeywords(string name)
+    public async Task<IEnumerable<Keyword>?> GetNameKeywords(string name)
     {
         try
         {
@@ -55,7 +55,7 @@ public class KeywordController : ControllerBase
     }
     
     [HttpGet("folder/{folderId}")]
-    public IEnumerable<Keyword>? GetFolderKeywords(int folderId)
+    public async Task<IEnumerable<Keyword>?> GetFolderKeywords(int folderId)
     {
         try
         {
@@ -70,7 +70,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet("note/{noteId}")]
-    public IEnumerable<Keyword>? GetNoteKeywords(int noteId)
+    public async Task<IEnumerable<Keyword>?> GetNoteKeywords(int noteId)
     {
         try
         {
@@ -85,7 +85,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet("{noteId}/{name}")]
-    public Keyword? Get(int noteId, string name)
+    public async Task<Keyword?> Get(int noteId, string name)
     {
         try
         {
@@ -100,7 +100,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpHead("{name}")]
-    public IActionResult Exists(string name)
+    public async Task<IActionResult> Exists(string name)
     {
         if(!_keywordsRepository.CheckIfKeywordExists(name))
         {
@@ -110,7 +110,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpPost("{noteId}/{name}")]
-    public IActionResult Create(int noteId, string name)
+    public async Task<IActionResult> Create(int noteId, string name)
     {
         try
         {
@@ -126,7 +126,7 @@ public class KeywordController : ControllerBase
     }
 
     [HttpDelete("{noteId}/{name}")]
-    public IActionResult Delete(int noteId, string name)
+    public async Task<IActionResult> Delete(int noteId, string name)
     {
         try
         {

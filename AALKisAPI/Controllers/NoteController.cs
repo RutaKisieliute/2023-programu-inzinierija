@@ -22,7 +22,7 @@ public class NoteController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public Note? Get(int id)
+    public async Task<Note?> Get(int id)
     {
         try
         {
@@ -37,7 +37,7 @@ public class NoteController : ControllerBase
     }
 
     [HttpHead("{id}")]
-    public IActionResult Exists(int id)
+    public async Task<IActionResult> Exists(int id)
     {
         if(!_notesRepository.CheckIfNoteExists(id))
         {
@@ -47,7 +47,7 @@ public class NoteController : ControllerBase
     }
 
     [HttpPost("[action]/{folderId}/{noteTitle}")]
-    public int? Create(int folderId, string noteTitle)
+    public async Task<int?> Create(int folderId, string noteTitle)
     {
         int? id = null;
         try
@@ -63,7 +63,7 @@ public class NoteController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
         try
         {
@@ -106,7 +106,7 @@ public class NoteController : ControllerBase
     }
 
     [HttpPost("{folderId}/{id}")]
-    public IActionResult ChangeNoteFolder(int folderId, int id)
+    public async Task<IActionResult> ChangeNoteFolder(int folderId, int id)
     {
         try
         {
