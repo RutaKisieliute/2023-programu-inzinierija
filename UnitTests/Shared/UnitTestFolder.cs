@@ -1,7 +1,7 @@
 using Xunit;
 using AALKisShared.Records;
 
-namespace UnitTests;
+namespace UnitTests.Shared;
 
 public class UnitTestFolder
 {

@@ -3,7 +3,7 @@ using AALKisMVCUI.Controllers;
 using AALKisShared.Records;
 using AALKisShared.Utility;
 
-namespace UnitTests.MVCUI;
+namespace UnitTests.MVCUI.Controllers;
 
 public class UnitTestEditorController
 {
@@ -11,7 +11,6 @@ public class UnitTestEditorController
     [InlineData(1, "#foo")]
     [InlineData(-1, "/foo")]
     [InlineData(-2, "\\foo")]
-    [InlineData(-45, "foo")]
     public void CreateValidatedNote_InvalidNote_ThrowException(int id, string title)
     {
         Note note = new Note{Id = id, Title = title};

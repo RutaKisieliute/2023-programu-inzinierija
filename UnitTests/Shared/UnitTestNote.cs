@@ -2,135 +2,131 @@ using Xunit;
 using AALKisShared.Records;
 using AALKisShared.Enums;
 
-namespace UnitTests;
+namespace UnitTests.Shared;
 
 public class UnitTestNote
 {
-    [Fact]
-    public void IsValid_InvalidNotes_ReturnsFalse()
+    [Theory]
+    [InlineData()]
+    [InlineData(1)]
+    [InlineData(null, null, "foo")]
+    [InlineData(null, "foo", "bar")]
+    public void IsValid_InvalidNotes_ReturnsFalse(int? id = null, string? title = null, string? content = null)
     {
-        Assert.False(new Note().IsValid());
-        Assert.False(new Note{Id = 1}.IsValid());
-        Assert.False(new Note{Content = "foo"}.IsValid());
-        Assert.False(new Note{Title = "foo", Content = "bar"}.IsValid());
+        var note = new Note{Title = title,
+            Content = content,
+            EditDate = DateTime.Now,
+            Flags = NoteFlags.None};
+        note.Id = id ?? note.Id;
+
+        Assert.False(note.IsValid());
     }
 
-    [Fact]
-    public void IsValid_InvalidTitle_ReturnsFalse()
+    [Theory]
+    [InlineData("foo#")]
+    [InlineData("due to all known laws of aviation.")]
+    [InlineData("")]
+    [InlineData("\t")]
+    [InlineData("\n")]
+    [InlineData("#")]
+    [InlineData("\x5C")]
+    [InlineData("/")]
+    [InlineData("<li></li>")]
+    [InlineData("?root=true")]
+    public void IsValid_InvalidTitle_ReturnsFalse(string title)
     {
-        Assert.False(new Note{Id = 1,
-                    Title = "foo#",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "due to all known laws of aviation.",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "\t",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "#",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "\x5C",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "/",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "<li></li>",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.False(new Note{Id = 1,
-                    Title = "?root=true",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
+        var note = new Note{Id = 1,
+            Title = title,
+            Content = "bar",
+            EditDate = DateTime.Now,
+            Flags = NoteFlags.None};
+
+        Assert.False(note.IsValid());
     }
 
-    [Fact]
-    public void IsValid_ValidNotes_ReturnsTrue()
+    [Theory]
+    [InlineData("due to all known laws of aviation,")]
+    [InlineData("foo")]
+    [InlineData("you can use spaces in the title")]
+    [InlineData("1234-05-06 07:08:09")]
+    [InlineData("@Friendo")]
+    public void IsValid_ValidNotes_ReturnsTrue(string title)
     {
-        Assert.True(new Note{Id = 1,
-                    Title = "due to all known laws of aviation,",
+        var note = new Note{Id = 1,
+                    Title = title,
                     Content = "bar",
                     EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.True(new Note{Id = 1,
-                    Title = "foo",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.True(new Note{Id = 1,
-                    Title = "you can use spaces in the title",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-         Assert.True(new Note{Id = 1,
-                    Title = "1234-05-06 07:08:09",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
-        Assert.True(new Note{Id = 1,
-                    Title = "@Friendo",
-                    Content = "bar",
-                    EditDate = DateTime.Now,
-                    Flags = 0}
-                .IsValid());
+                    Flags = NoteFlags.None};
 
+        Assert.True(note.IsValid());
     }
 
-    [Fact]
-    public void Update_SinglePropertyUpdates_AllEqual()
+    [Theory]
+    [InlineData("Red n'black I dress eagle on my chest")]
+    [InlineData("It's good to be an ALBANIAN")]
+    [InlineData("Keep my head up high for that flag I die")]
+    [InlineData("I'm proud to be an ALBANIAN")]
+    public void Update_Title_Equal(string title)
     {
-        Note testNote = new Note{};
-        Assert.Equal(testNote.Id, -1);
+        var note = new Note{Id = 1,
+            Title = "foo",
+            Content = "bar",
+            EditDate = DateTime.Now,
+            Flags = NoteFlags.None};
 
-        var newTitle = "PROUD TO BE ALBANIAN";
-        testNote.Update(title: newTitle);
-        Assert.Equal(testNote.Title, newTitle);
+        note.Update(title: title);
 
-        var newContent = "FOR MY FLAG I DIE";
-        testNote.Update(content: newContent);
-        Assert.Equal(testNote.Content, newContent);
+        Assert.Equal(note.Title, title);
+    }
 
-        var newEditDate = DateTime.Now;
-        testNote.Update(editDate: newEditDate);
-        Assert.Equal(testNote.EditDate, newEditDate);
+    [Theory]
+    [InlineData("Red n'black I dress eagle on my chest")]
+    [InlineData("It's good to be an ALBANIAN")]
+    [InlineData("Keep my head up high for that flag I die")]
+    [InlineData("I'm proud to be an ALBANIAN")]
+    public void Update_Content_Equal(string content)
+    {
+        var note = new Note{Id = 1,
+            Title = "foo",
+            Content = "bar",
+            EditDate = DateTime.Now,
+            Flags = NoteFlags.None};
 
-        var newFlags = NoteFlags.None;
-        testNote.Update(flags: newFlags);
-        Assert.Equal(testNote.Flags, newFlags);
+        note.Update(content: content);
+
+        Assert.Equal(note.Content, content);
+    }
+
+    [Theory]
+    [InlineData(1987, 01, 01)]
+    public void Update_EditTime_Equal(int year, int month, int day)
+    {
+        var note = new Note{Id = 1,
+            Title = "foo",
+            Content = "bar",
+            EditDate = DateTime.Now,
+            Flags = NoteFlags.None};
+        var date = new DateTime(year, month, day);
+
+        note.Update(editDate: date);
+
+        Assert.Equal(note.EditDate, date);
+    }
+
+    [Theory]
+    [InlineData(NoteFlags.Public)]
+    [InlineData(NoteFlags.Archived)]
+    public void Update_Flags_Equal(NoteFlags flags)
+    {
+        var note = new Note{Id = 1,
+            Title = "foo",
+            Content = "bar",
+            EditDate = DateTime.Now,
+            Flags = NoteFlags.None};
+
+        note.Update(flags: flags);
+
+        Assert.Equal(note.Flags, flags);
     }
 
     [Fact]
