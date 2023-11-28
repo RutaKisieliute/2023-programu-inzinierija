@@ -19,6 +19,7 @@ public class NoteController : ControllerBase
     {
         _logger = logger;
         _notesRepository = notesRepository;
+        _notesRepository.NoteCreated += NoteCreationLog;
     }
 
     [HttpGet("{id}")]
@@ -120,5 +121,11 @@ public class NoteController : ControllerBase
             return BadRequest();
         }
         return new StatusCodeResult(StatusCodes.Status204NoContent);
+    }
+
+    [NonAction]
+    public void NoteCreationLog(object sender, Note note)
+    {
+        _logger.LogDebug("!!!!!!!!!!!!!!!!!!Successfully created new note: " + note.ToString());
     }
 }

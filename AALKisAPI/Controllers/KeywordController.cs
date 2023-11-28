@@ -26,7 +26,7 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            return _keywordsRepository.Filter(EFKeywordsRepository.nothing, 0);
+            return _keywordsRepository.GetAllKeywords();
         }
         catch(Exception exception)
         {
@@ -41,7 +41,7 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            return _keywordsRepository.Filter(EFKeywordsRepository.name, name);
+            return _keywordsRepository.GetAllKeywordsByName(name);
         }
         catch(Exception exception)
         {
@@ -56,7 +56,7 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            return _keywordsRepository.Filter(EFKeywordsRepository.folder, folderId);
+            return _keywordsRepository.GetAllKeywordsByFolder(folderId);
         }
         catch(Exception exception)
         {
@@ -71,7 +71,7 @@ public class KeywordController : ControllerBase
     {
         try
         {
-            return _keywordsRepository.Filter(EFKeywordsRepository.note, noteId);
+            return _keywordsRepository.GetAllKeywordsByNote(noteId);
         }
         catch(Exception exception)
         {
