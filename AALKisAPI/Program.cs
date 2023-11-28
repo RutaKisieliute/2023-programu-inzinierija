@@ -29,25 +29,18 @@ public class Program
 
     public void ConfigureServices(IServiceCollection services)
     {
-        var isTestDb = "Test" == CurrentEnvironment.EnvironmentName;
-        string projectDirectory = CurrentEnvironment.ContentRootPath;
-        var _dbConnection = File.ReadAllText(
-            projectDirectory +
-            (isTestDb
-            ?
-            "/Services/testdatabaselogin.txt"
-            :
-            "/Services/databaselogin.txt"
-            ));
-        var serverVersion = new MySqlServerVersion("5.2.9");
+        
         services.AddControllers();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
-        services.AddSingleton(new ConnectionString { Value = _dbConnection });
-        services.AddDbContext<NoteDB>(
-        dbContextOptions => dbContextOptions
-            .UseMySql(_dbConnection, serverVersion)                
-        );
+
+        if(CurrentEnvironment.EnvironmentName != "Integration Test")
+        {
+            var _dbConnection = new ConnectionString { Value = File.ReadAllText("./Services/databaselogin.txt") };
+            services.AddSingleton(_dbConnection);
+            services.AddDbContext<NoteDB>();
+        }
+
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();
         services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();

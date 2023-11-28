@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace IntegrationTests;
+namespace IntegrationTests.MVC;
 
 // Works only when API Server is running locally.
 public class BasicTests : IClassFixture<AppFactory<AALKisMVCUI.Program>>

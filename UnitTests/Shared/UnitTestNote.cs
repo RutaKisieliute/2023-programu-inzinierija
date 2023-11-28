@@ -7,7 +7,7 @@ namespace UnitTests.Shared;
 public class UnitTestNote
 {
     [Theory]
-    [InlineData()]
+    [InlineData(null)]
     [InlineData(1)]
     [InlineData(null, null, "foo")]
     [InlineData(null, "foo", "bar")]

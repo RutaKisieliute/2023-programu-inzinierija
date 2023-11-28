@@ -3,8 +3,6 @@ using Newtonsoft.Json;
 using AALKisMVCUI.Utility;
 using AALKisShared.Records;
 using AALKisShared.Enums;
-using System.Net;
-using Microsoft.AspNetCore.Http.Extensions;
 using System.Text;
 
 namespace AALKisMVCUI.Controllers;

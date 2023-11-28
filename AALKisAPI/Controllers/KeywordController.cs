@@ -1,9 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
-using Newtonsoft.Json;
 using AALKisShared.Records;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace AALKisAPI.Controllers;
 
