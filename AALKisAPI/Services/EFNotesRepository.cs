@@ -1,6 +1,7 @@
 using AALKisAPI.Data;
 using AALKisAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Note = AALKisShared.Records.Note;
 
 namespace AALKisAPI.Services;
 
@@ -35,6 +36,7 @@ public class EFNotesRepository : INotesRepository
         };
         _database.Notes.Add(note);
         _database.SaveChanges();
+        OnNoteCreation(ToSharedNote(note));
         return note.Id;
     }
 
@@ -67,14 +69,21 @@ public class EFNotesRepository : INotesRepository
         return list2;
     }
 
-    public static AALKisShared.Records.Note ToSharedNote(AALKisAPI.Models.Note note)
+    public static Note ToSharedNote(AALKisAPI.Models.Note note)
     {
-        return new AALKisShared.Records.Note(){
+        return new Note(){
             Id = note.Id,
             Title = note.Title,
             Content = note.Content,
             Flags = (AALKisShared.Enums.NoteFlags?) note.Flags,
             EditDate = note.Modified
         };
+    }
+
+    public event EventHandler<Note> NoteCreated;
+
+    protected virtual void OnNoteCreation(Note arg)
+    {
+        NoteCreated?.Invoke(this, arg);
     }
 }

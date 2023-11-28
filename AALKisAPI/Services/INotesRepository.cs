@@ -15,4 +15,6 @@ public interface INotesRepository
     public void UpdateNote(Note record, int folderId = -1);
 
     public List<Note> SearchByTitle(string searchQuery);
+
+    public event EventHandler<Note> NoteCreated;
 }
