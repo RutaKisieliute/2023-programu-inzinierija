@@ -17,7 +17,6 @@ public class UnitTestEFFolderRepository : IClassFixture<TestNoteDBFixture>
     public void GetAllFolders_TwoNamedFolders()
     {
         using var context = NoteDb.CreateContext();
-
         var folderRepository = new EFFoldersRepository(context);
 
         var folders = folderRepository.GetAllFolders(true);
@@ -30,7 +29,6 @@ public class UnitTestEFFolderRepository : IClassFixture<TestNoteDBFixture>
     public void GetAllFolders_TwoNamedAndFilledFolders()
     {
         using var context = NoteDb.CreateContext();
-
         var folderRepository = new EFFoldersRepository(context);
 
         var folders = folderRepository.GetAllFolders(false);
@@ -60,7 +58,6 @@ public class UnitTestEFFolderRepository : IClassFixture<TestNoteDBFixture>
     public void CheckIfFolderExists(int id, bool expectedResult)
     {
         using var context = NoteDb.CreateContext();
-
         var folderRepository = new EFFoldersRepository(context);
 
         var result = folderRepository.CheckIfFolderExists(id);
@@ -74,8 +71,8 @@ public class UnitTestEFFolderRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
+        var folderRepository = new EFFoldersRepository(context);
 
-        var folderRepository = new EFFoldersRepository(NoteDb.CreateContext());
         var id = folderRepository.CreateFolder("foo bar world");
 
         context.ChangeTracker.Clear();
@@ -84,5 +81,39 @@ public class UnitTestEFFolderRepository : IClassFixture<TestNoteDBFixture>
         Assert.Equal("foo bar world", folder.Title);
         folder = context.Folders.Single(folder => folder.Id == id);
         Assert.Equal("foo bar world", folder.Title);
+    }
+
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(2, 2)]
+    [InlineData(3, 2)]
+    public void DeleteFolder_RemainingNotesCorrect(int id, int expectedCount)
+    {
+        using var context = NoteDb.CreateContext();
+        context.Database.BeginTransaction();
+        var folderRepository = new EFFoldersRepository(context);
+
+        folderRepository.DeleteFolder(id, true);
+
+        context.ChangeTracker.Clear();
+
+        Assert.Equal(expectedCount, context.Notes.Count());
+    }
+
+    [Theory]
+    [InlineData("foobar")]
+    [InlineData("barfoo")]
+    public void RenameFolder_CorrectlyRenamesFolder(string newName)
+    {
+        using var context = NoteDb.CreateContext();
+        context.Database.BeginTransaction();
+        var folderRepository = new EFFoldersRepository(context);
+
+        folderRepository.RenameFolder(1, newName);
+
+        context.ChangeTracker.Clear();
+
+        Assert.Equal(newName, context.Folders.First(x => x.Id == 1).Title);
+
     }
 }

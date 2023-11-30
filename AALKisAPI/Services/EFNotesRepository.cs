@@ -60,13 +60,11 @@ public class EFNotesRepository : INotesRepository
 
     public List<AALKisShared.Records.Note> SearchByTitle(string searchQuery)
     {
-        var list1 = (List<Models.Note>) _database.Notes.Where(note => note.Title.Contains(searchQuery));
-        var list2 = new List<AALKisShared.Records.Note>();
-        foreach(Models.Note note in list1)
-        {
-            list2.Add(ToSharedNote(note));
-        }
-        return list2;
+        var list1 = _database.Notes
+            .Where(note => note.Title.Contains(searchQuery))
+            .Select(note => ToSharedNote(note))
+            .ToList();
+        return list1;
     }
 
     public static Note ToSharedNote(AALKisAPI.Models.Note note)
