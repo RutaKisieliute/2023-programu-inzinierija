@@ -4,6 +4,7 @@ using AALKisMVCUI.Models;
 
 namespace AALKisMVCUI.Controllers;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

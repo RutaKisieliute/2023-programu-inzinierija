@@ -2,6 +2,7 @@ using AALKisMVCUI.Utility;
 
 namespace AALKisMVCUI;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class Program
 {
     public static readonly string LogFileName = "./AALKisMVCUI.log";

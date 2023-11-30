@@ -7,7 +7,7 @@
 	<OutputPath>build/$(Configuration)</OutputPath>
 	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
+	<IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>

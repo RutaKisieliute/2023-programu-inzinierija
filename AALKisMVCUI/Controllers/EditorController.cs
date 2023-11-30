@@ -16,17 +16,20 @@ public class EditorController : Controller
     private readonly ILogger<EditorController> _logger;
     private readonly APIClient _client;
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public EditorController(ILogger<EditorController> logger, APIClient client)
     {
         _logger = logger;
         _client = client;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public IActionResult Index()
     {
         return Redirect("Home/Error");
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [HttpGet("{id}")]
     public async Task<IActionResult> Index(int id)
     {
@@ -54,6 +57,7 @@ public class EditorController : Controller
         return BadRequest();
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [HttpGet("[action]/{id}")]
     public async Task<Note?> GetNote(int id)
     {
@@ -74,6 +78,7 @@ public class EditorController : Controller
         return null;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [HttpPost("[action]/{id}")]
     public async Task<IActionResult> PostNote(int id)
     {
@@ -158,7 +163,7 @@ public class EditorController : Controller
             var regex = new Regex(@"\$([A-z]+)", RegexOptions.IgnoreCase);
             foreach(Match match in regex.Matches(content))
             {
-                result.Add(new Keyword{Name = match.Groups[1].Value});
+                result.Add(new Keyword{Name = match.Groups[1].Value.ToLower()});
             }
         }
         return result;

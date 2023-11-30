@@ -5,6 +5,12 @@ using AALKisShared.Records;
 
 namespace AALKisAPI.Controllers;
 
+/// Controllers tagged with ExcludeFromCodeCoverage should not, under any circumstance,
+/// have important code, rather act as a bridge between requests and other parts of the code.
+/// However, if there's a need to have important code (e.g. validate something before sending it out),
+/// remove the tag from the class and apply it only to Http* methods,
+/// with the important code being in functions called by Http* methods.
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 [ApiController]
 [Route("[controller]")]
 public class FolderController : ControllerBase

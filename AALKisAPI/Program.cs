@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AALKisAPI;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class Program
 {
     public static readonly string LogFileName = "./AALKisAPI.log";

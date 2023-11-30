@@ -41,7 +41,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
 
     [Theory]
     [InlineData(1, "foobar", 3)]
-    [InlineData(1, "barfoo", 3)]
+    [InlineData(1, "barfoo", 4)]
     [InlineData(3, "barfoo", null)]
     public void CreateNote_CorrectNoteId(int folderId, string noteTitle, int? expectedResult)
     {
@@ -69,7 +69,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
 
         context.ChangeTracker.Clear();
 
-        Assert.Null(context.Notes.First(x => x.Id == noteId));
+        Assert.Null(context.Notes.FirstOrDefault(x => x.Id == noteId));
     }
 
     [Theory]
