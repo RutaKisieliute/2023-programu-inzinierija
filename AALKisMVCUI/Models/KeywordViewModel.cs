@@ -1,3 +1,6 @@
+namespace AALKisMVCUI.Models;
+
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class KeywordViewModel
 {
     public string Name { get; set; }

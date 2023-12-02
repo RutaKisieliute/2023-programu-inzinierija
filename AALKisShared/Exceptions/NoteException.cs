@@ -2,6 +2,7 @@ using AALKisShared.Records;
 
 namespace AALKisShared.Exceptions;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class NoteException : Exception
 {
     private NoteException() : base() { }
