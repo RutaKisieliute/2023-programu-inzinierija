@@ -36,6 +36,9 @@ public class Program
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
+        app.UseFallbackRedirection(target: "/");
+
         app.Run();
     }
+
 }
