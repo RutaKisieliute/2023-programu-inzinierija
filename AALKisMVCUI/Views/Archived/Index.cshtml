@@ -18,7 +18,7 @@
 @foreach(Folder<Note> folder in Model)
 {
 
-    <div class="folder">
+    <div class="folder" data-folder-id="@folder.Id">
         <p class="folder-name">@folder.Name</p>
         <div class="scroller snaps-inline">
 
@@ -31,7 +31,7 @@
             @foreach(Note note in folder.Records)
             {
                 
-                <div class="scroller-element">
+                <div class="scroller-element" data-note-id="@note.Id">
                     <svg tabIndex="0" data-bs-toggle="popover" class="overflow-btn" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                              viewBox="0 0 110 137.5" style="enable-background:new 0 0 110 137.5;" xml:space="preserve" fill="#ffff00">
                             <circle cx="55" cy="34" r="12" />

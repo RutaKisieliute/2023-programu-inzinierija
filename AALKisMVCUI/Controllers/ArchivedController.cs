@@ -38,31 +38,25 @@ public class ArchivedController : Controller
         return View(folders);
     }
     
-    [HttpPost("[action]/{folderName}/{noteName}")]
-    public async Task<IActionResult> ArchiveNote(string folderName, string noteName)
+    [HttpPost("[action]/{noteId}")]
+    public async Task<IActionResult> UnarchiveNote(int noteId)
     {
         try
         {
-            string targetUri = "/Note/" + noteName + "/" + folderName;
+            string targetUri = "/Note/" + noteId;
 
             Note fieldsToUpdate = new Note();
             fieldsToUpdate.Flags = NoteFlags.Archived; // Not sets, but switches.
 
             string jsonString = JsonConvert.SerializeObject(fieldsToUpdate);
-
-
-            // Update Note Archived Flag
-            await _client.Fetch($"Note/{folderName}/{noteName}",
-                    HttpMethod.Put,
-                    new StringContent(jsonString, Encoding.UTF8, "application/json"));
-
+            var response = await _client.Fetch(targetUri, HttpMethod.Put, new StringContent(jsonString, Encoding.UTF8, "application/json"))
+                ?? throw new JsonException($"Got empty response from {targetUri}");
             return Ok();
-
         }
         catch (Exception ex)
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
-            _logger.LogError($"Failed to create EmptyNote\n" + ex.ToString());
+            _logger.LogError($"Failed to archive note\n" + ex.ToString());
             return BadRequest();
         }
 
