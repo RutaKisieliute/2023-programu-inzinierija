@@ -4,6 +4,8 @@ using AALKisAPI.Controllers;
 using AALKisAPI.Services;
 using Microsoft.Extensions.Logging;
 using AALKisShared.Records;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace UnitTests.API;
 public class NoteControllerTest
@@ -21,7 +23,7 @@ public class NoteControllerTest
     [Fact]
     public async Task Get_ShouldReturnNote()
     {
-        var noteId = 5;
+        var noteId = 42;
         var noteTitle = "Test Title";
         var noteDto = new Note
         {
