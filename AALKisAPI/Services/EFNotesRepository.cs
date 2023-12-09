@@ -27,7 +27,7 @@ public class EFNotesRepository : INotesRepository
     
     public Note GetNote(int id, bool previewOnly)
     {
-        var note = _database.Notes.Find(id);
+        var note = _database.Notes.Include(o => o.Tags).First(n => n.Id == id);
         return note != null ? ToSharedNote(note) : new Note(); 
     }
 

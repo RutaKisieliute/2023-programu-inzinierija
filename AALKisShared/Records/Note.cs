@@ -77,5 +77,10 @@ public record struct Note : IComparable<Note>, IJsonSerializable
         // Otherwise, fall back to title string comparison
         return (this.Title ?? "").CompareTo(other.Title);
     }
+
+    public bool FlagCheck(NoteFlags check)
+    {
+        return (Flags & check) != 0;
+    }
 }
 

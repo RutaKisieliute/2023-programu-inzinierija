@@ -132,6 +132,6 @@ public class NoteController : ControllerBase
     [NonAction]
     public void NoteCreationLog(object sender, Note note)
     {
-        _logger.LogDebug("!!!!!!!!!!!!!!!!!!Successfully created new note: " + note.ToString());
+        _logger.LogDebug("Successfully created new note: " + note.ToString());
     }
 }
