@@ -20,7 +20,7 @@
         var noteId = keyword.Origin?.Id;
         <tr>
             <td>@keyword.Name</td> 
-            <td><a href="/Editor/@(noteId)#keyword!@(keyword.Name)">@(keyword.Origin?.Title) (#@(noteId))</a></td>
+            <td><a href="/Editor/@(noteId)#keyword_@(keyword.Name)">@(keyword.Origin?.Title) (#@(noteId))</a></td>
         </tr>
     }
     </tbody>

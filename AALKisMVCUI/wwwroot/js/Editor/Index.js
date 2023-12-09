@@ -51,12 +51,13 @@ function startup()
     });*/
 }
 
-const getKeywordId = (keyword) => { return "keyword!" + keyword; };
+const getKeywordId = (keyword) => { return "keyword_" + keyword; };
 
 // Helper function to scroll to element
 function scrollToHref(anchorTag)
 {
     let targetQuery = (anchorTag ? anchorTag.href : window.location.href).match(/#[A-z-_]+/);
+    console.log(targetQuery);
     if(!targetQuery)
     {
         return false;
@@ -91,6 +92,8 @@ function saveContents()
 {
     // Executed a save; clear the save timer
     clearTimeout(saveContentsTimeoutId);
+
+    statusDiv.innerHTML = "Saving..."
 
     fetch(webOrigin + "/" + controller + "/PostNote/"
         + note,
@@ -209,8 +212,6 @@ function parseAndMarkKeywords(text)
     return text.replaceAll(/\${0,1}([A-z]+)/gi, (...match) => {
         if(match[0][0] == '$')
         {
-            //console.log(match);
-            //console.log("matched as keyword");
             let keyword = match[1].toLowerCase();
 
             keywords.set(keyword, getKeywordId(keyword));
@@ -224,7 +225,6 @@ function parseAndMarkKeywords(text)
         {
             return match[0];
         }
-        //console.log(match);
         //console.log("matched as used keyword");
         return "<a href=\"#" + keyword + "\" onclick=\"scrollToHref(this)\">"
             + match[0]
