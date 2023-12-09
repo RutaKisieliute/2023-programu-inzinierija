@@ -49,11 +49,27 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
         context.Database.BeginTransaction();
         var notesRepository = new EFNotesRepository(context);
 
-        var result = notesRepository.CreateNote(folderId, noteTitle);
+        Console.WriteLine($"{folderId},{noteTitle},{expectedResult}");
+        foreach(var noteModel in context.Notes)
+        {
+            Console.WriteLine($"{noteModel}");
+        }
 
-        context.ChangeTracker.Clear();
+        int? result = null;
+        try
+        {
+            result = notesRepository.CreateNote(folderId, noteTitle);
+        }
+        catch (Exception)
+        {
+            Assert.Null(expectedResult);
+        }
+        finally
+        {
+            context.ChangeTracker.Clear();
+            Assert.Equal(expectedResult, result);
+        }
 
-        Assert.Equal(expectedResult, result);
     }
 
     [Theory]

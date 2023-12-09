@@ -27,6 +27,10 @@ public class EFNotesRepository : INotesRepository
 
     public int? CreateNote(int folderId, string noteTitle)
     {
+        if (_database.Folders.Find(folderId) == null)
+        {
+            throw new Exception($"Folder with id {folderId} does not exist");
+        }
         Models.Note note = new Models.Note(){
             Title = noteTitle,
             Flags = 8,
