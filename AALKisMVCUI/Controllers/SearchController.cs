@@ -4,6 +4,7 @@ using AALKisMVCUI.Utility;
 using AALKisShared.Records;
 using AALKisShared.Enums;
 using System.Text;
+using AALKisMVCUI.Models;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -35,7 +36,9 @@ public class SearchController : Controller
             notes[i] = note;
         }
 
-        return View(notes);
+        var searchModel = new SearchViewModel { Notes = notes, SearchQuery = q};
+
+        return View(searchModel);
     }
 
     string InsertStringsBetweenAllSubstrings(

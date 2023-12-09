@@ -1,5 +1,18 @@
+.search-result-text{
+    margin: 0 8% 2rem 8%;
+    font-size: 1rem;
+}
+
 .highlight{
     background: #ffff00
+}
+
+.grid-element {
+    margin: 1rem;
+}
+
+.note-grid {
+    padding: 0 8% 0 8% !important;
 }
 
 #create-folder-btn {
@@ -122,6 +135,9 @@
     border: 1px solid #aaa;
 }
 
+
+
+
 .scroller-element > a {
     
     display: inline-block;
@@ -142,7 +158,7 @@
 
 .scroller-element .paragraph {
     inline-size: 100%;
-    height: 15rem;
+    height: 14.5rem;
     overflow: hidden;
     word-wrap: break-word;
 }

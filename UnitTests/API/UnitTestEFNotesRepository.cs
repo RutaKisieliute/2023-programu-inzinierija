@@ -95,13 +95,13 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     [InlineData("testNote", 2)]
     [InlineData("Note1", 1)]
     [InlineData("Note2", 1)]
-    public void SearchByTitle_CorrectCount(string searchQuery, int expectedCount)
+    public void SearchNotes_CorrectCount(string searchQuery, int expectedCount)
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
         var notesRepository = new EFNotesRepository(context);
 
-        List<Note> records = notesRepository.SearchByTitle(searchQuery);
+        List<Note> records = notesRepository.SearchNotes(searchQuery).ToList();
 
         context.ChangeTracker.Clear();
 
