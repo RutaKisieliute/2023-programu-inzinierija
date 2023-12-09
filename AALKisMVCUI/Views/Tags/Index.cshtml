@@ -1,0 +1,14 @@
+@model List<AALKisShared.Records.Tag>
+
+<h1>Tags</h1>
+<h3><ul>
+    <table>
+    @foreach(Tag t in Model){
+        string link = "Tags/" + t.Name;
+        <tr>
+            <td><a href=@link>@t.Name</a></td>
+            <td style="padding: 5px; allign: right">@t.NoteCount</td> 
+        </tr>
+    }
+    </table>
+</ul></h3>
