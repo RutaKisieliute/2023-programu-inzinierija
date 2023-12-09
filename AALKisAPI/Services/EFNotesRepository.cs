@@ -1,6 +1,4 @@
 using AALKisAPI.Data;
-using AALKisAPI.Models;
-using Microsoft.EntityFrameworkCore;
 using Note = AALKisShared.Records.Note;
 
 namespace AALKisAPI.Services;

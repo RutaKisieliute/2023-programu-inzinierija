@@ -2,10 +2,8 @@ using Xunit;
 using Moq;
 using AALKisAPI.Controllers;
 using AALKisAPI.Services;
-using Microsoft.Extensions.Logging;
 using AALKisShared.Records;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+
 
 namespace UnitTests.API;
 public class NoteControllerTest

@@ -41,7 +41,7 @@ public class SearchController : Controller
         return View(searchModel);
     }
 
-    string InsertStringsBetweenAllSubstrings(
+    public static string InsertStringsBetweenAllSubstrings(
         string original,
         string substring,
         string firstString,
@@ -54,11 +54,8 @@ public class SearchController : Controller
         while ((index = result.ToString().IndexOf(substring, index, StringComparison.OrdinalIgnoreCase)) != -1)
         {
             result.Insert(index, firstString);
-
             result.Insert(index + substring.Length + firstString.Length, secondString);
-
             index = index + substring.Length + firstString.Length + secondString.Length;
-            
         }
         Console.WriteLine(result);
         return result.ToString();
