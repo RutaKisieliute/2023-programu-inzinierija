@@ -58,15 +58,6 @@ public class EFNotesRepository : INotesRepository
         _database.SaveChanges();
     }
 
-    public List<AALKisShared.Records.Note> SearchByTitle(string searchQuery)
-    {
-        var list1 = _database.Notes
-            .Where(note => note.Title.Contains(searchQuery))
-            .Select(note => ToSharedNote(note))
-            .ToList();
-        return list1;
-    }
-
     public static Note ToSharedNote(AALKisAPI.Models.Note note)
     {
         return new Note(){
@@ -83,5 +74,23 @@ public class EFNotesRepository : INotesRepository
     protected virtual void OnNoteCreation(Note arg)
     {
         NoteCreated?.Invoke(this, arg);
+    }
+
+    public IEnumerable<Note> SearchNotes(string query)
+    {
+        var list1 = _database.Notes
+        .Where(note => note.Title.Contains(query))
+        .Select(note => ToSharedNote(note))
+        .ToList();
+
+        var list2 = _database.Notes
+        .Where(note => note.Content.Contains(query))
+        .Select(note => ToSharedNote(note))
+        .ToList();
+
+        list1.AddRange(list2);
+        var list = list1.Distinct().ToList();
+
+        return list;
     }
 }

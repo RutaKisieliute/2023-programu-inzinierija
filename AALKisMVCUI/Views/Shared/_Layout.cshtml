@@ -13,11 +13,11 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Edu Notes</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home">Edu Notes</a>
                 <div class="search-bar">
                     <img src="~/svg/icon_search.svg" class="search-bar-icon" />
-                    <form asp-controller="Home" asp-action="Privacy">
-                        <input class="input-no-borders" type="text" placeholder="Search notes" name="search">
+                    <form asp-controller="Search" asp-action="Index" method="get">
+                        <input class="input-no-borders" type="text" placeholder="Search notes" name="q">
                     </form>
                 </div>
                 <a class="navbar-brand" style="visibility: hidden;">Edu Notes</a>
