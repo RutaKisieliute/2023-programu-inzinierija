@@ -1,4 +1,7 @@
 using AALKisAPI.Data;
+
+using Microsoft.EntityFrameworkCore;
+
 using Note = AALKisShared.Records.Note;
 using NoteEntity = AALKisAPI.Models.Note;
 
