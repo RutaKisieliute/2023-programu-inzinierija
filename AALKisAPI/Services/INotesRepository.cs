@@ -4,6 +4,8 @@ namespace AALKisAPI.Services;
 
 public interface INotesRepository
 {
+    public IEnumerable<Note> GetAllNotes();
+    
     public Note GetNote(int id, bool previewOnly);
 
     public bool CheckIfNoteExists(int id);

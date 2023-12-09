@@ -2,6 +2,7 @@ using AALKisAPI.Data;
 using AALKisAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using Note = AALKisShared.Records.Note;
+using NoteEntity = AALKisAPI.Models.Note;
 
 namespace AALKisAPI.Services;
 
@@ -14,10 +15,20 @@ public class EFNotesRepository : INotesRepository
         _database = database;
     }
     
-    public AALKisShared.Records.Note GetNote(int id, bool previewOnly)
+    public IEnumerable<Note> GetAllNotes()
+    {
+        List<Note> list = new();
+        foreach(NoteEntity note in _database.Notes.Include(o => o.Tags))
+        {
+            list.Add(ToSharedNote(note));
+        }
+        return list;
+    }
+    
+    public Note GetNote(int id, bool previewOnly)
     {
         var note = _database.Notes.Find(id);
-        return note != null ? ToSharedNote(note) : new AALKisShared.Records.Note(); 
+        return note != null ? ToSharedNote(note) : new Note(); 
     }
 
     public bool CheckIfNoteExists(int id)
@@ -27,7 +38,7 @@ public class EFNotesRepository : INotesRepository
 
     public int? CreateNote(int folderId, string noteTitle)
     {
-        Models.Note note = new Models.Note(){
+        NoteEntity note = new NoteEntity(){
             Title = noteTitle,
             Flags = 8,
             Content = "",
@@ -42,13 +53,17 @@ public class EFNotesRepository : INotesRepository
 
     public void DeleteNote(int id)
     {
-        _database.Notes.Remove(_database.Notes.Find(id));
-        _database.SaveChanges();
+        var note = _database.Notes.Find(id);
+        if(note != null)
+        {   
+            _database.Notes.Remove(note);
+            _database.SaveChanges();
+        }
     }
 
-    public void UpdateNote(AALKisShared.Records.Note record, int folderId = -1)
+    public void UpdateNote(Note record, int folderId = -1)
     {
-        Models.Note note = _database.Notes.Find(record.Id);
+        NoteEntity note = _database.Notes.Find(record.Id);
         if(note == null) throw new Exception();
         note.Title = record.Title;
         note.Content = record.Content;
@@ -58,23 +73,25 @@ public class EFNotesRepository : INotesRepository
         _database.SaveChanges();
     }
 
-    public List<AALKisShared.Records.Note> SearchByTitle(string searchQuery)
+    public List<Note> SearchByTitle(string searchQuery)
     {
         var list1 = _database.Notes
+            .Include(o => o.Tags)
             .Where(note => note.Title.Contains(searchQuery))
             .Select(note => ToSharedNote(note))
             .ToList();
         return list1;
     }
 
-    public static Note ToSharedNote(AALKisAPI.Models.Note note)
+    public static Note ToSharedNote(NoteEntity note)
     {
         return new Note(){
             Id = note.Id,
             Title = note.Title,
             Content = note.Content,
             Flags = (AALKisShared.Enums.NoteFlags?) note.Flags,
-            EditDate = note.Modified
+            EditDate = note.Modified,
+            Tags = note.Tags.Select(t => t.Tag1)
         };
     }
 
