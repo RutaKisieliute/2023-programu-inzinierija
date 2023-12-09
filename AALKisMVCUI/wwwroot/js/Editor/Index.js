@@ -113,8 +113,6 @@ function onEditorInput(event)
     // Clear the timer to save
     clearTimeout(saveContentsTimeoutId);
 
-    console.log(event);
-
     //editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("<br>", "\n");
 
     spanEditHTML = editorTextArea.innerHTML;
@@ -253,7 +251,7 @@ function onEditorFocusOut(event)
     spanViewHTML = DOMPurify.sanitize(spanEditHTML);//new Option(spanEditHTML).innerHTML;
 
     spanViewHTML = parseAndMarkKeywords(spanViewHTML);
-    spanViewHTML = marked.parse(spanViewHTML);
+    spanViewHTML = marked.parse(spanViewHTML.replaceAll("<br>", "\n")).replaceAll("\n", "<br>");
 
     if(spanViewHTML == "<p></p>")
     {
