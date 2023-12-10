@@ -98,7 +98,8 @@ public class NoteController : ControllerBase
             record.Update(
                     flags: record.Flags ^ fieldsToUpdate.Flags,
                     title: fieldsToUpdate.Title,
-                    content: fieldsToUpdate.Content);
+                    content: fieldsToUpdate.Content,
+                    tags: fieldsToUpdate.Tags);
 
             record.EditDate = DateTime.Now;
             _notesRepository.UpdateNote(record);

@@ -1,9 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Models;
-using System.Text.Json.Serialization;
-using Microsoft.JSInterop.Implementation;
-using System.Text.Json;
 using AALKisMVCUI.Utility;
 using AALKisShared.Records;
 
@@ -33,7 +30,7 @@ public class TagsController : Controller
             _logger.LogError(e.Message);
             Response.StatusCode = StatusCodes.Status500InternalServerError;
         }
-        return null;
+        return Redirect("Tags/Error");
     }
 
     [HttpGet("[Controller]/{tag}")]

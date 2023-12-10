@@ -18,6 +18,11 @@ const statusDiv = document.getElementById("editor-status");
 var saveContentsTimeoutId;
 var statusClearTimeoutId;
 
+const tagsTextArea = document.getElementById("tags-textarea");
+var tagText;
+
+const tagsAddButton = document.getElementById("add-button");
+
 function startup()
 {
     editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("\n", "<br>");
@@ -28,6 +33,10 @@ function startup()
     shouldUpdateSpanViewHTML = true;
 
     editorTextArea.innerHTML = spanEditHTML;
+
+    tagsAddButton.addEventListener("click", (onAddButtonClick));
+
+    tagsTextArea.addEventListener("focus", (onTagsFocus));
 
     //setInterval((fetchTextArea), miliBetweenFetches, editorTextArea)
     //
@@ -298,6 +307,28 @@ async function onTitleFocusOut(event)
 
     newTitle = await response.text();
     showSuccessStatus();
+}
+
+function onAddButtonClick()
+{
+    if(tagsTextArea.innerHTML != "add more tags" && tagsTextArea.innerHTML != "")
+    {
+        fetch(webOrigin + "/" + controller + "/PostNote/"
+            + note,
+            {
+                "method": "POST",
+                "body": JSON.stringify({ "Tags": ["++" + tagsTextArea.innerHTML]}),
+                "headers": {"content-type": "application/json"}
+            }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
+                (showFailureStatus));
+        tagsTextArea.innerHTML = "";
+        location.reload();
+    }
+}
+
+function onTagsFocus(event)
+{
+    if(tagsTextArea.innerHTML == "add more tags") tagsTextArea.innerHTML = "";
 }
 
 startup();

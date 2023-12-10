@@ -9,10 +9,13 @@ namespace AALKisAPI.Services;
 public class EFNotesRepository : INotesRepository
 {
     private readonly NoteDB _database;
+
+    private readonly ITagsRepository _tagsRepository;
     
-    public EFNotesRepository(NoteDB database)
+    public EFNotesRepository(NoteDB database, ITagsRepository tagsRepository)
     {
         _database = database;
+        _tagsRepository = tagsRepository;
     }
     
     public IEnumerable<Note> GetAllNotes()
@@ -63,13 +66,21 @@ public class EFNotesRepository : INotesRepository
 
     public void UpdateNote(Note record, int folderId = -1)
     {
-        NoteEntity note = _database.Notes.Find(record.Id);
+        NoteEntity? note = _database.Notes.Find(record.Id);
         if(note == null) throw new Exception();
         note.Title = record.Title;
         note.Content = record.Content;
         note.Flags = (sbyte?) record.Flags;
         if(folderId != -1) note.Folder = _database.Folders.Find(folderId);
         note.Modified = DateTime.UtcNow;
+        if(record.Tags != null)
+        {
+            foreach(string tagDiff in record.Tags)
+            {
+                if(tagDiff.StartsWith("--")) _tagsRepository.DeleteTag(tagDiff.Remove(0, 2), note.Id);
+                else if(tagDiff.StartsWith("++")) _tagsRepository.AddTag(tagDiff.Remove(0, 2), note.Id);
+            }
+        }  
         _database.SaveChanges();
     }
 
@@ -91,7 +102,7 @@ public class EFNotesRepository : INotesRepository
             Content = note.Content,
             Flags = (AALKisShared.Enums.NoteFlags?) note.Flags,
             EditDate = note.Modified,
-            Tags = note.Tags.Select(t => t.Tag1)
+            Tags = note.Tags.Select(t => t.Tag1).ToList()
         };
     }
 
