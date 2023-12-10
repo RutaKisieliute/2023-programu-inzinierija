@@ -5,6 +5,7 @@ using AALKisShared.Exceptions;
 using AALKisShared.Utility;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace AALKisMVCUI.Controllers;
 
