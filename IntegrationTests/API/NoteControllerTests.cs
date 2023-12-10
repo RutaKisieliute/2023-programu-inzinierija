@@ -63,4 +63,12 @@ public class NoteControllerTests : IClassFixture<AppFactory<AALKisAPI.Program>>
 
         response.EnsureSuccessStatusCode();
     }
+
+    [Fact]
+    public async Task Get_SearchNotes_ReturnsOkResult()
+    {
+        var response = await _client.Fetch($"/Note/Search/hello", HttpMethod.Get);
+
+        response.EnsureSuccessStatusCode();
+    }
 }

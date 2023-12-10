@@ -1,6 +1,7 @@
 using AALKisAPI.Data;
-using AALKisAPI.Models;
+
 using Microsoft.EntityFrameworkCore;
+
 using Note = AALKisShared.Records.Note;
 using NoteEntity = AALKisAPI.Models.Note;
 
@@ -84,16 +85,6 @@ public class EFNotesRepository : INotesRepository
         _database.SaveChanges();
     }
 
-    public List<Note> SearchByTitle(string searchQuery)
-    {
-        var list1 = _database.Notes
-            .Include(o => o.Tags)
-            .Where(note => note.Title.Contains(searchQuery))
-            .Select(note => ToSharedNote(note))
-            .ToList();
-        return list1;
-    }
-
     public static Note ToSharedNote(NoteEntity note)
     {
         return new Note(){
@@ -111,5 +102,23 @@ public class EFNotesRepository : INotesRepository
     protected virtual void OnNoteCreation(Note arg)
     {
         NoteCreated?.Invoke(this, arg);
+    }
+
+    public IEnumerable<Note> SearchNotes(string query)
+    {
+        var list1 = _database.Notes
+        .Where(note => note.Title.Contains(query))
+        .Select(note => ToSharedNote(note))
+        .ToList();
+
+        var list2 = _database.Notes
+        .Where(note => note.Content.Contains(query))
+        .Select(note => ToSharedNote(note))
+        .ToList();
+
+        list1.AddRange(list2);
+        var list = list1.Distinct().ToList();
+
+        return list;
     }
 }
