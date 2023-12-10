@@ -78,7 +78,8 @@ public class EFNotesRepository : INotesRepository
             Title = note.Title,
             Content = note.Content,
             Flags = (AALKisShared.Enums.NoteFlags?) note.Flags,
-            EditDate = note.Modified
+            EditDate = note.Modified,
+            OriginFolderId = note.FolderId
         };
     }
 

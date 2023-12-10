@@ -3,7 +3,7 @@ const miliBeforeStatusClear = 2000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
-const note = window.location.pathname.split('/')[2];
+const noteId = window.location.pathname.split('/')[2];
 
 const editorTextArea = document.getElementById("editor-textarea");
 var spanEditHTML;
@@ -18,7 +18,11 @@ const statusDiv = document.getElementById("editor-status");
 var saveContentsTimeoutId;
 var statusClearTimeoutId;
 
-function startup()
+var folderKeywords = new Map();
+
+const getKeywordId = (keyword) => { return "keyword_" + keyword; };
+
+async function startup()
 {
     editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("\n", "<br>");
     titleTextArea.innerHTML = titleTextArea.innerHTML.replaceAll("\n", "<br>");
@@ -28,6 +32,14 @@ function startup()
     shouldUpdateSpanViewHTML = true;
 
     editorTextArea.innerHTML = spanEditHTML;
+
+    let rawFolderKeywords = (await (await fetch(webOrigin + "/Keywords/Folder/" + noteFolderId)).json())
+        .filter(keyword => keyword.origin.id != noteId);
+
+    for (keyword of rawFolderKeywords)
+    {
+        folderKeywords.set(keyword.name, keyword.origin.id + "#" + getKeywordId(keyword.name));
+    }
 
     //setInterval((fetchTextArea), miliBetweenFetches, editorTextArea)
     //
@@ -51,13 +63,10 @@ function startup()
     });*/
 }
 
-const getKeywordId = (keyword) => { return "keyword_" + keyword; };
-
 // Helper function to scroll to element
 function scrollToHref(anchorTag)
 {
     let targetQuery = (anchorTag ? anchorTag.href : window.location.href).match(/#[A-z-_]+/);
-    console.log(targetQuery);
     if(!targetQuery)
     {
         return false;
@@ -96,7 +105,7 @@ function saveContents()
     statusDiv.innerHTML = "Saving..."
 
     fetch(webOrigin + "/" + controller + "/PostNote/"
-        + note,
+        + noteId,
         {
             "method": "POST",
             "body": JSON.stringify({ "Content": spanEditHTML.replaceAll("<br>", "\n") }),
@@ -220,12 +229,19 @@ function parseAndMarkKeywords(text)
                 + match[0]
                 + "</div>";
         }
-        var keyword = keywords.get(match[0].toLowerCase());
+        let matchedWord = match[0].toLowerCase();
+        var keyword = keywords.get(matchedWord);
         if(!keyword)
         {
-            return match[0];
+            var folderKeyword = folderKeywords.get(matchedWord);
+            if (!folderKeyword)
+            {
+                return match[0];
+            }
+            return "<a href=\"" + webOrigin + "/" + controller + "/" + folderKeyword + "\" onclick=\"scrollToHref(this)\">"
+                + match[0]
+                + "</a>";
         }
-        //console.log("matched as used keyword");
         return "<a href=\"#" + keyword + "\" onclick=\"scrollToHref(this)\">"
             + match[0]
             + "</a>";
@@ -276,7 +292,7 @@ async function onTitleFocusOut(event)
     var response;
     try
     {
-        response = await fetch(webOrigin + "/" + controller + "/PostNote/" + note,
+        response = await fetch(webOrigin + "/" + controller + "/PostNote/" + noteId,
             {
                 "method": "POST",
                 "body": JSON.stringify({ "Title": newTitle.replaceAll("<br>", "\n") }),

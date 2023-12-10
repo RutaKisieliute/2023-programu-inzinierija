@@ -38,6 +38,10 @@ public class EFFoldersRepository : IFoldersRepository
 
     public Folder GetFolder(int id, bool previewOnly)
     {
+        if(previewOnly)
+        {
+            return ToSharedFolder(_database.Folders.Single(b => b.Id == id));
+        }
         return ToSharedFolder(_database.Folders.Include(a => a.Notes).Single(b => b.Id == id));
     }
 

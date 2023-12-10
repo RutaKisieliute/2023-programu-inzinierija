@@ -49,12 +49,6 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
         context.Database.BeginTransaction();
         var notesRepository = new EFNotesRepository(context);
 
-        Console.WriteLine($"{folderId},{noteTitle},{expectedResult}");
-        foreach(var noteModel in context.Notes)
-        {
-            Console.WriteLine($"{noteModel}");
-        }
-
         int? result = null;
         try
         {

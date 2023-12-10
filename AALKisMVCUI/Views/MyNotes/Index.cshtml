@@ -34,7 +34,7 @@
 @foreach(Folder<Note> folder in Model)
 {
 
-    <div class="folder" data-folder-id="@folder.Id">
+    <div class="folder" id="folder_@(folder.Id)" data-folder-id="@folder.Id">
         <p class="folder-name">@folder.Name</p>
         <div class="scroller snaps-inline">
 

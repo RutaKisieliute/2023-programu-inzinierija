@@ -1,7 +1,7 @@
-@model IEnumerable<AALKisShared.Records.Keyword>;
+@model IEnumerable<AALKisMVCUI.Models.KeywordViewModel>;
 
 @{
-    ViewData["Title"] = "Editor";
+    ViewData["Title"] = "My Keywords";
 }
 
 @section ExtraHead {
@@ -12,15 +12,16 @@
 <table>
     <thead>
         <th><h4>Keyword</h4></th>
+        <th><h4>Origin Folder (#Id)</h4></th>
         <th><h4>Origin Note (#Id)</h4></th>
     </thead>
     <tbody>
-    @foreach(AALKisShared.Records.Keyword keyword in Model)
+    @foreach(var keyword in Model)
     {
-        var noteId = keyword.Origin?.Id;
         <tr>
-            <td>@keyword.Name</td> 
-            <td><a href="/Editor/@(noteId)#keyword_@(keyword.Name)">@(keyword.Origin?.Title) (#@(noteId))</a></td>
+            <td>@(keyword.Name)</td> 
+            <td><a href="/MyNotes#folder_@(keyword.FolderId)">@(keyword.FolderName) (#@(keyword.FolderId))</a></td>
+            <td><a href="/Editor/@(keyword.NoteId)#keyword_@(keyword.Name)">@(keyword.NoteTitle) (#@(keyword.NoteId))</a></td>
         </tr>
     }
     </tbody>

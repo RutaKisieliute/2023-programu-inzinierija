@@ -17,6 +17,8 @@ public record struct Note : IComparable<Note>, IJsonSerializable
 
     public NoteFlags? Flags { get; set; } = null;
 
+    public int? OriginFolderId {get; set; } = null;
+
     public Note() { }
 
     public void Update(
