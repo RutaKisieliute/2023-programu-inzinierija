@@ -18,7 +18,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     public void GetNote_CorrectNote(int noteId, string expectedTitle)
     {
         using var context = NoteDb.CreateContext();
-        var notesRepository = new EFNotesRepository(context);
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context));
 
         var note = notesRepository.GetNote(noteId, true);
 
@@ -32,7 +32,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     public void CheckIfNoteExists_CorrectBool(int noteId, bool expectedResult)
     {
         using var context = NoteDb.CreateContext();
-        var notesRepository = new EFNotesRepository(context);
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context));
 
         var result = notesRepository.CheckIfNoteExists(noteId);
 
@@ -47,13 +47,23 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context);
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context));
 
-        var result = notesRepository.CreateNote(folderId, noteTitle);
+        int? result = null;
+        try
+        {
+            result = notesRepository.CreateNote(folderId, noteTitle);
+        }
+        catch (Exception)
+        {
+            Assert.Null(expectedResult);
+        }
+        finally
+        {
+            context.ChangeTracker.Clear();
+            Assert.Equal(expectedResult, result);
+        }
 
-        context.ChangeTracker.Clear();
-
-        Assert.Equal(expectedResult, result);
     }
 
     [Theory]
@@ -63,7 +73,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context);
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context));
 
         notesRepository.DeleteNote(noteId);
 
@@ -79,7 +89,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context);
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context));
 
         Note record = notesRepository.GetNote(noteId, false);
         record.Update(content: newContent);
@@ -99,7 +109,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context);
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context));
 
         List<Note> records = notesRepository.SearchNotes(searchQuery).ToList();
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisAPI.Services;
 using AALKisShared.Records;
+using Newtonsoft.Json;
 
 namespace AALKisAPI.Controllers;
 
@@ -33,21 +34,6 @@ public class KeywordController : ControllerBase
         try
         {
             return _keywordsRepository.GetAllKeywords();
-        }
-        catch(Exception exception)
-        {
-            _logger.LogError(exception.ToString());
-            Response.StatusCode = StatusCodes.Status400BadRequest;
-        }
-        return null;
-    }
-
-    [HttpGet("name/{name}")]
-    public async Task<IEnumerable<Keyword>?> GetNameKeywords(string name)
-    {
-        try
-        {
-            return _keywordsRepository.GetAllKeywordsByName(name);
         }
         catch(Exception exception)
         {
@@ -141,6 +127,30 @@ public class KeywordController : ControllerBase
                     + exception.ToString());
             return BadRequest();
         }
+        return new StatusCodeResult(StatusCodes.Status204NoContent);
+    }
+
+    [HttpPatch("{noteId}")]
+    public async Task<IActionResult> Update(int noteId)
+    {
+        try
+        {
+            using var bodyStream = new StreamReader(Request.Body);
+            string body = await bodyStream.ReadToEndAsync();
+
+            List<Keyword> keywords = JsonConvert.DeserializeObject<List<Keyword>>(body)
+                    ?? throw new Exception($"Could not deserialize {body} into list of keywords");
+
+            _keywordsRepository.UpdateKeywordsForNote(keywords.Select(x => x.Name), noteId);
+
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError($"Failed to update note's {noteId} keywords: "
+                    + exception.ToString());
+            return BadRequest();
+        }
+
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
 }
