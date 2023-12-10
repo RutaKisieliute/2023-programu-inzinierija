@@ -1,13 +1,23 @@
 @model List<AALKisShared.Records.Tag>
 
+@section ExtraHead {
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/Tags/Index.css">
+}
+
 <h1>Tags</h1>
 <h3><ul>
     <table>
-    @foreach(Tag t in Model){
-        string link = "Tags/" + t.Name;
+    <th>
         <tr>
-            <td><a href=@link>@t.Name</a></td>
-            <td style="padding: 5px; allign: right">@t.NoteCount</td> 
+            <td class="col1">Tag</td>
+            <td class="col2">Note count</td>
+        </tr>
+    </th>
+    @foreach(Tag t in Model){
+        string link = "Tags/" + t.Name?.Replace(" ", "%20");
+        <tr>
+            <td class="col1"><kbd><a class="link" href=@link>@t.Name</a></kbd></td>
+            <td class="col2">@t.NoteCount</td> 
         </tr>
     }
     </table>

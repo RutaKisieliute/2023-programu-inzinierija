@@ -23,6 +23,7 @@ public class EFTagsRepository : ITagsRepository
             {
                 var found = tagList[index];
                 found.NoteCount++;
+                tagList[index] = found;
             }
             else
             {

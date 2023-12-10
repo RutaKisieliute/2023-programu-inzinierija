@@ -23,7 +23,6 @@ const tagList = document.getElementById("tags");
 var tags = tagList.querySelectorAll(".tag");
 
 const tagsTextArea = document.getElementById("tags-textarea");
-var tagText;
 
 const tagsAddButton = document.getElementById("add-button");
 
@@ -40,7 +39,7 @@ function startup()
 
     tagsAddButton.addEventListener("click", (onAddButtonClick));
 
-    tagsTextArea.addEventListener("focus", (onTagsFocus));
+    tagsTextArea.addEventListener("keypress", (onEnterPress));
 
     setTagListeners(tags);
 
@@ -317,7 +316,9 @@ async function onTitleFocusOut(event)
 
 function onAddButtonClick()
 {
-    if(tagsTextArea.innerHTML != "add more tags" && tagsTextArea.innerHTML != "")
+    tagsTextArea.innerHTML = tagsTextArea.innerHTML.replaceAll("<br>", "");
+    tagsTextArea.innerHTML = tagsTextArea.innerHTML.toLowerCase();
+    if(tagsTextArea.innerHTML != "add more tags" && tagsTextArea.innerHTML != "" && isValid(tagsTextArea.innerHTML) && notIncluded(tagsTextArea.innerHTML, tagList.innerHTML))
     {
         fetch(webOrigin + "/" + controller + "/PostNote/"
             + note,
@@ -327,17 +328,11 @@ function onAddButtonClick()
                 "headers": {"content-type": "application/json"}
             }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
                 (showFailureStatus));
-        tagList.innerHTML += "<kbd class=\"tag\" oncontextmenu=\"return false;\">" + tagsTextArea.innerHTML + "</kbd>";
+        tagList.innerHTML += " <kbd class=\"tag\" oncontextmenu=\"return false;\">" + tagsTextArea.innerHTML + "</kbd>";
         tags = tagList.querySelectorAll(".tag");
         setTagListeners(tags);
-        tagsTextArea.innerHTML = "";
-        //location.reload();
     }
-}
-
-function onTagsFocus(event)
-{
-    if(tagsTextArea.innerHTML == "add more tags") tagsTextArea.innerHTML = "";
+    tagsTextArea.innerHTML = "";
 }
 
 function setTagListeners(array)
@@ -349,14 +344,38 @@ function setTagListeners(array)
             + note,
             {
                 "method": "POST",
-                "body": JSON.stringify({ "Tags": ["--" + ev.target.innerHTML]}),
+                "body": JSON.stringify({ "Tags": ["--" + ev.target.innerHTML.replaceAll("<br>", "")]}),
                 "headers": {"content-type": "application/json"}
             }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
                 (showFailureStatus));
             ev.target.remove();
             return false;
-        })        
+        })
+        element.addEventListener("click", function(ev){
+            window.location.href = webOrigin + "/Tags/" + ev.target.innerHTML;
+        })    
     });
+}
+
+function isValid(str)
+{
+    if(!(str instanceof String || typeof str === "string")) return false;
+    var regex = /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/;
+    return !regex.test(str);
+}
+
+function onEnterPress(ev)
+{
+    if(ev.key === "Enter")
+    {
+        ev.preventDefault();
+        onAddButtonClick();
+    }
+}
+
+function notIncluded(str1, str2)
+{
+    return !str2.includes("<kbd class=\"tag\" oncontextmenu=\"return false;\">" + str1 + "</kbd>");
 }
 
 startup();
