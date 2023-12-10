@@ -45,6 +45,7 @@ public class Program
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();
         services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
+        services.AddScoped<ITagsRepository, EFTagsRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
     }
 

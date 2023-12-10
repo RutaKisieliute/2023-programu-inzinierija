@@ -25,7 +25,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="IntegrationTests"/>
+		<InternalsVisibleTo Include="IntegrationTests" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="wwwroot\svg\icon_drag.svg" />
+	  <None Include="wwwroot\svg\icon_overflow.svg" />
 	</ItemGroup>
 
 </Project>

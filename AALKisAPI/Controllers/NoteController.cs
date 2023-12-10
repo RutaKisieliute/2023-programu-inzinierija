@@ -3,6 +3,7 @@ using AALKisAPI.Services;
 using AALKisShared;
 using AALKisShared.Records;
 using Newtonsoft.Json;
+using System.Collections;
 
 namespace AALKisAPI.Controllers;
 
@@ -98,7 +99,8 @@ public class NoteController : ControllerBase
             record.Update(
                     flags: record.Flags ^ fieldsToUpdate.Flags,
                     title: fieldsToUpdate.Title,
-                    content: fieldsToUpdate.Content);
+                    content: fieldsToUpdate.Content,
+                    tags: fieldsToUpdate.Tags);
 
             record.EditDate = DateTime.Now;
             _notesRepository.UpdateNote(record);
@@ -132,6 +134,21 @@ public class NoteController : ControllerBase
     [NonAction]
     public void NoteCreationLog(object sender, Note note)
     {
-        _logger.LogDebug("!!!!!!!!!!!!!!!!!!Successfully created new note: " + note.ToString());
+        _logger.LogDebug("Successfully created new note: " + note.ToString());
     }
+
+    [HttpGet("[action]/{query}")]
+    public async Task<IEnumerable<Note>> Search(string query)
+    {
+        try
+        {
+            return _notesRepository.SearchNotes(query);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+        return new List<Note>();
+    } 
 }

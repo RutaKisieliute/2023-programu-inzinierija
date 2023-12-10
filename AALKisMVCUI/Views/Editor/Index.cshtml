@@ -10,6 +10,17 @@
 
 <div class="container editor-container">
     <h1>Currently editing "<span id="title-textarea" class="textarea" role="textbox" contenteditable=true>@Html.Raw(Model.Title)</span>"</h1>
+    <h3 id="tags" style="line-height:40px">Tags: @if(Model.Tags != null)
+    {
+        @foreach(string tag in Model.Tags)
+        {
+            <kbd class="tag" oncontextmenu="return false;">@tag</kbd>
+        }
+    }
+    </h3>
+    <p style="font-size:12px">Left-click to go to a tag, right-click to remove a tag from the note.</p>
+    <span id="tags-textarea" class="textarea" role="textbox" contenteditable=true>add more tags</span> <button id="add-button">Add</button>
+    <br><br>
     <span id="editor-textarea" class="textarea" role="textbox" contenteditable=false>@Html.Raw(Model.Content)</span>
 </div>
 <footer>

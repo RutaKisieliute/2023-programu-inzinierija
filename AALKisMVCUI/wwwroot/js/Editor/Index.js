@@ -18,6 +18,15 @@ const statusDiv = document.getElementById("editor-status");
 var saveContentsTimeoutId;
 var statusClearTimeoutId;
 
+const tagList = document.getElementById("tags");
+
+var tags = tagList.querySelectorAll(".tag");
+
+const tagsTextArea = document.getElementById("tags-textarea");
+var tagText;
+
+const tagsAddButton = document.getElementById("add-button");
+
 var folderKeywords = new Map();
 
 const getKeywordId = (keyword) => { return "keyword_" + keyword; };
@@ -40,6 +49,11 @@ async function startup()
     {
         folderKeywords.set(keyword.name, keyword.origin.id + "#" + getKeywordId(keyword.name));
     }
+    tagsAddButton.addEventListener("click", (onAddButtonClick));
+
+    tagsTextArea.addEventListener("focus", (onTagsFocus));
+
+    setTagListeners(tags);
 
     //setInterval((fetchTextArea), miliBetweenFetches, editorTextArea)
     //
@@ -312,6 +326,50 @@ async function onTitleFocusOut(event)
 
     newTitle = await response.text();
     showSuccessStatus();
+}
+
+function onAddButtonClick()
+{
+    if(tagsTextArea.innerHTML != "add more tags" && tagsTextArea.innerHTML != "")
+    {
+        fetch(webOrigin + "/" + controller + "/PostNote/"
+            + note,
+            {
+                "method": "POST",
+                "body": JSON.stringify({ "Tags": ["++" + tagsTextArea.innerHTML]}),
+                "headers": {"content-type": "application/json"}
+            }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
+                (showFailureStatus));
+        tagList.innerHTML += "<kbd class=\"tag\" oncontextmenu=\"return false;\">" + tagsTextArea.innerHTML + "</kbd>";
+        tags = tagList.querySelectorAll(".tag");
+        setTagListeners(tags);
+        tagsTextArea.innerHTML = "";
+        //location.reload();
+    }
+}
+
+function onTagsFocus(event)
+{
+    if(tagsTextArea.innerHTML == "add more tags") tagsTextArea.innerHTML = "";
+}
+
+function setTagListeners(array)
+{
+    array.forEach(element => {
+        element.addEventListener("contextmenu", function(ev){
+            ev.preventDefault();
+            fetch(webOrigin + "/" + controller + "/PostNote/"
+            + note,
+            {
+                "method": "POST",
+                "body": JSON.stringify({ "Tags": ["--" + ev.target.innerHTML]}),
+                "headers": {"content-type": "application/json"}
+            }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
+                (showFailureStatus));
+            ev.target.remove();
+            return false;
+        })        
+    });
 }
 
 startup();

@@ -17,6 +17,7 @@ public class BasicTests : IClassFixture<AppFactory<AALKisMVCUI.Program>>
     [InlineData("/MyNotes")]
     [InlineData("/Archived")]
     [InlineData("/Editor/1")]
+    [InlineData("/Search?q=hello")]
     public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
     {
         // Arrange
