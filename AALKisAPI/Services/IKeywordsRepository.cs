@@ -6,8 +6,6 @@ public interface IKeywordsRepository
 {
     public IEnumerable<Keyword> GetAllKeywords();
     
-    public IEnumerable<Keyword> GetAllKeywordsByName(string name);
-
     public IEnumerable<Keyword> GetAllKeywordsByFolder(int folderId);
 
     public IEnumerable<Keyword> GetAllKeywordsByNote(int noteId);
@@ -19,7 +17,11 @@ public interface IKeywordsRepository
     public void CreateKeyword(string name, int noteId);
 
     public void DeleteKeyword(string name, int noteId);
-    void CreateKeywordList(IEnumerable<string> keywordNames);
 
-    void DeleteKeywordList(IEnumerable<string> keywordNames);
+    public void CreateKeywordsForNote(IEnumerable<string> keywordNames, int noteId);
+
+    public void DeleteKeywordsForNote(IEnumerable<string> keywordNames, int noteId);
+
+    public void UpdateKeywordsForNote(IEnumerable<string> keywordNames, int noteId);
+
 }

@@ -3,7 +3,7 @@ const miliBeforeStatusClear = 2000;
 //const miliBetweenFetches = 1000;
 const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
-const note = window.location.pathname.split('/')[2];
+const noteId = window.location.pathname.split('/')[2];
 
 const editorTextArea = document.getElementById("editor-textarea");
 var spanEditHTML;
@@ -27,7 +27,11 @@ var tagText;
 
 const tagsAddButton = document.getElementById("add-button");
 
-function startup()
+var folderKeywords = new Map();
+
+const getKeywordId = (keyword) => { return "keyword_" + keyword; };
+
+async function startup()
 {
     editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("\n", "<br>");
     titleTextArea.innerHTML = titleTextArea.innerHTML.replaceAll("\n", "<br>");
@@ -38,6 +42,13 @@ function startup()
 
     editorTextArea.innerHTML = spanEditHTML;
 
+    let rawFolderKeywords = (await (await fetch(webOrigin + "/Keywords/Folder/" + noteFolderId)).json())
+        .filter(keyword => keyword.origin.id != noteId);
+
+    for (keyword of rawFolderKeywords)
+    {
+        folderKeywords.set(keyword.name, keyword.origin.id + "#" + getKeywordId(keyword.name));
+    }
     tagsAddButton.addEventListener("click", (onAddButtonClick));
 
     tagsTextArea.addEventListener("focus", (onTagsFocus));
@@ -65,8 +76,6 @@ function startup()
         saveTextArea(event.target);
     });*/
 }
-
-const getKeywordId = (keyword) => { return "keyword!" + keyword; };
 
 // Helper function to scroll to element
 function scrollToHref(anchorTag)
@@ -107,8 +116,10 @@ function saveContents()
     // Executed a save; clear the save timer
     clearTimeout(saveContentsTimeoutId);
 
+    statusDiv.innerHTML = "Saving..."
+
     fetch(webOrigin + "/" + controller + "/PostNote/"
-        + note,
+        + noteId,
         {
             "method": "POST",
             "body": JSON.stringify({ "Content": spanEditHTML.replaceAll("<br>", "\n") }),
@@ -127,8 +138,6 @@ function onEditorInput(event)
 {
     // Clear the timer to save
     clearTimeout(saveContentsTimeoutId);
-
-    console.log(event);
 
     //editorTextArea.innerHTML = editorTextArea.innerHTML.replaceAll("<br>", "\n");
 
@@ -226,8 +235,6 @@ function parseAndMarkKeywords(text)
     return text.replaceAll(/\${0,1}([A-z]+)/gi, (...match) => {
         if(match[0][0] == '$')
         {
-            //console.log(match);
-            //console.log("matched as keyword");
             let keyword = match[1].toLowerCase();
 
             keywords.set(keyword, getKeywordId(keyword));
@@ -236,13 +243,19 @@ function parseAndMarkKeywords(text)
                 + match[0]
                 + "</div>";
         }
-        var keyword = keywords.get(match[0].toLowerCase());
+        let matchedWord = match[0].toLowerCase();
+        var keyword = keywords.get(matchedWord);
         if(!keyword)
         {
-            return match[0];
+            var folderKeyword = folderKeywords.get(matchedWord);
+            if (!folderKeyword)
+            {
+                return match[0];
+            }
+            return "<a href=\"" + webOrigin + "/" + controller + "/" + folderKeyword + "\" onclick=\"scrollToHref(this)\">"
+                + match[0]
+                + "</a>";
         }
-        //console.log(match);
-        //console.log("matched as used keyword");
         return "<a href=\"#" + keyword + "\" onclick=\"scrollToHref(this)\">"
             + match[0]
             + "</a>";
@@ -268,7 +281,7 @@ function onEditorFocusOut(event)
     spanViewHTML = DOMPurify.sanitize(spanEditHTML);//new Option(spanEditHTML).innerHTML;
 
     spanViewHTML = parseAndMarkKeywords(spanViewHTML);
-    spanViewHTML = marked.parse(spanViewHTML);
+    spanViewHTML = marked.parse(spanViewHTML.replaceAll("<br>", "\n")).replaceAll("\n", "<br>");
 
     if(spanViewHTML == "<p></p>")
     {
@@ -293,7 +306,7 @@ async function onTitleFocusOut(event)
     var response;
     try
     {
-        response = await fetch(webOrigin + "/" + controller + "/PostNote/" + note,
+        response = await fetch(webOrigin + "/" + controller + "/PostNote/" + noteId,
             {
                 "method": "POST",
                 "body": JSON.stringify({ "Title": newTitle.replaceAll("<br>", "\n") }),

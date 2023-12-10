@@ -42,6 +42,10 @@ public class EFNotesRepository : INotesRepository
 
     public int? CreateNote(int folderId, string noteTitle)
     {
+        if (_database.Folders.Find(folderId) == null)
+        {
+            throw new Exception($"Folder with id {folderId} does not exist");
+        }
         NoteEntity note = new NoteEntity(){
             Title = noteTitle,
             Flags = 8,
@@ -93,6 +97,7 @@ public class EFNotesRepository : INotesRepository
             Content = note.Content,
             Flags = (AALKisShared.Enums.NoteFlags?) note.Flags,
             EditDate = note.Modified,
+            OriginFolderId = note.FolderId,
             Tags = note.Tags.Select(t => t.Tag1).ToList()
         };
     }

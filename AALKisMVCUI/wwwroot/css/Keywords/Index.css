@@ -1,0 +1,25 @@
+table {
+    margin: 0.5em;
+}
+
+th * {
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+td * {
+    margin: 0px !important;
+    padding: 0px !important;
+}
+
+th,td {
+    padding-left: 0.5em;
+    padding-right: 2em;
+    padding-top: 0.2em;
+    padding-bottom: 0.2em;
+}
+
+table, th,td {
+    border-collapse: collapse;
+    border: 1px solid var(--bs-gray-300) !important;
+}

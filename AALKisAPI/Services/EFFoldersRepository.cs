@@ -38,6 +38,10 @@ public class EFFoldersRepository : IFoldersRepository
 
     public Folder GetFolder(int id, bool previewOnly)
     {
+        if(previewOnly)
+        {
+            return ToSharedFolder(_database.Folders.Single(b => b.Id == id));
+        }
         return ToSharedFolder(_database.Folders.Include(a => a.Notes).Single(b => b.Id == id));
     }
 
@@ -61,7 +65,10 @@ public class EFFoldersRepository : IFoldersRepository
     {
         FolderEntity? folder = _database.Folders.Find(id);
         if(folder == null) return;
-        foreach(NoteEntity note in folder.Notes) _database.Notes.Remove(note); 
+        if(force)
+        {
+            _database.Notes.RemoveRange(_database.Notes.Where(x => x.FolderId == id));
+        }
         _database.Folders.Remove(folder);
         _database.SaveChanges();
     }

@@ -2,35 +2,32 @@ using AALKisAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using Keyword = AALKisShared.Records.Keyword;
 using KeywordEntity = AALKisAPI.Models.Keyword;
+using NoteModel = AALKisAPI.Models.Note;
 
 namespace AALKisAPI.Services;
 
 public class EFKeywordsRepository : IKeywordsRepository
 {
     private readonly NoteDB _database;
+    private readonly ILogger<EFKeywordsRepository> _logger;
     
-    public EFKeywordsRepository(NoteDB database)
+    public EFKeywordsRepository(NoteDB database,
+            ILogger<EFKeywordsRepository> logger)
     {
         _database = database;
+        _logger = logger;
     }
 
     public IEnumerable<Keyword> GetAllKeywords()
     {
+        var notes = _database.Notes.ToList();
+
         var list1 = _database.Keywords.AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();
         foreach(KeywordEntity entity in list1)
         {
-            list2.Add(ToSharedKeyword(entity));
-        }
-        return list2;
-    }
-    
-    public IEnumerable<Keyword> GetAllKeywordsByName(string name)
-    {
-        var list1 = _database.Keywords.Where(a => a.Name == name).AsEnumerable();
-        List<Keyword> list2 = new List<Keyword>();
-        foreach(KeywordEntity entity in list1)
-        {
+            entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
+                    ?? throw new Exception($"Keyword {entity.Name} references missing note with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
         }
         return list2;
@@ -38,10 +35,16 @@ public class EFKeywordsRepository : IKeywordsRepository
 
     public IEnumerable<Keyword> GetAllKeywordsByNote(int noteId)
     {
-        var list1 = _database.Keywords.Where(a => a.NoteId == noteId).AsEnumerable();
+        var notes = _database.Notes.ToList();
+
+        var list1 = _database.Keywords
+                .Where(a => a.NoteId == noteId)
+                .AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();
         foreach(KeywordEntity entity in list1)
         {
+            entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
+                    ?? throw new Exception($"Keyword {entity.Name} references missing note with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
         }
         return list2;
@@ -49,10 +52,17 @@ public class EFKeywordsRepository : IKeywordsRepository
 
     public IEnumerable<Keyword> GetAllKeywordsByFolder(int folderId)
     {
-        var list1 = _database.Keywords.Include(o => o.Note).Where(a => a.Note.FolderId == folderId).AsEnumerable();
+        var notes = _database.Notes.ToList();
+
+        var list1 = _database.Keywords
+                .Include(o => o.Note)
+                .Where(a => a.Note.FolderId == folderId)
+                .AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();
         foreach(KeywordEntity entity in list1)
         {
+            entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
+                    ?? throw new Exception($"Keyword {entity.Name} references missing note with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
         }
         return list2;
@@ -95,31 +105,57 @@ public class EFKeywordsRepository : IKeywordsRepository
         };
     }
 
-    public void CreateKeywordList(IEnumerable<string> keywordNames)
+    public void CreateKeywordsForNote(IEnumerable<string> keywordNames, int noteId)
     {
         foreach (var name in keywordNames)
         {
             _database.Keywords.Add(new KeywordEntity()
             {
                 Name = name,
-                NoteId = 0
+                NoteId = noteId
             });
         }
 
         _database.SaveChanges();
     }
 
-    public void DeleteKeywordList(IEnumerable<string> keywordNames)
+    public void DeleteKeywordsForNote(IEnumerable<string> keywordNames, int noteId)
     {
         foreach (var name in keywordNames)
         {
-            var keywordToRemove = _database.Keywords.FirstOrDefault(k => k.Name == name && k.NoteId == 0);
+            var keywordToRemove = _database.Keywords
+                .FirstOrDefault(k => k.Name == name && k.NoteId == noteId);
 
             if (keywordToRemove != null)
             {
                 _database.Keywords.Remove(keywordToRemove);
             }
         }
+
+        _database.SaveChanges();
+    }
+
+    public void UpdateKeywordsForNote(IEnumerable<string> newKeywords, int noteId)
+    {
+        Console.WriteLine("UpdateKeywordsForNote");
+        IEnumerable<string> oldKeywords = GetAllKeywordsByNote(noteId).Select(x => x.Name);
+        var commonKeywords = oldKeywords.Intersect(newKeywords);
+
+        var toDeleteKeywords = oldKeywords.Except(commonKeywords);
+        var toCreateKeywords = newKeywords.Except(commonKeywords);
+
+        foreach(var toDeleteKeyword in toDeleteKeywords)
+        {
+            _logger.LogDebug($"FOOBAR: deleting {toDeleteKeyword}");
+        }
+
+        foreach(var toCreateKeyword in toCreateKeywords)
+        {
+            _logger.LogDebug($"FOOBAR: creating {toCreateKeyword}");
+        }
+
+        DeleteKeywordsForNote(toDeleteKeywords, noteId);
+        CreateKeywordsForNote(toCreateKeywords, noteId);
 
         _database.SaveChanges();
     }
