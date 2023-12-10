@@ -51,7 +51,7 @@ public class EFTagsRepository : ITagsRepository
 
     public void DeleteTag(string name, int noteId)
     {
-        var tag = _database.Tags.Find(name, noteId);
+        var tag = _database.Tags.Find(noteId, name);
         if(tag != null)
         {   
             _database.Tags.Remove(tag);

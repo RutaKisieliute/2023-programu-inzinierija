@@ -18,6 +18,10 @@ const statusDiv = document.getElementById("editor-status");
 var saveContentsTimeoutId;
 var statusClearTimeoutId;
 
+const tagList = document.getElementById("tags");
+
+var tags = tagList.querySelectorAll(".tag");
+
 const tagsTextArea = document.getElementById("tags-textarea");
 var tagText;
 
@@ -37,6 +41,8 @@ function startup()
     tagsAddButton.addEventListener("click", (onAddButtonClick));
 
     tagsTextArea.addEventListener("focus", (onTagsFocus));
+
+    setTagListeners(tags);
 
     //setInterval((fetchTextArea), miliBetweenFetches, editorTextArea)
     //
@@ -321,14 +327,36 @@ function onAddButtonClick()
                 "headers": {"content-type": "application/json"}
             }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
                 (showFailureStatus));
+        tagList.innerHTML += "<kbd class=\"tag\" oncontextmenu=\"return false;\">" + tagsTextArea.innerHTML + "</kbd>";
+        tags = tagList.querySelectorAll(".tag");
+        setTagListeners(tags);
         tagsTextArea.innerHTML = "";
-        location.reload();
+        //location.reload();
     }
 }
 
 function onTagsFocus(event)
 {
     if(tagsTextArea.innerHTML == "add more tags") tagsTextArea.innerHTML = "";
+}
+
+function setTagListeners(array)
+{
+    array.forEach(element => {
+        element.addEventListener("contextmenu", function(ev){
+            ev.preventDefault();
+            fetch(webOrigin + "/" + controller + "/PostNote/"
+            + note,
+            {
+                "method": "POST",
+                "body": JSON.stringify({ "Tags": ["--" + ev.target.innerHTML]}),
+                "headers": {"content-type": "application/json"}
+            }).then((response) => { if(!response.ok) showFailureStatus(); else showSuccessStatus(); },
+                (showFailureStatus));
+            ev.target.remove();
+            return false;
+        })        
+    });
 }
 
 startup();
