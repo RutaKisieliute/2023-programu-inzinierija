@@ -2,6 +2,7 @@ const webOrigin = window.location.protocol + "//" + window.location.host;
 const controller = window.location.pathname.split('/')[1];
 const $createFolderDialog = $("#create-folder-dialog");
 const $moveNoteToFolderDialog = $("#move-note-to-folder-dialog");
+const $exportNotesDialog = $("#export-notes-dialog");
 var overflowSelectedNoteId = null;
 
 
@@ -11,12 +12,17 @@ function main() {
     enableRefreshOnNavigateBack();
     enablePopOvers();
     renderNotesContentAsInnerHtml();
+
     setOnClickListenersForCreateElements();
+    setOnClickListenersForFolderNameTexts();
     setOnClickListenersForOverflowButtons();
-    setOnClickListenerForCreateFolderButton()
+
+    setOnClickListenerForCreateFolderButton();
+    setOnClickListenerForExportNotesButton();
+
     setOnClickListenerForCreateFolderDialog();
     setOnClickListenerForMoveNoteToFolderDialog();
-    setOnClickListenersForFolderNameTexts();
+    setOnClickListenerForExportNotesDialog();
 }
 
 // Start methods
@@ -92,6 +98,11 @@ function setOnClickListenerForCreateFolderButton() {
         $createFolderDialog[0].showModal();
     });
 }
+function setOnClickListenerForExportNotesButton() {
+    $("#export-notes-btn").on("click", function () {
+        $exportNotesDialog[0].showModal();
+    });
+}
 function setOnClickListenerForCreateFolderDialog() {
     $createFolderDialog.on("click", (dismissDialogOnOutsideClick));
     $createFolderDialog.find("button")
@@ -101,6 +112,14 @@ function setOnClickListenerForCreateFolderDialog() {
                 createEmptyFolder(folderName);
             }
             else window.alert("Invalid folder name.");
+        });
+}
+
+function setOnClickListenerForExportNotesDialog() {
+    $exportNotesDialog.on("click", (dismissDialogOnOutsideClick));
+    $exportNotesDialog.find("button")
+        .on("click", function () {
+            exportNotes();
         });
 }
 function setOnClickListenerForMoveNoteToFolderDialog() {
@@ -192,9 +211,102 @@ function showMoveNoteToFolderDialog(folderName, noteName) {
     $("#folder-selector").html(dropDownOptions);
     $moveNoteToFolderDialog.find("h6").html(`Move note '<span>${noteName}</span>' to folder`);
 }
+function sanitizeFilename(filename) {
+    const forbiddenCharsRegExp = /[<>:"\/\\|?*\x00-\x1F]/g;
+    return filename.replace(forbiddenCharsRegExp, '');
+}
+
+// Export - import
+function crawlNotesForExport() {
+    /*
+    returns: 
+    [{
+        folderName: ..., notes: 
+        [{
+            title: ...,
+            content: ...
+        }]
+    }]
+    */
 
 
+    // dict folder-id checked
+    // dict note-id folder-id checked
 
+    var folderCheckboxes = $('input[type="checkbox"][data-folder-id]');
+    var folderDict = folderCheckboxes.map(function () {
+        return {
+            folderId: $(this).data('folder-id'),
+            checked: $(this).prop('checked')
+        };
+    }).get();
+
+    var noteCheckboxes = $('input[type="checkbox"][data-note-id][data-parent-folder-id]');
+    var noteDict = noteCheckboxes.map (function () {
+        return {
+            folderId: $(this).data('parent-folder-id'),
+            noteId: $(this).data('note-id'),
+            checked: $(this).prop('checked')
+        };
+    }).get();
+
+    var notesForExport = [];
+    for (var folderInfo of folderDict) {
+        if (folderInfo.checked) {
+            //const folderName = $(`div[data-folder-id=${folderInfo.folderId}] p`).html();
+            const folderName = $(`label[for="folder-${folderInfo.folderId}"]`).html();
+            var folderNotes = [];
+            for (var noteInfo of noteDict) {
+                if (noteInfo.folderId === folderInfo.folderId) {
+                    if (noteInfo.checked) {
+                        const noteTitle = $(`label[for="note-${noteInfo.noteId}"]`).html();
+                        const noteContent = $(`div[data-note-id=${noteInfo.noteId}] > a > div.paragraph`).html();
+                        folderNotes.push({ title: noteTitle, content: noteContent });
+                    }
+                    else {
+                        break;
+                    }
+                }
+            }
+            notesForExport.push({ folderName: folderName, notes: folderNotes });
+        }
+    }
+    return notesForExport;
+    
+
+}
+function exportNotes() {
+
+    const notesForExport = crawlNotesForExport();
+    var zip = new JSZip();
+
+    for (var folderNotes of notesForExport) {
+        zip.folder(sanitizeFilename(folderNotes.folderName));
+        for (var note of folderNotes.notes) {
+            zip.file(`${sanitizeFilename(folderNotes.folderName)}/${sanitizeFilename(note.title)}.md`, note.content);
+        }
+    }
+    
+    const filename = "exported-notes.zip";
+    // Generate the zip file
+    zip.generateAsync({ type: "blob" })
+        .then(function (content) {
+            // Trigger the download
+            if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                // For Edge or Internet explorer
+                window.navigator.msSaveOrOpenBlob(content, filename);
+            } else {
+                // For other browsers
+                var a = document.createElement('a');
+                a.download = filename;
+                a.href = window.URL.createObjectURL(content);
+                a.dataset.downloadurl = ['application/zip', a.download, a.href].join(':');
+                var e = document.createEvent('MouseEvents');
+                e.initEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                a.dispatchEvent(e);
+            }
+        });
+}
 
 // API Calls (To MVC endpoints, not API endpoints)
 function createEmptyNote(folderId) {
@@ -276,7 +388,6 @@ function moveNoteToFolder(folderId, noteId) {
             console.error("There was a problem with the fetch operation:", error);
         });
 }
-
 function renameFolder(folderId, newName) {
     fetch(webOrigin + "/" + controller + "/RenameFolder/" + folderId + "/" + newName, {
         method: "POST",

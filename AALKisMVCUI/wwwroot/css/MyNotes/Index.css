@@ -1,3 +1,11 @@
+.branch-label{
+    font-size: 0.9rem;
+}
+
+.note-branch{
+    margin: 0 0 0 1rem;
+}
+
 .search-result-text{
     margin: 0 8% 2rem 8%;
     font-size: 1rem;
@@ -17,6 +25,9 @@
 
 #create-folder-btn {
     margin: 0rem 1rem 1rem 1rem;
+}
+#export-notes-btn {
+    margin: 0rem 1rem 1rem 0rem;
 }
 
 #archived-btn {
