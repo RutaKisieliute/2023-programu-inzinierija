@@ -334,7 +334,7 @@ function onAddButtonClick()
     if(tagsTextArea.innerHTML != "add more tags" && tagsTextArea.innerHTML != "" && isValid(tagsTextArea.innerHTML) && notIncluded(tagsTextArea.innerHTML, tagList.innerHTML))
     {
         fetch(webOrigin + "/" + controller + "/PostNote/"
-            + note,
+            + noteId,
             {
                 "method": "POST",
                 "body": JSON.stringify({ "Tags": ["++" + tagsTextArea.innerHTML]}),
@@ -354,7 +354,7 @@ function setTagListeners(array)
         element.addEventListener("contextmenu", function(ev){
             ev.preventDefault();
             fetch(webOrigin + "/" + controller + "/PostNote/"
-            + note,
+            + noteId,
             {
                 "method": "POST",
                 "body": JSON.stringify({ "Tags": ["--" + ev.target.innerHTML.replaceAll("<br>", "")]}),
