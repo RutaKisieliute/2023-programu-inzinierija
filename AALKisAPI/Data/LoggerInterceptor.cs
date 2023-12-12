@@ -12,13 +12,29 @@ public class LoggerInterceptor : SaveChangesInterceptor
 
     public override ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
     {
-        File.AppendAllTextAsync(FilePath, eventData.ToString() + "\n", cancellationToken);
+        try
+        {
+            File.AppendAllTextAsync(FilePath, eventData.ToString() + "\n", cancellationToken);
+        }
+        catch(Exception ex)
+        {
+
+        }
+        
         return new ValueTask<int>(Task.FromResult(result));
     }
 
     public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
     {
-        File.AppendAllText(FilePath, DateTime.UtcNow + " " + eventData.ToString() + "\n");
+        try
+        {
+            File.AppendAllText(FilePath, DateTime.UtcNow + " " + eventData.ToString() + "\n");
+        }
+        catch(Exception ex)
+        {
+
+        }
+        
         return result;
     }
 }
