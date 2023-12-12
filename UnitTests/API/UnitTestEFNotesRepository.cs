@@ -63,6 +63,12 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
             context.ChangeTracker.Clear();
             Assert.Equal(expectedResult, result);
         }
+        
+        var result = notesRepository.CreateNote(folderId, noteTitle, "");
+
+        context.ChangeTracker.Clear();
+
+        Assert.Equal(expectedResult, result);
 
     }
 

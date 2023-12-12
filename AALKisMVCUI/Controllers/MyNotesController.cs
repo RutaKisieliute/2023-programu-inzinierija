@@ -39,13 +39,20 @@ public class MyNotesController : Controller
     }
 
     [HttpPost("[action]/{folderId}")]
-    public async Task<IActionResult> CreateEmptyNote(int folderId)
+    public async Task<IActionResult> CreateNote(int folderId, [FromBody] Note contents)
     {
         try 
         {
-            string targetUri = $"/Note/Create/{folderId}/Untitled";
+            if (contents == null)
+                return BadRequest("Invalid JSON data");
+
+            string json = JsonConvert.SerializeObject(contents);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+
+            string targetUri = $"/Note/Create/{folderId}";
             var id = await _client
-                    .Fetch<int?>(targetUri, HttpMethod.Post)
+                    .Fetch<int?>(targetUri, HttpMethod.Post, content)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
 
             return Json(new { redirectToUrl = "Editor/" + id});
@@ -66,10 +73,10 @@ public class MyNotesController : Controller
         try
         {
             string targetUri = "/Folder/" + folderName;
-            var response = await _client
-                    .Fetch(targetUri, HttpMethod.Post)
+            var folderId = await _client
+                    .Fetch<int?>(targetUri, HttpMethod.Post)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
-            return Ok();
+            return Ok(new {id = folderId});
         }
         catch (Exception ex)
         {
