@@ -49,7 +49,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
         context.Database.BeginTransaction();
         var notesRepository = new EFNotesRepository(context);
 
-        var result = notesRepository.CreateNote(folderId, noteTitle);
+        var result = notesRepository.CreateNote(folderId, noteTitle, "");
 
         context.ChangeTracker.Clear();
 

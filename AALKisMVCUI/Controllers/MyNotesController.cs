@@ -4,6 +4,8 @@ using AALKisMVCUI.Utility;
 using AALKisShared.Records;
 using AALKisShared.Enums;
 using System.Text;
+using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -39,13 +41,20 @@ public class MyNotesController : Controller
     }
 
     [HttpPost("[action]/{folderId}")]
-    public async Task<IActionResult> CreateEmptyNote(int folderId)
+    public async Task<IActionResult> CreateNote(int folderId, [FromBody] Note contents)
     {
         try 
         {
-            string targetUri = $"/Note/Create/{folderId}/Untitled";
+            if (contents == null)
+                return BadRequest("Invalid JSON data");
+
+            string json = JsonConvert.SerializeObject(contents);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+
+            string targetUri = $"/Note/Create/{folderId}";
             var id = await _client
-                    .Fetch<int?>(targetUri, HttpMethod.Post)
+                    .Fetch<int?>(targetUri, HttpMethod.Post, content)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
 
             return Json(new { redirectToUrl = "Editor/" + id});

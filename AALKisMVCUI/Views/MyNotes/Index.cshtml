@@ -7,7 +7,31 @@
 <button id="create-folder-btn" class="btn btn-secondary">Create New Folder</button>
 <a id="archived-btn" href="/Archived" class="btn btn-secondary">Archived Notes</a>
 <button id="export-notes-btn" class="btn btn-secondary">Export Notes</button>
+<button id="import-notes-btn" class="btn btn-secondary">Import Notes</button>
 
+
+<dialog id="import-notes-dialog" class="dialog">
+    <h5>Import notes</h5>
+    <div id="drop-area" ondragover="allowDrop(event);" ondragleave="leaveDropZone(event);" ondrop="drop(event);" >
+        Drag and Drop
+        <br />
+        File or Folder here
+    </div>
+    <div id="import-file-container" hidden>
+        <p>Select folder for "<span id="import-file-note-name">Note name</span>" note:</p>
+        <select id="import-note-folder-selector" class="form-control">
+            <option value="" selected disabled>-</option>
+            <option value="option1">Option 1</option>
+            <option value="option2">Option 2</option>
+            <option value="option3">Option 3</option>
+        </select>
+        <br />
+        <button id="import-notes-dialog-btn-file" class="btn btn-secondary">Import</button>
+    </div>
+    <div id="import-folder-container" hidden>
+        <button id="import-notes-dialog-btn-folder" class="btn btn-secondary">Import</button>
+    </div>
+</dialog>
 
 <dialog id="export-notes-dialog" class="dialog">
     <p>Select notes to export:</p>

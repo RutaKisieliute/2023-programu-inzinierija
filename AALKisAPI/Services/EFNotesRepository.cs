@@ -37,12 +37,12 @@ public class EFNotesRepository : INotesRepository
         return _database.Notes.Find(id) != null;
     }
 
-    public int? CreateNote(int folderId, string noteTitle)
+    public int? CreateNote(int folderId, string noteTitle, string content)
     {
         NoteEntity note = new NoteEntity(){
             Title = noteTitle,
             Flags = 8,
-            Content = "",
+            Content = content,
             FolderId = folderId,
             Modified = DateTime.UtcNow
         };

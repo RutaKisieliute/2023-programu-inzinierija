@@ -3,7 +3,11 @@ const controller = window.location.pathname.split('/')[1];
 const $createFolderDialog = $("#create-folder-dialog");
 const $moveNoteToFolderDialog = $("#move-note-to-folder-dialog");
 const $exportNotesDialog = $("#export-notes-dialog");
+const $importNotesDialog = $("#import-notes-dialog");
+const $dropArea = $("#drop-area");
 var overflowSelectedNoteId = null;
+
+var singleNote = {title: null, content: null};
 
 
 
@@ -17,12 +21,14 @@ function main() {
     setOnClickListenersForFolderNameTexts();
     setOnClickListenersForOverflowButtons();
 
-    setOnClickListenerForCreateFolderButton();
-    setOnClickListenerForExportNotesButton();
+    setOnClickListenerForMenuButtons();
 
     setOnClickListenerForCreateFolderDialog();
     setOnClickListenerForMoveNoteToFolderDialog();
     setOnClickListenerForExportNotesDialog();
+    setOnClickListenerForImportNotesDialog();
+
+    setDropAreaListeners();
 }
 
 // Start methods
@@ -62,7 +68,7 @@ function setOnClickListenersForCreateElements() {
         const $createElement = $(this).find(".create-element");
         const folderId = $(this).data("folder-id");
         $createElement.on("click", function () {
-            createEmptyNote(folderId);
+            createNote(folderId);
         })
     });
 }
@@ -93,14 +99,15 @@ function setOnClickListenersForOverflowButtons() {
 
     });
 }
-function setOnClickListenerForCreateFolderButton() {
+function setOnClickListenerForMenuButtons() {
     $("#create-folder-btn").on("click", function () {
         $createFolderDialog[0].showModal();
     });
-}
-function setOnClickListenerForExportNotesButton() {
     $("#export-notes-btn").on("click", function () {
         $exportNotesDialog[0].showModal();
+    });
+    $("#import-notes-btn").on("click", function () {
+        $importNotesDialog[0].showModal();
     });
 }
 function setOnClickListenerForCreateFolderDialog() {
@@ -120,6 +127,17 @@ function setOnClickListenerForExportNotesDialog() {
     $exportNotesDialog.find("button")
         .on("click", function () {
             exportNotes();
+        });
+}
+function setOnClickListenerForImportNotesDialog() {
+    $importNotesDialog.on("click", (dismissDialogOnOutsideClick));
+    $("#import-notes-dialog-btn-file")
+        .on("click", function () {
+            importSingleNote();
+        });
+    $("#import-notes-dialog-btn-folder")
+        .on("click", function () {
+            importMultipleNotes();
         });
 }
 function setOnClickListenerForMoveNoteToFolderDialog() {
@@ -169,7 +187,114 @@ function setOnClickListenersForFolderNameTexts() {
         input.focus();
     });
 }
+
+function setDropAreaListeners() {
+    $dropArea[0].addEventListener(
+        "dragover",
+        function (e) {
+            e = e || event;
+            e.preventDefault();
+        },
+        false
+    );
+
+    $dropArea[0].addEventListener(
+        "drop",
+        function (event) {
+            event.preventDefault();
+            var items = event.dataTransfer.items;
+            if (items.length > 1) {
+                window.alert("Please import 1 file/folder at a time.");
+                return;
+            }
+
+            getFilesDataTransferItems(items).then(files => {
+                console.log(files);
+                filterAndReadTextFiles(files).then(filteredFiles => {
+                    console.log(filteredFiles);
+                    // IT IS THE DESIGN OF OUR BACKEND!
+                    if (filteredFiles.length === 0) {
+                        window.alert("Your provided folder contains no notes.");
+                    }
+                    else if (filteredFiles.length === 1 && occ(filteredFiles[0].filename, "/") === 0) {
+                        // Case 1
+                        var dict = getFolderNamesIdsDictionary();
+                        var dropDownOptions = `<option value="" selected disabled>-</option>`;
+                        for (var obj of dict)
+                                dropDownOptions += `<option data-folder-id="${obj.folderId}">${obj.folderName}</option>`;
+
+                        $("#import-note-folder-selector").html(dropDownOptions);
+                        let notename = filteredFiles[0].filename.replace(/\.[^/.]+$/, ""); // remove extension if there is one
+                        $("#import-file-note-name").html(notename);
+
+                        singleNote = { title: notename, content: filteredFiles[0].content };
+
+                        $("#drop-area").attr("hidden", "");
+                        $("#import-file-container").removeAttr("hidden");
+                        return;
+                    }
+                    let containsNoteInLevelOne = false;
+                    for (let file of filteredFiles) {
+                        if (occ(file, "/") === 1) {
+                            containsNoteInLevelOne = true;
+                            break;
+                        }
+                    }
+                    /*
+                    let folders = [];
+                    if (containsNoteInLevelOne) {
+                        // Case 2
+                        folders.push({ foldername: filteredFiles[0].filename.split("/")[0], notes: filteredFiles });
+                    }
+                    else {
+                        // Case 3
+                        for (let file in filteredFiles) {
+                            let notefolder = file.filename.split("/")[1];
+                            let contains = false;
+                            for (let folder in folders) {
+                                if (folder.foldername === notefolder) {
+                                    contains = true;
+                                    folder.notes.push(file);
+                                    break;
+                                }
+                            }
+                            if (!contains) {
+                                folders.push({ foldername: notefolder, notes: [file] });
+                            }
+                        }
+                    }
+                    */
+
+                });
+                /*
+                    [{
+                        name: "foldername"
+                        subfolder: [
+                            File {filpath, size, name}
+                            Object {name, subfolder}
+                        ]
+                    }]
+                    THREE CASES
+                    CASE 1 - Uploaded single file
+                    Give dropdown to select existing folder, to which to upload the note.
+
+                    CASE 2 - Uploaded folder, that contains at least one note
+                    Create folder with that name, if it doesn't exist already and flatten all subfolders, upload their notes too.
+
+                    CASE 3 - Uploaded folder, that contains only other folders that contains notes.
+                    Create many folders and upload to them their corresponding notes. If there are further subfolders, that contain notes, flatten them.
+                */
+            });
+        },
+        false
+    );
+}
+
 // Utility methods
+function occ(str, substr) {
+    let regex = new RegExp(substr, "g");
+    return (str.match(regex) || []).length;
+}
 function dismissDialogOnOutsideClick(e) {
     if (e.target.tagName !== 'DIALOG') //This prevents issues with forms
         return;
@@ -211,9 +336,105 @@ function showMoveNoteToFolderDialog(folderName, noteName) {
     $("#folder-selector").html(dropDownOptions);
     $moveNoteToFolderDialog.find("h6").html(`Move note '<span>${noteName}</span>' to folder`);
 }
+
 function sanitizeFilename(filename) {
     const forbiddenCharsRegExp = /[<>:"\/\\|?*\x00-\x1F]/g;
     return filename.replace(forbiddenCharsRegExp, '');
+}
+
+// Drag n drop
+// 3 methods purely for aesthetics
+function allowDrop(ev) {
+    $(ev.target).attr("drop-active", true);
+    ev.preventDefault();
+}
+function leaveDropZone(ev) {
+    $(ev.target).removeAttr("drop-active");
+}
+function drop(ev) {
+    ev.preventDefault();
+    $(ev.target).removeAttr("drop-active");
+}
+
+
+function getFilesDataTransferItems(dataTransferItems) {
+    function traverseFileTreePromise(item, path = "", folder) {
+        return new Promise(resolve => {
+            if (item.isFile) {
+                item.file(file => {
+                    file.filepath = (path || "") + "" + file.name;
+                    folder.push(file);
+                    resolve(file);
+                });
+            } else if (item.isDirectory) {
+                let dirReader = item.createReader();
+                dirReader.readEntries(entries => {
+                    let entriesPromises = [];
+                    subfolder = [];
+                    folder.push({ name: item.name, subfolder: subfolder });
+                    for (let entr of entries)
+                        entriesPromises.push(
+                            traverseFileTreePromise(entr, (path || "") + item.name + "/", subfolder)
+                        );
+                    resolve(Promise.all(entriesPromises));
+                });
+            }
+        });
+    }
+
+    let files = [];
+    return new Promise((resolve, reject) => {
+        let entriesPromises = [];
+        for (let it of dataTransferItems)
+            entriesPromises.push(
+                traverseFileTreePromise(it.webkitGetAsEntry(), null, files)
+            );
+        Promise.all(entriesPromises).then(entries => {
+            resolve(files);
+        });
+    });
+}
+
+function filterAndReadTextFiles(files) {
+    function filterFiles(files) {
+        let filteredFiles = [];
+        for (var file of files) {
+            if (file instanceof File) {
+                if (file.type === 'text/plain' || (file.name.endsWith('.txt') || file.name.endsWith('.md'))) {
+                    filteredFiles.push(file);
+                }
+            }
+            else {
+                var subdirFiles = filterFiles(file.subfolder);
+                for (var subdirFile of subdirFiles) {
+                    filteredFiles.push(subdirFile);
+                }
+            }
+        }
+        return filteredFiles;
+    }
+
+    return new Promise(async (resolve, reject) => {
+        
+
+        let filteredFiles = filterFiles(files);
+        let filesData = [];
+        for (let file of filteredFiles) {
+            const content = await readFileContent(file);
+            filesData.push({ filename: file.filepath, content: content });
+        }
+
+        resolve(filesData);
+    });
+}
+
+function readFileContent(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsText(file);
+    });
 }
 
 // Export - import
@@ -308,13 +529,28 @@ function exportNotes() {
         });
 }
 
+function importSingleNote() {
+    //const selectedFolderName = $("#import-note-folder-selector").value;
+    const selectedFolderId = $("#import-note-folder-selector option:selected").data("folder-id");
+    if (selectedFolderId !== null && selectedFolderId !== undefined) {
+        createNote(selectedFolderId, singleNote.title, singleNote.content);
+    }
+    else window.alert("Select folder to move your note.");
+
+}
+
+function importMultipleNotes() {
+    window.alert("To be implemented multiple note!");
+}
+
 // API Calls (To MVC endpoints, not API endpoints)
-function createEmptyNote(folderId) {
-    fetch(webOrigin + "/" + controller + "/CreateEmptyNote/" + folderId, {
+function createNote(folderId, title = "Untitled", content = "") {
+    fetch(webOrigin + "/" + controller + "/CreateNote/" + folderId, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify({ title: title, content: content })
     })
     .then(response => {
         if (!response.ok) {
