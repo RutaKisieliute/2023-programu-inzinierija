@@ -8,14 +8,11 @@ namespace AALKisAPI.Services;
 
 public class EFKeywordsRepository : IKeywordsRepository
 {
-    private readonly NoteDB _database;
-    private readonly ILogger<EFKeywordsRepository> _logger;
-    
+    private readonly NoteDB _database;    
     public EFKeywordsRepository(NoteDB database,
             ILogger<EFKeywordsRepository> logger)
     {
         _database = database;
-        _logger = logger;
     }
 
     public IEnumerable<Keyword> GetAllKeywords()
@@ -143,16 +140,6 @@ public class EFKeywordsRepository : IKeywordsRepository
 
         var toDeleteKeywords = oldKeywords.Except(commonKeywords);
         var toCreateKeywords = newKeywords.Except(commonKeywords);
-
-        foreach(var toDeleteKeyword in toDeleteKeywords)
-        {
-            _logger.LogDebug($"FOOBAR: deleting {toDeleteKeyword}");
-        }
-
-        foreach(var toCreateKeyword in toCreateKeywords)
-        {
-            _logger.LogDebug($"FOOBAR: creating {toCreateKeyword}");
-        }
 
         DeleteKeywordsForNote(toDeleteKeywords, noteId);
         CreateKeywordsForNote(toCreateKeywords, noteId);

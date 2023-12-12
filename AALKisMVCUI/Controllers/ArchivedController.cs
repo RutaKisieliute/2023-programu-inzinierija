@@ -31,7 +31,7 @@ public class ArchivedController : Controller
         notes = notes
             .Where(note => note.FlagCheck(NoteFlags.Archived))
             .ToList();
-        notes.Sort();
+        notes.Sort((a, b) => -1 * (a.EditDate ?? DateTime.UtcNow).CompareTo(b.EditDate));
         return View(notes);
     }
     

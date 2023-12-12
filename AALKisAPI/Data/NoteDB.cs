@@ -1,6 +1,7 @@
 using System;
 using AALKisAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace AALKisAPI.Data;
 
@@ -10,21 +11,23 @@ public partial class NoteDB : DbContext
 
     private readonly MySqlServerVersion _serverVersion;
 
-    private readonly LoggerInterceptor _loggerInterceptor;
+    private readonly SaveChangesInterceptor _saveChangesInterceptor = new TestLoggerInterceptor();
     
-    public NoteDB(ConnectionString connectionString)
+    public NoteDB(ConnectionString connectionString, SaveChangesInterceptor? saveChangesInterceptor = null)
     {
         _dbConnection = connectionString.Value!;
         _serverVersion = new MySqlServerVersion(new Version(5, 5, 62));
-        _loggerInterceptor = new LoggerInterceptor("./Logs");
+        if(saveChangesInterceptor != null) _saveChangesInterceptor = saveChangesInterceptor;
+        //new LoggerInterceptor("./Logs");
     }
 
-    public NoteDB(DbContextOptions<NoteDB> options, ConnectionString connectionString)
+    public NoteDB(DbContextOptions<NoteDB> options, ConnectionString connectionString, SaveChangesInterceptor? saveChangesInterceptor = null)
         : base(options)
     {
         _dbConnection = connectionString.Value!;
         _serverVersion = new MySqlServerVersion(new Version(5, 5, 62));
-        _loggerInterceptor = new LoggerInterceptor("./Logs");
+        if(saveChangesInterceptor != null) _saveChangesInterceptor = saveChangesInterceptor;
+        //_saveChangesInterceptor = new LoggerInterceptor("./Logs");
     }
 
     public virtual DbSet<Folder> Folders { get; set; }
@@ -36,7 +39,7 @@ public partial class NoteDB : DbContext
     public virtual DbSet<Tag> Tags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(_dbConnection, _serverVersion).AddInterceptors(_loggerInterceptor);
+        => optionsBuilder.UseMySql(_dbConnection, _serverVersion).AddInterceptors(_saveChangesInterceptor);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

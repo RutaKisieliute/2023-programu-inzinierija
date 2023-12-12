@@ -1,6 +1,7 @@
 using AALKisAPI.Data;
 using AALKisAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace AALKisAPI;
 
@@ -38,9 +39,12 @@ public class Program
         if(CurrentEnvironment.EnvironmentName != "Integration Test")
         {
             var _dbConnection = new ConnectionString { Value = File.ReadAllText("./Services/databaselogin.txt") };
+            services.AddSingleton<SaveChangesInterceptor>(i => new LoggerInterceptor("./Logs"));
+            //services.AddScoped<LoggerInterceptor>();
             services.AddSingleton(_dbConnection);
             services.AddDbContext<NoteDB>();
         }
+        else services.AddSingleton<SaveChangesInterceptor>(i => new TestLoggerInterceptor());
 
         services.AddScoped<IFoldersRepository, EFFoldersRepository>();
         services.AddScoped<INotesRepository, EFNotesRepository>();

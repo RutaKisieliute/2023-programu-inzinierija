@@ -7,7 +7,7 @@ public class LoggerInterceptor : SaveChangesInterceptor
     public string FilePath { get; set; }
     public LoggerInterceptor(string directoryPath) 
     {
-        FilePath = directoryPath + "/" + DateTime.UtcNow.ToShortDateString() + "databaselog.txt";
+        FilePath = directoryPath + "/" + DateTime.UtcNow.Year.ToString() + "-" + DateTime.UtcNow.Month.ToString() + "-" + DateTime.UtcNow.Day.ToString() + "databaselog.txt";
     }
 
     public override ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
