@@ -29,6 +29,21 @@ public class NoteController : ControllerBase
         _notesRepository.NoteCreated += NoteCreationLog;
     }
 
+    [HttpGet("/Note")]
+    public async Task<IEnumerable<Note>> GetAll()
+    {
+        try
+        {
+            return _notesRepository.GetAllNotes();
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+        return null;
+    }
+    
     [HttpGet("{id}")]
     public async Task<Note?> Get(int id)
     {

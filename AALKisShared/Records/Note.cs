@@ -79,7 +79,7 @@ public record struct Note : IComparable<Note>, IJsonSerializable
             return -1;
         }
         // Otherwise, fall back to title string comparison
-        return (this.Title ?? "").CompareTo(other.Title);
+        return -1 * (this.EditDate ?? DateTime.UtcNow).CompareTo(other.EditDate);
     }
 
     public bool FlagCheck(NoteFlags check)

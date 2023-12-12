@@ -4,6 +4,7 @@
     <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
 }
 
+<h1 style="text-align: center;">Public notes that contain the <kbd>@ViewContext.RouteData.Values["tag"]</kbd> tag.</h1>
 <div class="container note-grid">
     <div class="row">
         @foreach (Note note in Model)

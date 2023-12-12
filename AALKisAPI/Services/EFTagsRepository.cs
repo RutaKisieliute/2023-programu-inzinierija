@@ -38,6 +38,11 @@ public class EFTagsRepository : ITagsRepository
         return new Tag(){Name = name, NoteCount = _database.Tags.Where(t => t.Tag1 == name).Count()};
     }
 
+    public IEnumerable<Tag> GetTagsByNote(int noteId)
+    {
+        return _database.Tags.Where(t => t.NoteId == noteId).Select(t => GetTag(t.Tag1));
+    }
+
     public bool CheckIfTagExists(string name)
     {
         return _database.Tags.Where(t => t.Tag1 == name).Any();
@@ -58,5 +63,15 @@ public class EFTagsRepository : ITagsRepository
             _database.Tags.Remove(tag);
             _database.SaveChanges();
         }
+    }
+
+    public void DeleteTagsForNote(int noteId)
+    {
+        var tags = _database.Tags.Where(t => t.NoteId == noteId);
+        foreach(TagEntity tag in tags)
+        {
+            _database.Tags.Remove(tag);
+        }
+        _database.SaveChanges();
     }
 }

@@ -12,11 +12,14 @@ public class EFNotesRepository : INotesRepository
     private readonly NoteDB _database;
 
     private readonly ITagsRepository _tagsRepository;
+
+    private readonly IKeywordsRepository _keywordsRepository;
     
-    public EFNotesRepository(NoteDB database, ITagsRepository tagsRepository)
+    public EFNotesRepository(NoteDB database, ITagsRepository tagsRepository, IKeywordsRepository keywordsRepository)
     {
         _database = database;
         _tagsRepository = tagsRepository;
+        _keywordsRepository = keywordsRepository;
     }
     
     public IEnumerable<Note> GetAllNotes()
@@ -64,6 +67,9 @@ public class EFNotesRepository : INotesRepository
         var note = _database.Notes.Find(id);
         if(note != null)
         {   
+            var keywords = _keywordsRepository.GetAllKeywordsByNote(id);
+            _keywordsRepository.DeleteKeywordsForNote(keywords.Select(k => k.Name ?? ""), id);
+            _tagsRepository.DeleteTagsForNote(id);
             _database.Notes.Remove(note);
             _database.SaveChanges();
         }
