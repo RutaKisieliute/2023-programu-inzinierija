@@ -17,7 +17,9 @@ public record struct Note : IComparable<Note>, IJsonSerializable
 
     public NoteFlags? Flags { get; set; } = null;
 
-    public IEnumerable<string>? Tags { get; set; } = null;
+    public int? OriginFolderId { get; set; } = null;
+    
+    public ICollection<string>? Tags { get; set; } = null;
 
     public Note() { }
 
@@ -25,12 +27,14 @@ public record struct Note : IComparable<Note>, IJsonSerializable
             string? title = null,
             string? content = null,
             DateTime? editDate = null,
-            NoteFlags? flags = null)
+            NoteFlags? flags = null,
+            ICollection<string>? tags = null)
     {
         Title = title ?? Title;
         Content = content ?? Content;
         EditDate = editDate ?? EditDate;
         Flags = flags ?? Flags;
+        Tags = tags ?? Tags;
         return;
     }
 
@@ -75,7 +79,12 @@ public record struct Note : IComparable<Note>, IJsonSerializable
             return -1;
         }
         // Otherwise, fall back to title string comparison
-        return (this.Title ?? "").CompareTo(other.Title);
+        return -1 * (this.EditDate ?? DateTime.UtcNow).CompareTo(other.EditDate);
+    }
+
+    public bool FlagCheck(NoteFlags check)
+    {
+        return (Flags & check) != 0;
     }
 }
 

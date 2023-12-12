@@ -1,20 +1,36 @@
-@model List<AALKisShared.Records.Note>
+@model List<Note>
 
-<h1>@ViewContext.RouteData.Values["tag"]</h1>
-<h2>Published notes for @ViewContext.RouteData.Values["tag"] go here.</h2>
-@{
-if(Model.Count == 0)
-{
-    <h1>This tag doesn't exist.</h1>
+@section ExtraHead{
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
 }
-else
-{
-    //Console.WriteLine(Model.Notes.Count);
-    <h3><ul>
-    @foreach(Note note in Model)
-    {
-        <ul>@Html.ActionLink(note.Title, "Index", "Editor", new {id=note.Id})</ul>
-    }
-    </ul></h3>
-}
-}
+
+<h1 style="text-align: center;">Public notes that contain the <kbd>@ViewContext.RouteData.Values["tag"]</kbd> tag.</h1>
+<div class="container note-grid">
+    <div class="row">
+        @foreach (Note note in Model)
+        {
+
+            <div class="scroller-element grid-element col-2" data-note-id="@note.Id">
+                <svg tabIndex="0" data-bs-toggle="popover" class="overflow-btn" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                     viewBox="0 0 110 137.5" style="enable-background:new 0 0 110 137.5;" xml:space="preserve" fill="#ffff00">
+                <circle cx="55" cy="34" r="12" />
+                <circle cx="55" cy="67" r="12" />
+                <circle cx="55" cy="100" r="12" />
+                </svg>
+
+                <a href="/Editor/@note.Id">
+                    <p class="title prevent-select">@Html.Raw(note.Title)</p>
+                    <div class="paragraph prevent-select">@Html.Raw(note.Content)</div>
+                    <div class="fader"></div>
+                </a>
+
+            </div>
+
+
+        }
+    </div>
+
+</div>
+
+
+

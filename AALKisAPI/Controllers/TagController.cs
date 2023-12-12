@@ -44,7 +44,7 @@ public class TagController : ControllerBase
     {
         try
         {
-            return _notesRepository.GetAllNotes().Where(n => n.Tags?.Contains(name) ?? false);
+            return _notesRepository.GetAllNotes().Where(n => n.Tags?.Contains(name) ?? false && n.FlagCheck(AALKisShared.Enums.NoteFlags.Public));
         }
         catch(Exception exception)
         {

@@ -1,11 +1,28 @@
-﻿@model IEnumerable<AALKisShared.Records.Keyword>;
+@model IEnumerable<AALKisMVCUI.Models.KeywordViewModel>;
 
-<table>
-@foreach(AALKisShared.Records.Keyword keyword in Model)
-{
-    <tr>
-        <td style="padding: 5px;">@keyword.Name</td> 
-        <td><a href="/Editor/@keyword.Origin?.Id">@keyword.Origin?.Id</a></td>
-    </tr>
+@{
+    ViewData["Title"] = "My Keywords";
 }
+
+@section ExtraHead {
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/Keywords/Index.css">
+}
+
+<h1>Defined Keywords</h1>
+<table>
+    <thead>
+        <th><h4>Keyword</h4></th>
+        <th><h4>Origin Folder (#Id)</h4></th>
+        <th><h4>Origin Note (#Id)</h4></th>
+    </thead>
+    <tbody>
+    @foreach(var keyword in Model)
+    {
+        <tr>
+            <td>@(keyword.Name)</td> 
+            <td><a href="/MyNotes#folder_@(keyword.FolderId)">@(keyword.FolderName) (#@(keyword.FolderId))</a></td>
+            <td><a href="/Editor/@(keyword.NoteId)#keyword_@(keyword.Name)">@(keyword.NoteTitle) (#@(keyword.NoteId))</a></td>
+        </tr>
+    }
+    </tbody>
 </table>

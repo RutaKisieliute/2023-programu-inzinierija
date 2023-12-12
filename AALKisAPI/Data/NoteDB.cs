@@ -9,11 +9,14 @@ public partial class NoteDB : DbContext
     private readonly string _dbConnection;
 
     private readonly MySqlServerVersion _serverVersion;
+
+    private readonly LoggerInterceptor _loggerInterceptor;
     
     public NoteDB(ConnectionString connectionString)
     {
         _dbConnection = connectionString.Value!;
         _serverVersion = new MySqlServerVersion(new Version(5, 5, 62));
+        _loggerInterceptor = new LoggerInterceptor("./Logs");
     }
 
     public NoteDB(DbContextOptions<NoteDB> options, ConnectionString connectionString)
@@ -21,6 +24,7 @@ public partial class NoteDB : DbContext
     {
         _dbConnection = connectionString.Value!;
         _serverVersion = new MySqlServerVersion(new Version(5, 5, 62));
+        _loggerInterceptor = new LoggerInterceptor("./Logs");
     }
 
     public virtual DbSet<Folder> Folders { get; set; }
@@ -32,7 +36,7 @@ public partial class NoteDB : DbContext
     public virtual DbSet<Tag> Tags { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(_dbConnection, _serverVersion);
+        => optionsBuilder.UseMySql(_dbConnection, _serverVersion).AddInterceptors(_loggerInterceptor);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

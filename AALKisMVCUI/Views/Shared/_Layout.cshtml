@@ -14,6 +14,8 @@
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home">Edu Notes</a>
+                <a class="nav-link text-white" asp-area="" asp-controller="Keywords" asp-action="Index">Keywords</a>
+                <a class="nav-link text-white" asp-area="" asp-controller="Tags" asp-action="Index">Tags</a>
                 <div class="search-bar">
                     <img src="~/svg/icon_search.svg" class="search-bar-icon" />
                     <form asp-controller="Search" asp-action="Index" method="get">

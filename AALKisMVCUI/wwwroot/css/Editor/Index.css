@@ -104,3 +104,15 @@ ul,ol {
     line-height: 1em;
     margin: 0.5em;
 }
+
+#tags-textarea[contenteditable]{
+    display: inline;
+    min-inline-size: 120px;
+    width: 200px;
+}
+
+#tags-textarea[contenteditable]:empty::before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    display: inline-block;
+}

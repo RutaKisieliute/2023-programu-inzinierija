@@ -2,4 +2,8 @@
 EXEC_DIR=$(dirname $(realpath $0))
 cd $EXEC_DIR
 
-dotnet test --collect:"XPlat Code Coverage" --settings:./TestSettings.runsettings
+cd UnitTests/
+dotnet test --collect:"XPlat Code Coverage" --settings:../TestSettings.runsettings
+
+cd ../IntegrationTests/
+dotnet test --collect:"XPlat Code Coverage" --settings:../TestSettings.runsettings

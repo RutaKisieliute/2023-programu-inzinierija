@@ -29,6 +29,21 @@ public class NoteController : ControllerBase
         _notesRepository.NoteCreated += NoteCreationLog;
     }
 
+    [HttpGet("/Note")]
+    public async Task<IEnumerable<Note>> GetAll()
+    {
+        try
+        {
+            return _notesRepository.GetAllNotes();
+        }
+        catch(Exception exception)
+        {
+            _logger.LogError(exception.ToString());
+            Response.StatusCode = StatusCodes.Status400BadRequest;
+        }
+        return null;
+    }
+    
     [HttpGet("{id}")]
     public async Task<Note?> Get(int id)
     {
@@ -99,7 +114,8 @@ public class NoteController : ControllerBase
             record.Update(
                     flags: record.Flags ^ fieldsToUpdate.Flags,
                     title: fieldsToUpdate.Title,
-                    content: fieldsToUpdate.Content);
+                    content: fieldsToUpdate.Content,
+                    tags: fieldsToUpdate.Tags);
 
             record.EditDate = DateTime.Now;
             _notesRepository.UpdateNote(record);
@@ -133,7 +149,7 @@ public class NoteController : ControllerBase
     [NonAction]
     public void NoteCreationLog(object sender, Note note)
     {
-        _logger.LogDebug("!!!!!!!!!!!!!!!!!!Successfully created new note: " + note.ToString());
+        _logger.LogDebug("Successfully created new note: " + note.ToString());
     }
 
     [HttpGet("[action]/{query}")]

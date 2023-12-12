@@ -5,6 +5,7 @@ using AALKisShared.Exceptions;
 using AALKisShared.Utility;
 using System.Text;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -94,11 +95,20 @@ public class EditorController : Controller
                 _logger.LogDebug($"Found keyword {keyword}");
             }
 
-            string jsonString = fieldsToUpdate.ToJsonString();
+            string noteJsonString = fieldsToUpdate.ToJsonString();
+            string keywordJsonString = JsonConvert.SerializeObject(keywords.ToList());
 
-            await _client.Fetch($"Note/{id}",
+            var noteResponse = await _client.Fetch($"Note/{id}",
                     HttpMethod.Put,
-                    new StringContent(jsonString, Encoding.UTF8, "application/json"));
+                    new StringContent(noteJsonString, Encoding.UTF8, "application/json"));
+
+            noteResponse.EnsureSuccessStatusCode();
+
+            var keywordResponse = await _client.Fetch($"Keyword/{id}",
+                    HttpMethod.Patch,
+                    new StringContent(keywordJsonString, Encoding.UTF8, "application/json"));
+
+            keywordResponse.EnsureSuccessStatusCode();
 
             if(fieldsToUpdate.Title != null)
             {

@@ -1,0 +1,64 @@
+@model List<Folder<Note>>
+
+@section ExtraHead{
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
+}
+
+<button id="create-folder-btn" class="btn btn-secondary">Create New Folder</button>
+
+<dialog id="create-folder-dialog" class="dialog">
+    <h6 for="exampleInputEmail1">Folder name</h6>
+    
+    <input maxlength="20" id="exampleInputEmail1" type="text" class="form-control" placeholder="Enter folder name">
+    <br />
+    <button type="submit" class="btn btn-secondary">Create</button>
+   
+</dialog>
+
+@foreach(Folder<Note> folder in Model)
+{
+
+    <div class="folder" data-folder-id="@folder.Id">
+        <p class="folder-name">@folder.Name</p>
+        <div class="scroller snaps-inline">
+
+            <div class="scroller-element create-element">
+                <p class="title create-text prevent-select">Create note</p>
+                <div class="bar"></div>
+                <div class="bar" style="rotate: 90deg;"></div>
+            </div>
+
+            @foreach(Note note in folder.Records)
+            {
+                
+                <div class="scroller-element" data-note-id="@note.Id">
+                    <svg tabIndex="0" data-bs-toggle="popover" class="overflow-btn" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             viewBox="0 0 110 137.5" style="enable-background:new 0 0 110 137.5;" xml:space="preserve" fill="#ffff00">
+                            <circle cx="55" cy="34" r="12" />
+                            <circle cx="55" cy="67" r="12" />
+                            <circle cx="55" cy="100" r="12" />
+                    </svg>
+                    
+                    <a href="/Editor/@note.Id">
+                        <p class="title prevent-select">@note.Title</p>
+                        <div class="paragraph prevent-select">@note.Content</div>
+                        <div class="fader"></div>
+                    </a>
+                    
+                </div>
+                
+
+            }
+
+
+        </div>
+
+    </div>
+
+}
+
+
+@section Scripts{
+    <script src="~/js/Archived/Index.js"></script>
+}
+
