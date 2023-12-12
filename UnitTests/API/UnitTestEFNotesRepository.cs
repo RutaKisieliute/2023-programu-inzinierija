@@ -11,7 +11,6 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     public UnitTestEFNotesRepository(TestNoteDBFixture noteDb)
     {
         NoteDb = noteDb;
-        using ILoggerFactory factory = LoggerFactory.Create(builder => builder.AddConsole());
     }
 
     [Theory]
@@ -34,7 +33,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     public void CheckIfNoteExists_CorrectBool(int noteId, bool expectedResult)
     {
         using var context = NoteDb.CreateContext();
-        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context, logger));
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context));
 
         var result = notesRepository.CheckIfNoteExists(noteId);
 
@@ -49,7 +48,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context, logger));
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context));
 
         int? result = null;
         try
@@ -81,7 +80,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context, logger));
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context));
 
         notesRepository.DeleteNote(noteId);
 
@@ -97,7 +96,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context, logger));
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context));
 
         Note record = notesRepository.GetNote(noteId, false);
         record.Update(content: newContent);
@@ -117,7 +116,7 @@ public class UnitTestEFNotesRepository : IClassFixture<TestNoteDBFixture>
     {
         using var context = NoteDb.CreateContext();
         context.Database.BeginTransaction();
-        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context, logger));
+        var notesRepository = new EFNotesRepository(context, new EFTagsRepository(context), new EFKeywordsRepository(context));
 
         List<Note> records = notesRepository.SearchNotes(searchQuery).ToList();
 

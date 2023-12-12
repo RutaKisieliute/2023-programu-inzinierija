@@ -9,8 +9,7 @@ namespace AALKisAPI.Services;
 public class EFKeywordsRepository : IKeywordsRepository
 {
     private readonly NoteDB _database;    
-    public EFKeywordsRepository(NoteDB database,
-            ILogger<EFKeywordsRepository> logger)
+    public EFKeywordsRepository(NoteDB database)
     {
         _database = database;
     }
