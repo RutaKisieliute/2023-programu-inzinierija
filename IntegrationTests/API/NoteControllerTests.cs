@@ -1,8 +1,10 @@
 using System.Text;
 using AALKisAPI.Models;
 using AALKisShared.Utility;
+using AALKisShared.Records;
 using AALKisMVCUI.Utility;
 using Xunit;
+using Newtonsoft.Json;
 
 namespace IntegrationTests.API;
 
@@ -20,7 +22,11 @@ public class NoteControllerTests : IClassFixture<AppFactory<AALKisAPI.Program>>
     [Fact]
     public async Task Post_CreateNote_ReturnsOkResult()
     {
-        var response = await _client.Fetch($"/Note/Create/{1}/TestNoteName", HttpMethod.Post);
+        var note = new AALKisShared.Records.Note{ Title = "Title", Content = "content"};
+        string json = JsonConvert.SerializeObject(note);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        var response = await _client.Fetch($"/Note/Create/{1}", HttpMethod.Post, content);
 
         response.EnsureSuccessStatusCode();
     }

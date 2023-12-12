@@ -69,17 +69,17 @@ public class NoteController : ControllerBase
         return new StatusCodeResult(StatusCodes.Status204NoContent);
     }
 
-    [HttpPost("[action]/{folderId}/{noteTitle}")]
-    public async Task<int?> Create(int folderId, string noteTitle)
+    [HttpPost("[action]/{folderId}")]
+    public async Task<int?> Create(int folderId, [FromBody] Note contents)
     {
         int? id = null;
         try
         {
-            id = _notesRepository.CreateNote(folderId, noteTitle);
+            id = _notesRepository.CreateNote(folderId, contents.Title, contents.Content);
         }
         catch(Exception exception)
         {
-            _logger.LogError($"Failed to create note {noteTitle} in folder {folderId}: "
+            _logger.LogError($"Failed to create note in folder {folderId}: "
                     + exception.ToString());
         }
         return id;
