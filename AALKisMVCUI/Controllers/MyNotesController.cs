@@ -4,8 +4,6 @@ using AALKisMVCUI.Utility;
 using AALKisShared.Records;
 using AALKisShared.Enums;
 using System.Text;
-using Newtonsoft.Json.Linq;
-using System.Text.Json.Nodes;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -75,10 +73,10 @@ public class MyNotesController : Controller
         try
         {
             string targetUri = "/Folder/" + folderName;
-            var response = await _client
-                    .Fetch(targetUri, HttpMethod.Post)
+            var folderId = await _client
+                    .Fetch<int?>(targetUri, HttpMethod.Post)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
-            return Ok();
+            return Ok(new {id = folderId});
         }
         catch (Exception ex)
         {
