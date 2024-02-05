@@ -1,0 +1,125 @@
+@model List<Folder<Note>>
+
+@section ExtraHead{
+    <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
+}
+
+<button id="create-folder-btn" class="btn btn-secondary">Create New Folder</button>
+<a id="archived-btn" href="/Archived" class="btn btn-secondary">Archived Notes</a>
+<button id="export-notes-btn" class="btn btn-secondary">Export Notes</button>
+<button id="import-notes-btn" class="btn btn-secondary">Import Notes</button>
+
+
+<dialog id="import-notes-dialog" class="dialog">
+    <h5>Import notes</h5>
+    <div id="drop-area" ondragover="allowDrop(event);" ondragleave="leaveDropZone(event);" ondrop="drop(event);" >
+        Drag and Drop
+        <br />
+        File or Folder here
+    </div>
+    <div id="import-file-container" hidden>
+        <p>Select folder for "<span id="import-file-note-name">Note name</span>" note:</p>
+        <select id="import-note-folder-selector" class="form-control">
+            <option value="" selected disabled>-</option>
+            <option value="option1">Option 1</option>
+            <option value="option2">Option 2</option>
+            <option value="option3">Option 3</option>
+        </select>
+        <br />
+        <button id="import-notes-dialog-btn-file" class="btn btn-secondary">Import</button>
+    </div>
+    <div id="import-folder-container" hidden>
+        <fieldset class="folder-branch">
+
+        </fieldset>
+        <br />
+        <button id="import-notes-dialog-btn-folder" class="btn btn-secondary">Import</button>
+    </div>
+</dialog>
+
+<dialog id="export-notes-dialog" class="dialog">
+    <p>Select notes to export:</p>
+    @foreach (Folder<Note> folder in Model)
+    {
+        <fieldset class="folder-branch">
+            <input id="folder-@folder.Id" type="checkbox" checked data-folder-id="@folder.Id">
+            <label class="branch-label" for="folder-@folder.Id">@folder.Name</label>
+            
+            @foreach (Note note in folder.Records)
+            {
+                <div id="note-branch-folder-@folder.Id" class="note-branch">
+                    <input id="note-@note.Id" type="checkbox" checked data-parent-folder-id="@folder.Id" data-note-id="@note.Id">
+                    <label class="branch-label" for="note-@note.Id">@note.Title</label>
+                </div>
+            }
+
+        </fieldset>
+    }
+    <br />
+    <button id="export-notes-dialog-btn" class="btn btn-secondary">Export</button>
+</dialog>
+
+<dialog id="create-folder-dialog" class="dialog">
+    <h6 for="folderNameInput">Folder name</h6>
+    
+    <input maxlength="20" id="folderNameInput" type="text" class="form-control" placeholder="Enter folder name">
+    <br />
+    <button type="submit" class="btn btn-secondary">Create</button>
+   
+</dialog>
+
+<dialog id="move-note-to-folder-dialog" class="dialog">
+    <h6 for="folder-selector"></h6>
+
+    <select id="folder-selector" class="form-control">
+        <option value="" selected disabled>Select folder</option>
+        <option value="option1">Option 1</option>
+        <option value="option2">Option 2</option>
+        <option value="option3">Option 3</option>
+    </select>
+
+    <br />
+    <button type="submit" class="btn btn-secondary">Move</button>
+
+</dialog>
+
+@foreach(Folder<Note> folder in Model)
+{
+
+    <div class="folder" id="folder_@(folder.Id)" data-folder-id="@folder.Id">
+        <p class="folder-name">@folder.Name</p>
+        <div class="scroller snaps-inline">
+
+            <div class="scroller-element create-element">
+                <p class="title create-text prevent-select">Create note</p>
+                <div class="bar"></div>
+                <div class="bar" style="rotate: 90deg;"></div>
+            </div>
+
+            @foreach(Note note in folder.Records)
+            {   
+                <div class="scroller-element" data-note-id="@note.Id">
+                    <svg tabIndex="0" data-bs-toggle="popover" class="overflow-btn" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                             viewBox="0 0 110 137.5" style="enable-background:new 0 0 110 137.5;" xml:space="preserve" fill="#ffff00">
+                            <circle cx="55" cy="34" r="12" />
+                            <circle cx="55" cy="67" r="12" />
+                            <circle cx="55" cy="100" r="12" />
+                    </svg>
+                    <a href="/Editor/@note.Id">
+                        <p class="title prevent-select">@Html.Raw(@note.Title)</p>
+                        <div class="paragraph prevent-select">@Html.Raw(@note.Content)</div>
+                        <div class="fader"></div>
+                    </a>
+                </div>
+            }
+        </div>
+
+    </div>
+
+}
+
+@section Scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
+    <script src="~/js/MyNotes/Index.js"></script>
+}
+

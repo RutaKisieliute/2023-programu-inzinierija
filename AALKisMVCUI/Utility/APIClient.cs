@@ -16,7 +16,7 @@ public class APIClient
         return;
     }
 
-    public async Task<string?> Fetch(string uri, HttpMethod method, HttpContent? content = null)
+    public async Task<HttpResponseMessage> Fetch(string uri, HttpMethod method, HttpContent? content = null)
     {
         HttpRequestMessage request = new HttpRequestMessage(method, uri) { Content = content };
         HttpResponseMessage response = await Client.SendAsync(request);
@@ -26,17 +26,23 @@ public class APIClient
                     + $" to {uri} with {method} {content}",
                     (int)response.StatusCode);
         }
-        if(response == null || response.Content.Headers.ContentLength == 0)
-        {
-            return null;
-        }
-        return await response.Content.ReadAsStringAsync();
+        return response;
+        //if(response == null || response.Content.Headers.ContentLength == 0)
+        //{
+        //    return null;
+        //}
+        //return await response.Content.ReadAsStringAsync();
     }
 
     public async Task<T?> Fetch<T>(string uri, HttpMethod method, HttpContent? content = null)
     {
-        string? json = await Fetch(uri, method, content);
-        return JsonConvert.DeserializeObject<T>(json
-                ?? throw new JsonException("Attempted to deserialize a null string"));
+        var response = await Fetch(uri, method, content);
+        string json = await response.Content.ReadAsStringAsync();
+        return JsonConvert.DeserializeObject<T>(json);
     }
+
+    //public async Task<T?> Fetch<Http>(string uri, HttpMethod method, HttpContent? content = null)
+    //{
+    //    return default(T);
+    //}
 }

@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Utility;
-using AALKisMVCUI.Models;
-using AALKisShared;
+using AALKisShared.Records;
+using AALKisShared.Exceptions;
+using AALKisShared.Utility;
+using System.Text;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
-using System.Text.Json;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -13,31 +15,34 @@ public class EditorController : Controller
     private readonly ILogger<EditorController> _logger;
     private readonly APIClient _client;
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public EditorController(ILogger<EditorController> logger, APIClient client)
     {
         _logger = logger;
         _client = client;
     }
 
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public IActionResult Index()
     {
         return Redirect("Home/Error");
     }
 
-    [HttpGet("{category}/{note}")]
-    public async Task<IActionResult> Index(string category, string note)
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> Index(int id)
     {
         try
         {
-            bool exists = await _client.Fetch<bool>($"NoteCatalog/Exists/{category}/{note}",
-                    HttpMethod.Get);
+            var response = await _client.Fetch($"Note/{id}",
+                    HttpMethod.Head);
 
-            if(!exists)
+            if(!response.IsSuccessStatusCode)
             {
-                throw new Exception($"{note} in {category} does not exist, yet attempted to open it");
+                throw new NoteException($"Note with {id} does not exist, yet attempted to open it");
             }
 
-            return View(await GetNoteRecord(category, note));
+            return View(await GetNote(id));
         }
         catch(HttpRequestException e)
         {
@@ -51,14 +56,14 @@ public class EditorController : Controller
         return BadRequest();
     }
 
-    [HttpGet("[action]/{category}/{note}")]
-    public async Task<NoteRecord?> GetNoteRecord(string category, string note)
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [HttpGet("[action]/{id}")]
+    public async Task<Note?> GetNote(int id)
     {
         try
         {
-            var record = await _client.Fetch<NoteRecord>($"NoteCatalog/Get/{category}/{note}",
+            var record = await _client.Fetch<Note>($"Note/{id}",
                     HttpMethod.Get);
-            record.Title = note;
 
             return record;
         }
@@ -66,44 +71,109 @@ public class EditorController : Controller
         {
             Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            _logger.LogError($"Failed to get {category}/{note} NoteRecord;\n"
+            _logger.LogError($"Failed to get {id} Note;\n"
                     + e.ToString());
         }
         return null;
     }
 
-    [HttpPost("[action]/{category}/{note}")]
-    public async Task<IActionResult> PostNoteRecord(string category, string note, [FromBody] JsonElement body)
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [HttpPost("[action]/{id}")]
+    public async Task<IActionResult> PostNote(int id)
     {
+        IActionResult result = Ok();
         try
         {
-            var record = await GetNoteRecord(category, note)
-                ?? throw new HttpRequestException("Failed to get the note record.");
-            record.Content = body.GetProperty("text").GetString()
-                ?? throw new BadHttpRequestException("Got an empty text property");
+            string body = await new StreamReader(Request.Body).ReadToEndAsync();
 
-            record.Content = record.Content.Replace("<br>", "\n");
-            record.Content = System.Web.HttpUtility.HtmlEncode(record.Content)
-                .Replace("&amp;", "&")
-                .Replace("\n", "<br>");
+            Note fieldsToUpdate = CreateValidatedNote(body);
+            fieldsToUpdate.Id = id;
 
-            await _client.Fetch($"NoteCatalog/Put/{category}/{note}",
+            HashSet<Keyword> keywords = GetKeywordsFromString(fieldsToUpdate.Content);
+            foreach(Keyword keyword in keywords)
+            {
+                _logger.LogDebug($"Found keyword {keyword}");
+            }
+
+            string noteJsonString = fieldsToUpdate.ToJsonString();
+            string keywordJsonString = JsonConvert.SerializeObject(keywords.ToList());
+
+            var noteResponse = await _client.Fetch($"Note/{id}",
                     HttpMethod.Put,
-                    new StringContent(record.ToJsonString()));
+                    new StringContent(noteJsonString, Encoding.UTF8, "application/json"));
+
+            noteResponse.EnsureSuccessStatusCode();
+
+            var keywordResponse = await _client.Fetch($"Keyword/{id}",
+                    HttpMethod.Patch,
+                    new StringContent(keywordJsonString, Encoding.UTF8, "application/json"));
+
+            keywordResponse.EnsureSuccessStatusCode();
+
+            if(fieldsToUpdate.Title != null)
+            {
+                result = Content(fieldsToUpdate.Title);
+            }
         }
-        catch(HttpRequestException e)
+        catch(HttpRequestException exception)
         {
-            _logger.LogError(e.ToString());
+            _logger.LogError(exception.ToString());
             return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
-        catch(Exception e)
+        catch(Exception exception)
         {
-            _logger.LogError($"Failed to post {category}/{note} NoteRecord;\n"
-                    + e.ToString());
+            _logger.LogError($"Failed to post {id} Note;\n"
+                    + exception.ToString());
 
             return BadRequest();
         }
 
-        return Ok();
+        return result;
+    }
+
+    public static Note CreateValidatedNote(string json)
+    {
+        Note validatedNote = new Note();
+        validatedNote.SetFromJsonString(json);
+
+        if(validatedNote.Title != null)
+        {
+            if(!validatedNote.IsTitleValid())
+            {
+                throw new NoteException(validatedNote,
+                        $"Invalid title \"{validatedNote.Title}\" while validating note");
+            }
+            validatedNote.Title = System.Web.HttpUtility
+                .HtmlEncode(validatedNote.Title)
+                .Replace("&amp;", "&");
+        }
+
+        if(validatedNote.Content != null)
+        {
+            if(!validatedNote.IsContentValid())
+            {
+                throw new NoteException(validatedNote,
+                        $"Invalid content while validating note");
+            }
+            validatedNote.Content = System.Web.HttpUtility
+                .HtmlEncode(validatedNote.Content)
+                .Replace("&amp;", "&");
+        }
+
+        return validatedNote;
+    }
+
+    public static HashSet<Keyword> GetKeywordsFromString(string? content)
+    {
+        HashSet<Keyword> result = new HashSet<Keyword>();
+        if(content != null)
+        {
+            var regex = new Regex(@"\$([A-z]+)", RegexOptions.IgnoreCase);
+            foreach(Match match in regex.Matches(content))
+            {
+                result.Add(new Keyword{Name = match.Groups[1].Value.ToLower()});
+            }
+        }
+        return result;
     }
 }

@@ -1,32 +1,72 @@
+using AALKisAPI.Data;
+using AALKisAPI.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+
 namespace AALKisAPI;
 
-public static class Program
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public class Program
 {
+    public static readonly string LogFileName = "./AALKisAPI.log";
     public static void Main(string[] args)
     {
-        var builder = WebApplication.CreateBuilder(args);
+        CreateHostBuilder(args).Build().Run();
+    }
 
-        // Add services to the container.
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Program>();
+                webBuilder.UseEnvironment("Development");
+            });
 
-        builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+    public Program(IWebHostEnvironment env)
+    {
+        CurrentEnvironment = env;
+    }
 
-        var app = builder.Build();
+    private IWebHostEnvironment CurrentEnvironment { get; set; }
 
-        // Configure the HTTP request pipeline.
-#if DEBUG
-        app.UseSwagger();
-        app.UseSwaggerUI();
-#endif
+    public void ConfigureServices(IServiceCollection services)
+    {
+        
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
 
+        if(CurrentEnvironment.EnvironmentName != "Integration Test")
+        {
+            var _dbConnection = new ConnectionString { Value = File.ReadAllText("./Services/databaselogin.txt") };
+            services.AddSingleton<SaveChangesInterceptor>(i => new LoggerInterceptor("./Logs"));
+            //services.AddScoped<LoggerInterceptor>();
+            services.AddSingleton(_dbConnection);
+            services.AddDbContext<NoteDB>();
+        }
+        else services.AddSingleton<SaveChangesInterceptor>(i => new TestLoggerInterceptor());
+
+        services.AddScoped<IFoldersRepository, EFFoldersRepository>();
+        services.AddScoped<INotesRepository, EFNotesRepository>();
+        services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
+        services.AddScoped<ITagsRepository, EFTagsRepository>();
+        services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
         app.UseHttpsRedirection();
-
+        app.UseRouting();
         app.UseAuthorization();
 
-        app.MapControllers();
-
-        app.Run();
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }

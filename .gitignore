@@ -1,5 +1,10 @@
 # Ignore build artifacts
 */obj/*
 */build/*
+*/bin/*
+*.log
 .vs/
-AALKisAPI/Utility/databaselogin.txt
+AALKisAPI/Services/databaselogin.txt
+AALKisAPI/Services/testdatabaselogin.txt
+*/TestResults/*
+*/Logs/*

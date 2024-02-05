@@ -2,15 +2,19 @@ using AALKisMVCUI.Utility;
 
 namespace AALKisMVCUI;
 
-public static class Program
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+public class Program
 {
+    public static readonly string LogFileName = "./AALKisMVCUI.log";
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-        builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+        builder.Services.AddControllersWithViews();
         builder.Services.AddHttpClient<APIClient>();
+        builder.Services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
+
 
         var app = builder.Build();
 
@@ -32,6 +36,9 @@ public static class Program
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
+        app.UseFallbackRedirection(target: "/");
+
         app.Run();
     }
+
 }

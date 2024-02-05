@@ -1,0 +1,118 @@
+.editor-container {
+    min-height: 100%;
+    padding-bottom: var(--footer-line-height);
+}
+
+[contenteditable] {
+    outline: 0px solid transparent;
+}
+
+div.keyword {
+    display: inline;
+    text-shadow: 1px 1px 0 #212529c0;
+}
+
+.textarea {
+    display: inline;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+    resize: none;
+
+    min-height: 1em;
+
+    font-family: inherit;
+    font-size: inherit;
+
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    padding: 4px;
+}
+
+.textarea:hover {
+    border-color: #888;
+    border-width: 1px;
+    outline: 1px solid #888;
+    padding: 4px;
+}
+
+.textarea[contenteditable="true"]:focus {
+    outline: 1px solid #222;
+    border: 1px solid #222;
+    padding: 4px;
+}
+
+#editor-textarea {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    flex: 1 1 auto;
+}
+
+#editor-textarea * {
+    display: inline-block;
+}
+
+ul p {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+ol p {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+ul,ol {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+#editor-textarea li {
+    line-height: 0.75em;
+    display: list-item;
+}
+
+#editor-textarea:empty::before {
+    content: "Double click me to begin writing!";
+    color: #aaa;
+}
+
+#editor-textarea[contenteditable="true"]:empty::before
+{
+    content: "You can write in here!";
+    color: #666;
+}
+
+#title-textarea:empty::before {
+    content: "Give this note a name!";
+    color: #aaa;
+}
+
+#editor-status {
+    min-height: 1em;
+    line-height: 1em;
+    margin: 0.5em;
+}
+
+#tags-textarea[contenteditable]{
+    display: inline;
+    min-inline-size: 120px;
+    width: 200px;
+}
+
+#tags-textarea[contenteditable]:empty::before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    display: inline-block;
+}

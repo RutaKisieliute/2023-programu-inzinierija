@@ -1,0 +1,26 @@
+.link {
+    color: white;
+    text-decoration: inherit;
+}
+
+table {
+    width: 100%;
+}
+
+tr {
+    border-bottom: 1px solid #ddd;
+}
+
+tr:hover {
+    background-color: #999;
+}
+
+.col1 {
+    padding: 5px;
+    text-align: left;
+}
+
+.col2 {
+    padding: 5px;
+    text-align: right;
+}

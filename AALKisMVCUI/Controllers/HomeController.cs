@@ -4,6 +4,7 @@ using AALKisMVCUI.Models;
 
 namespace AALKisMVCUI.Controllers;
 
+[System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
@@ -15,7 +16,7 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        return Redirect("/MyNotes/");
     }
 
     public IActionResult Privacy()
