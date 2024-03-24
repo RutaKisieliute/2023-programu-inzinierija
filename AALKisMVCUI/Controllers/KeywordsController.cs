@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Models;
 using AALKisMVCUI.Utility;
 using AALKisShared.Records;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -13,11 +15,13 @@ public class KeywordsController : Controller
     private readonly ILogger<KeywordsController> _logger;
 
     private readonly APIClient _client;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public KeywordsController(ILogger<KeywordsController> logger, APIClient client)
+    public KeywordsController(ILogger<KeywordsController> logger, APIClient client, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
         _client = client;
+        _contextAccessor = contextAccessor;
     }
 
     [HttpGet]
@@ -25,12 +29,16 @@ public class KeywordsController : Controller
     {
         try
         {
+            int user_id = _contextAccessor.HttpContext.Session.GetInt32("Id") ?? default;
+            string json = JsonConvert.SerializeObject(user_id);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             IEnumerable<Keyword> keywords = await _client.Fetch<IEnumerable<Keyword>>("/Keyword",
-                    HttpMethod.Get)
+                    HttpMethod.Get, content)
                 ?? throw new Exception("Could not fetch keywords from API");
 
             IEnumerable<Folder<Note>> folders = await _client.Fetch<IEnumerable<Folder<Note>>>("/Folder?getContents=false",
-                    HttpMethod.Get)
+                    HttpMethod.Get, content)
                 ?? throw new Exception("Could not fetch folder names from API");
 
             var viewModels = keywords.Select(keyword => {

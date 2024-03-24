@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,6 +16,7 @@ public partial class Note
     public string? Content { get; set; }
 
     public int? FolderId { get; set; }
+    public int? UserId { get; set; }
 
     public DateTime Modified { get; set; }
 

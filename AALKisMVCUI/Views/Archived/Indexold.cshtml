@@ -1,4 +1,12 @@
+@inject IHttpContextAccessor context
 @model List<Folder<Note>>
+
+@{
+    if (context.HttpContext.Session.GetString("User") == null)
+    {
+        context.HttpContext.Response.Redirect("/User/login");
+    }
+}
 
 @section ExtraHead{
     <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">

@@ -14,9 +14,9 @@ public class EFKeywordsRepository : IKeywordsRepository
         _database = database;
     }
 
-    public IEnumerable<Keyword> GetAllKeywords()
+    public IEnumerable<Keyword> GetAllKeywords(int userId)
     {
-        var notes = _database.Notes.ToList();
+        var notes = _database.Notes.Where(u => u.UserId == userId).ToList();
 
         var list1 = _database.Keywords.AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();

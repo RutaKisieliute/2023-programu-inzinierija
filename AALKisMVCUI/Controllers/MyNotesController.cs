@@ -12,19 +12,25 @@ public class MyNotesController : Controller
 {
     private readonly ILogger<MyNotesController> _logger;
     private readonly APIClient _client;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public MyNotesController(ILogger<MyNotesController> logger, APIClient client)
+    public MyNotesController(ILogger<MyNotesController> logger, APIClient client, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
         _client = client;
+        _contextAccessor = contextAccessor;
     }
 
     public async Task<IActionResult> Index()
     {
         string targetUri = "/Folder";
+        int user_id = _contextAccessor.HttpContext.Session.GetInt32("Id") ?? default;
+        string json = JsonConvert.SerializeObject(user_id);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
 
         var folders = await _client
-            .Fetch<List<Folder<Note>>>(targetUri, HttpMethod.Get)
+            .Fetch<List<Folder<Note>>>(targetUri, HttpMethod.Get, content)
             ?? throw new JsonException($"Got empty response from {targetUri}");
         folders.Sort();
         // Order by access date descending.
@@ -46,6 +52,9 @@ public class MyNotesController : Controller
             if (contents == null)
                 return BadRequest("Invalid JSON data");
 
+            int user_id = _contextAccessor.HttpContext.Session.GetInt32("Id") ?? default;
+
+            contents.UserId = user_id;
             string json = JsonConvert.SerializeObject(contents);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -72,9 +81,13 @@ public class MyNotesController : Controller
     {
         try
         {
+            int user_id = _contextAccessor.HttpContext.Session.GetInt32("Id") ?? default;
+            string json = JsonConvert.SerializeObject(user_id);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
             string targetUri = "/Folder/" + folderName;
             var folderId = await _client
-                    .Fetch<int?>(targetUri, HttpMethod.Post)
+                    .Fetch<int?>(targetUri, HttpMethod.Post, content)
                     ?? throw new JsonException($"Got empty response from {targetUri}");
             return Ok(new {id = folderId});
         }

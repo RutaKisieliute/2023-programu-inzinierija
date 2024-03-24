@@ -29,11 +29,11 @@ public class KeywordController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Keyword>?> GetAllKeywords()
+    public async Task<IEnumerable<Keyword>?> GetAllKeywords([FromBody] int userId)
     {
         try
         {
-            return _keywordsRepository.GetAllKeywords();
+            return _keywordsRepository.GetAllKeywords(userId);
         }
         catch(Exception exception)
         {

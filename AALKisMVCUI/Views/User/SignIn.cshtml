@@ -1,0 +1,97 @@
+@inject IHttpContextAccessor context
+@model Users
+@{
+    ViewData["Title"] = "SignIn";
+    if (context.HttpContext.Session.GetString("User") != null)
+    {
+        context.HttpContext.Response.Redirect("/MyNotes");
+    }
+}
+
+<p></p>
+<div style="float:right">
+    <input type="submit" onclick="location.href='@Url.Action("LogIn","User")'" value="Back to Log in" class="btn btn-primary" />
+</div>
+<h1>Sign In</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="User" asp-action="SignIn">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">Name</label><br />
+                <input id="name" name="name" type="text" value="" /><br />
+                <label asp-for="Password" class="control-label">Password</label><br />
+                <input id="Password" name="Password" type="password" value="" /><br />
+                <label asp-for="PasswordCheck" class="control-label">Repeat password</label><br />
+                <input id="PasswordCheck" name="PasswordCheck" type="password" value="" /><br />
+                <label asp-for="Email" class="control-label">Email</label><br />
+                <input id="email" name="email" type="text" value="" /><br />
+            </div>
+            <p></p>
+            <div class="form-group">
+                <input type="submit" onclick="JavascriptFunction()" value="Sign in" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Success Message Modal -->
+<div class="modal fade" id="myModalSuccess" tabindex="-1" role="dialog" aria-labelledby="myModalSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #66BB6A; color: black;">
+                <h5 class="modal-title" id="myModalSuccessLabel">Success!</h5>
+            </div>
+            <div class="modal-body">
+                <div id="MyModalSuccessAlertBody"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Message Modal -->
+<div class="modal fade" id="myModalError" tabindex="-1" role="dialog" aria-labelledby="myModalErrorLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #ff6b6b; color: black;">
+                <h5 class="modal-title" id="myModalErrorLabel">Oops...</h5>
+            </div>
+            <div class="modal-body">
+                <div id="MyModalErrorAlertBody"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+<script type="text/javascript">
+    function openSuccessModal(strMessage) {
+        var myDiv = document.getElementById("MyModalSuccessAlertBody");
+        myDiv.innerHTML = strMessage;
+        $('#myModalSuccess').modal('show');
+    }
+    $(document).ready(function () {
+        var msg = "@TempData["SuccessMessage"]";
+        if (msg)
+            openSuccessModal(msg);
+    });
+</script>
+
+<script type="text/javascript">
+    function openErrorModal(errorMessage) {
+        var errorDiv = document.getElementById("MyModalErrorAlertBody");
+        errorDiv.innerHTML = errorMessage;
+        $('#myModalError').modal('show');
+    }
+
+    $(document).ready(function () {
+        var errorMsg = "@TempData["ErrorMessage"]";
+        if (errorMsg)
+            openErrorModal(errorMsg);
+    });
+</script>
+
+
+ }
