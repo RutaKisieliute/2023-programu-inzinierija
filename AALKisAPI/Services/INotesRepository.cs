@@ -4,7 +4,7 @@ namespace AALKisAPI.Services;
 
 public interface INotesRepository
 {
-    public IEnumerable<Note> SearchNotes(string query);
+    public IEnumerable<Note> SearchNotes(string query, int userId);
 
     public IEnumerable<Note> GetAllNotes();
     

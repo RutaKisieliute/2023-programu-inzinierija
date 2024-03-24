@@ -19,32 +19,18 @@ public class APIClient
     public async Task<HttpResponseMessage> Fetch(string uri, HttpMethod method, HttpContent? content = null)
     {
 
-        Console.WriteLine($"URI: {uri}");
-        Console.WriteLine($"Method: {method}");
-        if (content != null)
-        {
-            Console.WriteLine($"Content: {await content.ReadAsStringAsync()}");
-        }
-        else
-        {
-            Console.WriteLine("Content is null");
-        }
 
 
         HttpRequestMessage request = new HttpRequestMessage(method, uri) { Content = content };
         HttpResponseMessage response = await Client.SendAsync(request);
-
-        Console.WriteLine($"Response status code: {response.StatusCode}");
-        Console.WriteLine($"Response content: {await response.Content.ReadAsStringAsync()}");
+;
 
         if (!response.IsSuccessStatusCode)
         {
-            Console.WriteLine($"Response throw status code: {response.StatusCode}");
             throw new BadHttpRequestException($"Failed to execute fetch"
                     + $" to {uri} with {method} {content}",
                     (int)response.StatusCode);
         }
-        Console.WriteLine($"Response send status code: {response.StatusCode}");
         return response;
         //if(response == null || response.Content.Headers.ContentLength == 0)
         //{

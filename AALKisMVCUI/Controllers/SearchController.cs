@@ -13,19 +13,26 @@ public class SearchController : Controller
 {
     private readonly ILogger<MyNotesController> _logger;
     private readonly APIClient _client;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public SearchController(ILogger<MyNotesController> logger, APIClient client)
+    public SearchController(ILogger<MyNotesController> logger, APIClient client, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
         _client = client;
+        _contextAccessor = contextAccessor;
     }
     [HttpGet]
     public async Task<IActionResult> Index([FromQuery] string q)
     {
+
         string targetUri = $"/Note/Search/{q}";
+        int user_id = _contextAccessor.HttpContext.Session.GetInt32("Id") ?? default;
+        string json = JsonConvert.SerializeObject(user_id);
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
+
 
         var notes = await _client
-            .Fetch<List<Note>>(targetUri, HttpMethod.Get)
+            .Fetch<List<Note>>(targetUri, HttpMethod.Get, content)
             ?? throw new JsonException($"Got empty response from {targetUri}");
 
         for (int i = 0; i < notes.Count; i++)
@@ -57,7 +64,6 @@ public class SearchController : Controller
             result.Insert(index + substring.Length + firstString.Length, secondString);
             index = index + substring.Length + firstString.Length + secondString.Length;
         }
-        Console.WriteLine(result);
         return result.ToString();
     }
 }

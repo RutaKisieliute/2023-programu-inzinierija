@@ -6,7 +6,7 @@ using AALKisShared.Records;
 
 using Microsoft.EntityFrameworkCore;
 
-using UsersEntity = AALKisAPI.Models.Users;
+using UsersEntity = AALKisAPI.Models.User;
 
 namespace AALKisAPI.Services
 {
@@ -32,12 +32,6 @@ namespace AALKisAPI.Services
             _database.SaveChanges();
 
             var users = _database.Users.ToList(); // Retrieve all users from the database
-            foreach (var usertest in users)
-            {
-                Console.WriteLine($"User ID: {usertest.Id}, Name: {usertest.Name}, Email: {usertest.Email}");
-                // Print other properties as needed
-            }
-
         }
 
         public bool IsSignedIn (string username, string password) 
@@ -63,11 +57,10 @@ namespace AALKisAPI.Services
 
         public bool IsNameTaken (string name)
         {
-            Console.WriteLine("takennnn");
             return _database.Users.Any(u => u.Name == name);
         }
 
-        public AALKisAPI.Models.Users GetUser (string name) 
+        public AALKisAPI.Models.User GetUser (string name) 
         {
             return _database.Users.FirstOrDefault(u => u.Name == name);
         }

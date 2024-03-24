@@ -7,7 +7,7 @@ namespace AALKisAPI.Services
         public bool IsValidName(string name);
         public bool IsValidEmail(string email);
         public bool IsNameTaken(string name);
-        public AALKisAPI.Models.Users GetUser(string name);
+        public AALKisAPI.Models.User GetUser(string name);
 
     }
 }

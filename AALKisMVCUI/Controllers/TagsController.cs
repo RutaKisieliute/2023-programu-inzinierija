@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using AALKisMVCUI.Models;
 using AALKisMVCUI.Utility;
 using AALKisShared.Records;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace AALKisMVCUI.Controllers;
 
@@ -10,11 +12,13 @@ public class TagsController : Controller
 {
     private readonly ILogger<TagsController> _logger;
     private readonly APIClient _client;
+    private readonly IHttpContextAccessor _contextAccessor;
 
-    public TagsController(ILogger<TagsController> logger, APIClient client)
+    public TagsController(ILogger<TagsController> logger, APIClient client, IHttpContextAccessor contextAccessor)
     {
         _logger = logger;
         _client = client;
+        _contextAccessor = contextAccessor;
     }
 
     [HttpGet("[Controller]")]
@@ -22,7 +26,11 @@ public class TagsController : Controller
     {
         try
         {
-            var tags = await _client.Fetch<List<Tag>>("/Tag", HttpMethod.Get) ?? throw new Exception("No tags returned");
+            int user_id = _contextAccessor.HttpContext.Session.GetInt32("Id") ?? default;
+            string json = JsonConvert.SerializeObject(user_id);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var tags = await _client.Fetch<List<Tag>>("/Tag", HttpMethod.Get, content) ?? throw new Exception("No tags returned");
             return View(tags);
         }
         catch(Exception e)

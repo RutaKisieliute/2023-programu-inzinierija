@@ -13,11 +13,11 @@ public class EFTagsRepository : ITagsRepository
         _database = database;
     }
     
-    public IEnumerable<Tag> GetAllTags()
+    public IEnumerable<Tag> GetAllTags(int userId)
     {
         var tagList = new List<Tag>();
         int index;
-        foreach(TagEntity tag in _database.Tags.ToList())
+        foreach(TagEntity tag in _database.Tags.Where(t => t.Note.UserId == userId).ToList())
         {
             if((index = tagList.FindIndex(t => t.Name == tag.Tag1)) != -1)
             {

@@ -1,5 +1,5 @@
 @inject IHttpContextAccessor context
-@model Users
+@model User
 @{
     ViewData["Title"] = "SignIn";
     if (context.HttpContext.Session.GetString("User") != null)

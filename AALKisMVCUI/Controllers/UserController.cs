@@ -35,7 +35,7 @@ namespace AALKisMVCUI.Controllers
         }
 
         [HttpPost("signin")]
-        public async Task<IActionResult> SignInAsync(Users user)
+        public async Task<IActionResult> SignInAsync(User user)
         {
             if (user == null)
             {
@@ -92,7 +92,7 @@ namespace AALKisMVCUI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LogInAsync(Users user)
+        public async Task<IActionResult> LogInAsync(User user)
         {
             if (user == null)
             {
@@ -110,8 +110,7 @@ namespace AALKisMVCUI.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        var loggedUser = JsonConvert.DeserializeObject<Users>(responseBody);
-                        Console.WriteLine("\n\nlogin " + loggedUser.Id + "\n\n");
+                        var loggedUser = JsonConvert.DeserializeObject<User>(responseBody);
 
                         _contextAccessor.HttpContext.Session.SetString("User", loggedUser.Name);
                         _contextAccessor.HttpContext.Session.SetInt32("Id", loggedUser.Id);
@@ -126,8 +125,6 @@ namespace AALKisMVCUI.Controllers
                     }
                     else
                     {
-                        Console.WriteLine("\n\n" + ex.Message + "\n\n" + ex.StatusCode + "\n\n");
-                        Console.WriteLine(user.Name + "  " + user.Password);
                         TempData["ErrorMessage"] = "An error occurred while processing your request";
                     }
                     return View();

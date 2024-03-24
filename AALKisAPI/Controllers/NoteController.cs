@@ -75,8 +75,6 @@ public class NoteController : ControllerBase
         int? id = null;
         try
         {
-            Console.WriteLine("\n\n contr"+ contents.UserId + "\n\n");
-
             id = _notesRepository.CreateNote(folderId, contents.Title, contents.Content, (int)contents.UserId);
         }
         catch(Exception exception)
@@ -155,11 +153,11 @@ public class NoteController : ControllerBase
     }
 
     [HttpGet("[action]/{query}")]
-    public async Task<IEnumerable<Note>> Search(string query)
+    public async Task<IEnumerable<Note>> Search(string query, [FromBody] int userId)
     {
         try
         {
-            return _notesRepository.SearchNotes(query);
+            return _notesRepository.SearchNotes(query, userId);
         }
         catch (Exception exception)
         {

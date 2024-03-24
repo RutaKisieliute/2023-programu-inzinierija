@@ -4,7 +4,7 @@ namespace AALKisAPI.Services;
 
 public interface ITagsRepository
 {
-    public IEnumerable<Tag> GetAllTags();
+    public IEnumerable<Tag> GetAllTags(int userId);
 
     public Tag GetTag(string name);
 
