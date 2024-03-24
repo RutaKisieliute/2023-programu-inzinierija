@@ -43,18 +43,20 @@ public class EFNotesRepository : INotesRepository
         return _database.Notes.Find(id) != null;
     }
 
-    public int? CreateNote(int folderId, string noteTitle, string content)
+    public int? CreateNote(int folderId, string noteTitle, string content, int userId)
     {
         if (_database.Folders.Find(folderId) == null)
         {
             throw new Exception($"Folder with id {folderId} does not exist");
         }
+        Console.WriteLine("\n\n"+userId+"\n\n");
         NoteEntity note = new NoteEntity(){
             Title = noteTitle,
             Flags = 8,
             Content = content,
             FolderId = folderId,
-            Modified = DateTime.UtcNow
+            Modified = DateTime.UtcNow,
+            UserId = userId
         };
         _database.Notes.Add(note);
         _database.SaveChanges();
@@ -104,7 +106,8 @@ public class EFNotesRepository : INotesRepository
             Flags = (AALKisShared.Enums.NoteFlags?) note.Flags,
             EditDate = note.Modified,
             OriginFolderId = note.FolderId,
-            Tags = note.Tags.Select(t => t.Tag1).ToList()
+            Tags = note.Tags.Select(t => t.Tag1).ToList(),
+            UserId = note.UserId
         };
     }
 

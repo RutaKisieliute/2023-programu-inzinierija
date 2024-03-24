@@ -50,6 +50,7 @@ public class Program
         services.AddScoped<INotesRepository, EFNotesRepository>();
         services.AddScoped<IKeywordsRepository, EFKeywordsRepository>();
         services.AddScoped<ITagsRepository, EFTagsRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddLogging(loggingBuilder => loggingBuilder.AddFile(LogFileName, append: false));
     }
 

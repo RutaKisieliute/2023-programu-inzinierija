@@ -37,6 +37,7 @@ public partial class NoteDB : DbContext
     public virtual DbSet<Keyword> Keywords { get; set; }
 
     public virtual DbSet<Tag> Tags { get; set; }
+    public virtual DbSet<Users> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseMySql(_dbConnection, _serverVersion).AddInterceptors(_saveChangesInterceptor);
@@ -88,6 +89,9 @@ public partial class NoteDB : DbContext
             entity.Property(e => e.Title)
                 .HasColumnType("text")
                 .HasColumnName("title");
+            entity.Property(e => e.UserId)
+                .HasColumnType("int(11)")
+                .HasColumnName("user_id");
 
             entity.HasOne(d => d.Folder).WithMany(p => p.Notes)
                 .HasForeignKey(d => d.FolderId)
@@ -135,7 +139,27 @@ public partial class NoteDB : DbContext
                 .HasConstraintName("keywords_ibfk_1");
         });
 
-        OnModelCreatingPartial(modelBuilder);
+        modelBuilder.Entity<Users>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("users");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.Name)
+                .HasColumnType("text")
+                .HasColumnName("name");
+            entity.Property(e => e.Password)
+                .HasColumnType("text")
+                .HasColumnName("password");
+            entity.Property(e => e.Email)
+                .HasColumnType("text")
+                .HasColumnName("email");
+        });
+
+            OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

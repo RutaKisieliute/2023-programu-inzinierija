@@ -12,7 +12,7 @@ public interface INotesRepository
 
     public bool CheckIfNoteExists(int id);
 
-    public int? CreateNote(int folderId, string noteTitle, string content);
+    public int? CreateNote(int folderId, string noteTitle, string content, int userId);
 
     public void DeleteNote(int id);
 

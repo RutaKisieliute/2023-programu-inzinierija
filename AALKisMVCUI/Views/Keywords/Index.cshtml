@@ -1,7 +1,13 @@
+@inject IHttpContextAccessor context
 @model IEnumerable<AALKisMVCUI.Models.KeywordViewModel>;
 
 @{
     ViewData["Title"] = "My Keywords";
+    if (context.HttpContext.Session.GetString("User") == null)
+    {
+        context.HttpContext.Response.Redirect("/User/login");
+    }
+
 }
 
 @section ExtraHead {

@@ -1,7 +1,13 @@
+@inject IHttpContextAccessor context
 @model Note
 
 @{
     ViewData["Title"] = "Editor";
+    if (context.HttpContext.Session.GetString("User") == null)
+    {
+        context.HttpContext.Response.Redirect("/User/login");
+    }
+
 }
 
 @section ExtraHead {

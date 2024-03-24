@@ -27,11 +27,11 @@ public class FolderController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Folder<Note>>?> Get([FromQuery] bool getContents = true)
+    public async Task<IEnumerable<Folder<Note>>?> GetAll([FromBody] int userId, [FromQuery] bool getContents = true)
     {
         try
         {
-            return _foldersRepository.GetAllFolders(previewOnly: !getContents);
+            return _foldersRepository.GetAllFolders(userId, previewOnly: !getContents);
         }
         catch(Exception exception)
         {
@@ -70,11 +70,11 @@ public class FolderController : ControllerBase
     }
 
     [HttpPost("{folderName}")]
-    public async Task<int> Create(string folderName)
+    public async Task<int> Create(string folderName, [FromBody] int userId)
     {
         try
         {
-            return _foldersRepository.CreateFolder(folderName);
+            return _foldersRepository.CreateFolder(folderName, userId);
         }
         catch(Exception exception)
         {

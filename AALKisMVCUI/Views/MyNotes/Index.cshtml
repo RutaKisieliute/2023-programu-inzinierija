@@ -1,4 +1,12 @@
+@inject IHttpContextAccessor context
 @model List<Folder<Note>>
+
+@{
+    if (context.HttpContext.Session.GetString("User") == null)
+    {
+        context.HttpContext.Response.Redirect("/User/login");
+    }
+}
 
 @section ExtraHead{
     <link id="note-stylesheet" rel="stylesheet" href="~/css/MyNotes/Index.css">
@@ -118,8 +126,65 @@
 
 }
 
+
+<!-- Success Message Modal -->
+<div class="modal fade" id="myModalSuccess" tabindex="-1" role="dialog" aria-labelledby="myModalSuccessLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #66BB6A; color: black;">
+                <h5 class="modal-title" id="myModalSuccessLabel">Success!</h5>
+            </div>
+            <div class="modal-body">
+                <div id="MyModalSuccessAlertBody"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Message Modal -->
+<div class="modal fade" id="myModalError" tabindex="-1" role="dialog" aria-labelledby="myModalErrorLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #ff6b6b; color: black;">
+                <h5 class="modal-title" id="myModalErrorLabel">Oops...</h5>
+            </div>
+            <div class="modal-body">
+                <div id="MyModalErrorAlertBody"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 @section Scripts{
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js"></script>
     <script src="~/js/MyNotes/Index.js"></script>
-}
 
+
+    <script type="text/javascript">
+        function openSuccessModal(strMessage) {
+            var myDiv = document.getElementById("MyModalSuccessAlertBody");
+            myDiv.innerHTML = strMessage;
+            $('#myModalSuccess').modal('show');
+        }
+        $(document).ready(function () {
+            var msg = "@TempData["SuccessMessage"]";
+            if (msg)
+                openSuccessModal(msg);
+        });
+    </script>
+
+    <script type="text/javascript">
+        function openErrorModal(errorMessage) {
+            var errorDiv = document.getElementById("MyModalErrorAlertBody");
+            errorDiv.innerHTML = errorMessage;
+            $('#myModalError').modal('show');
+        }
+
+        $(document).ready(function () {
+            var errorMsg = "@TempData["ErrorMessage"]";
+            if (errorMsg)
+                openErrorModal(errorMsg);
+        });
+    </script>
+}

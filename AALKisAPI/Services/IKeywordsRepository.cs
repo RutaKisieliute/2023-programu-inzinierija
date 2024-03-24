@@ -4,7 +4,7 @@ namespace AALKisAPI.Services;
 
 public interface IKeywordsRepository
 {
-    public IEnumerable<Keyword> GetAllKeywords();
+    public IEnumerable<Keyword> GetAllKeywords(int userId);
     
     public IEnumerable<Keyword> GetAllKeywordsByFolder(int folderId);
 

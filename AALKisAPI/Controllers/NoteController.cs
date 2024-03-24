@@ -75,7 +75,9 @@ public class NoteController : ControllerBase
         int? id = null;
         try
         {
-            id = _notesRepository.CreateNote(folderId, contents.Title, contents.Content);
+            Console.WriteLine("\n\n contr"+ contents.UserId + "\n\n");
+
+            id = _notesRepository.CreateNote(folderId, contents.Title, contents.Content, (int)contents.UserId);
         }
         catch(Exception exception)
         {

@@ -19,7 +19,7 @@ public class EFFoldersRepository : IFoldersRepository
         _database = database;
     }
     
-    public List<Folder> GetAllFolders(bool previewOnly)
+    public List<Folder> GetAllFolders(int userId, bool previewOnly)
     {
         
         IEnumerable<FolderEntity> list1; 
@@ -29,7 +29,12 @@ public class EFFoldersRepository : IFoldersRepository
         }
         else
         {
-            list1 = _database.Folders.Include(o => o.Notes).AsEnumerable();
+            list1 = _database.Folders.Where(x => x.UserId == userId)
+                .Include(o => o.Notes).AsEnumerable();
+            foreach (var item in list1)
+            {
+                Console.WriteLine("\nid: "+item.Id+" userid: "+ item.UserId+ " name: " + item.Title+"\n");
+            }
         }
         List<Folder> list2 = new List<Folder>();
         foreach(FolderEntity folder in list1) list2.Add(ToSharedFolder(folder));
@@ -50,11 +55,11 @@ public class EFFoldersRepository : IFoldersRepository
         return _database.Folders.Find(id) != null;
     }
 
-    public int CreateFolder(string folderName)
+    public int CreateFolder(string folderName, int userId)
     {
         FolderEntity folder = new FolderEntity(){
             Title = folderName,
-            UserId = 1
+            UserId = userId
         };
         _database.Folders.Add(folder);
         _database.SaveChanges();
