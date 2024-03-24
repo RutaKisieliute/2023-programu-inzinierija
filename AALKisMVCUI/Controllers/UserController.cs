@@ -111,7 +111,6 @@ namespace AALKisMVCUI.Controllers
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
                         var loggedUser = JsonConvert.DeserializeObject<User>(responseBody);
-                        Console.WriteLine("\n\nlogin " + loggedUser.Id + "\n\n");
 
                         _contextAccessor.HttpContext.Session.SetString("User", loggedUser.Name);
                         _contextAccessor.HttpContext.Session.SetInt32("Id", loggedUser.Id);
@@ -126,8 +125,6 @@ namespace AALKisMVCUI.Controllers
                     }
                     else
                     {
-                        Console.WriteLine("\n\n" + ex.Message + "\n\n" + ex.StatusCode + "\n\n");
-                        Console.WriteLine(user.Name + "  " + user.Password);
                         TempData["ErrorMessage"] = "An error occurred while processing your request";
                     }
                     return View();

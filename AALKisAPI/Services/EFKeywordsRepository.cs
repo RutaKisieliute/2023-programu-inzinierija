@@ -16,18 +16,12 @@ public class EFKeywordsRepository : IKeywordsRepository
 
     public IEnumerable<Keyword> GetAllKeywords(int userId)
     {
-
-        Console.WriteLine("\n\naaaaaaaaa" + userId + "\n\n");
         var notes = _database.Notes.Where(u => u.UserId == userId).ToList();
-
-        // Log the number of notes fetched
-        Console.WriteLine($"\n\n\nNumber of notes fetched: {notes.Count}\n\n\n");
 
         var list1 = _database.Keywords.Where(u => u.Note.UserId == userId).AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();
         foreach(KeywordEntity entity in list1)
         {
-        Console.WriteLine($"Processing keyword entity: {entity.Name}");
             entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
                     ?? throw new Exception($"Keyword {entity.Name} references missing note (all) with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
@@ -139,7 +133,6 @@ public class EFKeywordsRepository : IKeywordsRepository
 
     public void UpdateKeywordsForNote(IEnumerable<string> newKeywords, int noteId)
     {
-        Console.WriteLine("UpdateKeywordsForNote");
         IEnumerable<string> oldKeywords = GetAllKeywordsByNote(noteId).Select(x => x.Name);
         var commonKeywords = oldKeywords.Intersect(newKeywords);
 

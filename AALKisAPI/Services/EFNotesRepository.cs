@@ -49,10 +49,9 @@ public class EFNotesRepository : INotesRepository
         {
             throw new Exception($"Folder with id {folderId} does not exist");
         }
-        Console.WriteLine("\n\n"+userId+"\n\n");
         NoteEntity note = new NoteEntity(){
             Title = noteTitle,
-            Flags = 8,
+            Flags = 0,
             Content = content,
             FolderId = folderId,
             Modified = DateTime.UtcNow,
@@ -118,15 +117,15 @@ public class EFNotesRepository : INotesRepository
         NoteCreated?.Invoke(this, arg);
     }
 
-    public IEnumerable<Note> SearchNotes(string query)
+    public IEnumerable<Note> SearchNotes(string query, int userId)
     {
         var list1 = _database.Notes
-        .Where(note => note.Title.Contains(query))
+        .Where(note => note.Title.Contains(query) && note.UserId == userId)
         .Select(note => ToSharedNote(note))
         .ToList();
 
         var list2 = _database.Notes
-        .Where(note => note.Content.Contains(query))
+        .Where(note => note.Content.Contains(query) && note.UserId == userId)
         .Select(note => ToSharedNote(note))
         .ToList();
 

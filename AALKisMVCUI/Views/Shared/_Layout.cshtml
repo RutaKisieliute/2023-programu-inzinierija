@@ -1,3 +1,4 @@
+@inject IHttpContextAccessor context
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,28 +11,28 @@
     <link rel="stylesheet" href="~/AALKisMVCUI.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home">Edu Notes</a>
-                <a class="nav-link text-white" asp-area="" asp-controller="Keywords" asp-action="Index">Keywords</a>
-                <a class="nav-link text-white" asp-area="" asp-controller="Tags" asp-action="Index">Tags</a>
-
-
-                <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="LogOut">Log out</a>
-
-
-
-                <div class="search-bar">
-                    <img src="~/svg/icon_search.svg" class="search-bar-icon" />
-                    <form asp-controller="Search" asp-action="Index" method="get">
-                        <input class="input-no-borders" type="text" placeholder="Search notes" name="q">
-                    </form>
-                </div>
-                <a class="navbar-brand" style="visibility: hidden;">Edu Notes</a>
-            </div>
-        </nav>
-    </header>
+    @{
+        if (context.HttpContext.Session.GetString("User") != null)
+        {
+            <header>
+                <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                    <div class="container-fluid">
+                        <a class="navbar-brand" asp-area="" asp-controller="Home">Edu Notes</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Keywords" asp-action="Index">Keywords</a>
+                        <a class="nav-link text-white" asp-area="" asp-controller="Tags" asp-action="Index">Tags</a>
+                        <div class="search-bar">
+                            <img src="~/svg/icon_search.svg" class="search-bar-icon" />
+                            <form asp-controller="Search" asp-action="Index" method="get">
+                                <input class="input-no-borders" type="text" placeholder="Search notes" name="q">
+                            </form>
+                        </div>
+                        <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="LogOut">Log out</a>
+                        <a class="navbar-brand" style="visibility: hidden;">Edu Notes</a>
+                    </div>
+                </nav>
+            </header>
+        }
+    }
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
