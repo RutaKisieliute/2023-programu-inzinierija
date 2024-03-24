@@ -37,7 +37,7 @@ public partial class NoteDB : DbContext
     public virtual DbSet<Keyword> Keywords { get; set; }
 
     public virtual DbSet<Tag> Tags { get; set; }
-    public virtual DbSet<Users> Users { get; set; }
+    public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         => optionsBuilder.UseMySql(_dbConnection, _serverVersion).AddInterceptors(_saveChangesInterceptor);
@@ -139,7 +139,7 @@ public partial class NoteDB : DbContext
                 .HasConstraintName("keywords_ibfk_1");
         });
 
-        modelBuilder.Entity<Users>(entity =>
+        modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 

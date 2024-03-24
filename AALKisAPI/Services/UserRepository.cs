@@ -6,7 +6,7 @@ using AALKisShared.Records;
 
 using Microsoft.EntityFrameworkCore;
 
-using UsersEntity = AALKisAPI.Models.Users;
+using UsersEntity = AALKisAPI.Models.User;
 
 namespace AALKisAPI.Services
 {
@@ -67,7 +67,7 @@ namespace AALKisAPI.Services
             return _database.Users.Any(u => u.Name == name);
         }
 
-        public AALKisAPI.Models.Users GetUser (string name) 
+        public AALKisAPI.Models.User GetUser (string name) 
         {
             return _database.Users.FirstOrDefault(u => u.Name == name);
         }

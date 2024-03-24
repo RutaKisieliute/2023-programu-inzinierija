@@ -24,11 +24,11 @@ public class TagController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Tag>?> Get()
+    public async Task<IEnumerable<Tag>?> Get([FromBody] int userId)
     {
         try
         {
-            return _tagsRepository.GetAllTags();
+            return _tagsRepository.GetAllTags(userId);
         }
         catch(Exception exception)
         {

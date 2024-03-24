@@ -21,7 +21,7 @@ namespace AALKisAPI.Controllers
 
         [HttpPost]
         [Route("signin")]
-        public async Task<IActionResult> SignIn([FromBody] Users user)
+        public async Task<IActionResult> SignIn([FromBody] User user)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace AALKisAPI.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult LogIn([FromBody] Users user) 
+        public IActionResult LogIn([FromBody] User user) 
         { 
             if (_userRepository.IsValidName(user.Name) && _userRepository.IsValidName(user.Password) &&_userRepository.IsSignedIn(user.Name, user.Password)) 
             {

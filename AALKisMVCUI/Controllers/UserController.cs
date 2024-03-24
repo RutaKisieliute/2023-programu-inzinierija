@@ -35,7 +35,7 @@ namespace AALKisMVCUI.Controllers
         }
 
         [HttpPost("signin")]
-        public async Task<IActionResult> SignInAsync(Users user)
+        public async Task<IActionResult> SignInAsync(User user)
         {
             if (user == null)
             {
@@ -92,7 +92,7 @@ namespace AALKisMVCUI.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> LogInAsync(Users user)
+        public async Task<IActionResult> LogInAsync(User user)
         {
             if (user == null)
             {
@@ -110,7 +110,7 @@ namespace AALKisMVCUI.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         var responseBody = await response.Content.ReadAsStringAsync();
-                        var loggedUser = JsonConvert.DeserializeObject<Users>(responseBody);
+                        var loggedUser = JsonConvert.DeserializeObject<User>(responseBody);
                         Console.WriteLine("\n\nlogin " + loggedUser.Id + "\n\n");
 
                         _contextAccessor.HttpContext.Session.SetString("User", loggedUser.Name);

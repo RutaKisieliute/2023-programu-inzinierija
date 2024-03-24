@@ -16,14 +16,20 @@ public class EFKeywordsRepository : IKeywordsRepository
 
     public IEnumerable<Keyword> GetAllKeywords(int userId)
     {
+
+        Console.WriteLine("\n\naaaaaaaaa" + userId + "\n\n");
         var notes = _database.Notes.Where(u => u.UserId == userId).ToList();
 
-        var list1 = _database.Keywords.AsEnumerable();
+        // Log the number of notes fetched
+        Console.WriteLine($"\n\n\nNumber of notes fetched: {notes.Count}\n\n\n");
+
+        var list1 = _database.Keywords.Where(u => u.Note.UserId == userId).AsEnumerable();
         List<Keyword> list2 = new List<Keyword>();
         foreach(KeywordEntity entity in list1)
         {
+        Console.WriteLine($"Processing keyword entity: {entity.Name}");
             entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
-                    ?? throw new Exception($"Keyword {entity.Name} references missing note with id {entity.NoteId}");
+                    ?? throw new Exception($"Keyword {entity.Name} references missing note (all) with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
         }
         return list2;
@@ -40,7 +46,7 @@ public class EFKeywordsRepository : IKeywordsRepository
         foreach(KeywordEntity entity in list1)
         {
             entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
-                    ?? throw new Exception($"Keyword {entity.Name} references missing note with id {entity.NoteId}");
+                    ?? throw new Exception($"Keyword {entity.Name} references missing note (note) with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
         }
         return list2;
@@ -58,7 +64,7 @@ public class EFKeywordsRepository : IKeywordsRepository
         foreach(KeywordEntity entity in list1)
         {
             entity.Note = notes.FirstOrDefault(note => note.Id == entity.NoteId)
-                    ?? throw new Exception($"Keyword {entity.Name} references missing note with id {entity.NoteId}");
+                    ?? throw new Exception($"Keyword {entity.Name} references missing note (folder) with id {entity.NoteId}");
             list2.Add(ToSharedKeyword(entity));
         }
         return list2;
